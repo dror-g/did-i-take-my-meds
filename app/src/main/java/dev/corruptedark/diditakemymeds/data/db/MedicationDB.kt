@@ -174,10 +174,11 @@ abstract  class MedicationDB: RoomDatabase() {
         }
 
         fun databaseFileIsValid(context: Context, databaseUri: Uri?): Boolean {
+            if (databaseUri == null) return false
             return try {
-                val restoreFileStream = context.contentResolver.openInputStream(databaseUri!!)!!
-                restoreFileStream.copyTo(context.getDatabasePath(TEST_DATABASE_NAME).outputStream())
-                restoreFileStream.close()
+                context.contentResolver.openInputStream(databaseUri)!!.use { restoreFileStream  ->
+                    restoreFileStream.copyTo(context.getDatabasePath(TEST_DATABASE_NAME).outputStream())
+                }
                 val testDatabase = Room.databaseBuilder(context, MedicationDB::class.java, TEST_DATABASE_NAME)
                     .addMigrations(*MIGRATIONS).build()
                 val hasEntries = testDatabase.medicationDao().getAllRaw().isNotEmpty()

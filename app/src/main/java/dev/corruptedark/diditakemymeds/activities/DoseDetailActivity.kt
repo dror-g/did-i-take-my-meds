@@ -25,7 +25,6 @@ import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.View
 import android.widget.TextView
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -33,7 +32,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.activities.base.BaseBoundActivity
+import com.siravorona.utils.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.proofImageDao
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord

@@ -22,27 +22,20 @@ package dev.corruptedark.diditakemymeds.activities
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.res.ResourcesCompat
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
+import com.siravorona.utils.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.listadapters.MedListAdapter
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.BuildConfig
-import dev.corruptedark.diditakemymeds.activities.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.util.ZipFileManager
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 import dev.corruptedark.diditakemymeds.data.models.Medication
@@ -51,12 +44,14 @@ import dev.corruptedark.diditakemymeds.data.db.medicationTypeDao
 import dev.corruptedark.diditakemymeds.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import java.io.File
+import java.util.Comparator
 //import kotlinx.coroutines.*
 import java.util.concurrent.Executors
 
 
-class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding::class) {
-    private var medicationListAdapter: MedListAdapter? = null
+class MainActivity : BaseBoundActivity<ActivityMainBinding>(
+    ActivityMainBinding::class
+) {
     private lateinit var sortType: String
     private val TIME_SORT = "time"
     private val NAME_SORT = "name"
@@ -66,14 +61,18 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
     private val MINIMUM_DELAY = 1000L // 1 second in milliseconds
     private val MIME_TYPES = "application/*"
     @Volatile private var medications: MutableList<Medication>? = null
+    private var medicationListAdapter: MedListAdapter? = null
+
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val context = this
     private val mainScope = MainScope()
     private var refreshJob: Job? = null
-    private var imageDir: File? = null
-    private var tempDir: File? = null
     @Volatile private var restoreJob: Job? = null
     @Volatile private var backupJob: Job? = null
+
+    private val tempDir by lazy { File(filesDir.path + File.separator + getString(R.string.temp_dir)) }
+    private val imageDir by lazy { File(filesDir.path + File.separator + getString(R.string.image_path)) }
+
 
     private val activityResultStarter =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -82,219 +81,28 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
 
     private val restoreResultStarter =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val restoreUri: Uri? = result.data?.data
-
-            val tempFolder = tempDir
-            val imageFolder = imageDir
-
-            if (result.resultCode == Activity.RESULT_OK) {
-                restoreJob = lifecycleScope.launch(lifecycleDispatcher) {
-                    if (MedicationDB.databaseFileIsValid(applicationContext, restoreUri)) {
-                        stopRefresherLoop(refreshJob)
-                        MedicationDB.getInstance(applicationContext).close()
-                        MedicationDB.wipeInstance()
-
-                        withContext(Dispatchers.IO) {
-                            runCatching {
-                                contentResolver.openInputStream(restoreUri!!)!!.use { inputStream ->
-                                    applicationContext.getDatabasePath(MedicationDB.DATABASE_NAME).outputStream().use { outputStream ->
-                                        inputStream.copyTo(outputStream)
-                                    }
-                                }
-                            }.onSuccess {
-                                if (refreshJob == null || !refreshJob!!.isActive) {
-                                    refreshJob = startRefresherLoop()
-                                }
-                                mainScope.launch {
-                                    Toast.makeText(
-                                        applicationContext,
-                                        getString(R.string.database_restored),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }.onFailure { exception ->
-                                exception.printStackTrace()
-                                if (refreshJob == null || !refreshJob!!.isActive) {
-                                    refreshJob = startRefresherLoop()
-                                }
-                                mainScope.launch {
-                                    Toast.makeText(
-                                        applicationContext,
-                                        getString(R.string.database_is_invalid),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        }
-
-                        mainScope.launch {
-                            medicationDao(applicationContext).getAll()
-                                .observe(context, { medicationList ->
-                                    lifecycleScope.launch(lifecycleDispatcher) {
-                                        refreshFromDatabase(medicationList)
-                                    }
-                                })
-                        }
-                    }
-                    else {
-                        if (restoreUri != null && tempFolder != null && imageFolder != null) {
-
-                            withContext(Dispatchers.IO) {
-                                tempFolder.deleteRecursively()
-                                runCatching {
-                                    contentResolver.openInputStream(restoreUri)
-                                        ?.use { inputStream ->
-                                            ZipFileManager.streamZipToFolder(
-                                                inputStream,
-                                                tempFolder
-                                            )
-                                        }
-
-                                    val tempFiles = tempFolder.listFiles()
-
-                                    val databaseFile = tempFiles?.find { file -> file.name == MedicationDB.DATABASE_NAME }
-
-                                    databaseFile?.inputStream()?.use { databaseStream ->
-                                        if (MedicationDB.databaseFileIsValid(context, databaseFile.toUri())) {
-                                            stopRefresherLoop(refreshJob)
-                                            MedicationDB.getInstance(applicationContext).close()
-                                            MedicationDB.wipeInstance()
-                                            context.getDatabasePath(MedicationDB.DATABASE_NAME).outputStream().use { outStream ->
-                                                databaseStream.copyTo(outStream)
-                                            }
-                                        }
-                                    }
-
-                                    imageFolder.listFiles()?.forEach { file ->
-                                        if (file.exists()) {
-                                            file.deleteRecursively()
-                                        }
-                                    }
-
-                                    val tempImageFolder = tempFiles?.find { file -> file.isDirectory && file.name == imageFolder.name }
-
-                                    tempImageFolder?.copyRecursively(imageFolder)
-
-                                    if (tempFolder.exists()) {
-                                        tempFolder.deleteRecursively()
-                                    }
-                                }.onFailure { exception ->
-                                    exception.printStackTrace()
-                                    if (refreshJob == null || !refreshJob!!.isActive) {
-                                        refreshJob = startRefresherLoop()
-                                    }
-                                    mainScope.launch {
-                                        Toast.makeText(
-                                            applicationContext,
-                                            getString(R.string.database_is_invalid),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                }.onSuccess {
-                                    if (refreshJob == null || !refreshJob!!.isActive) {
-                                        refreshJob = startRefresherLoop()
-                                    }
-                                    mainScope.launch {
-                                        medicationDao(applicationContext).getAll()
-                                            .observe(context, { medicationList ->
-                                                lifecycleScope.launch(lifecycleDispatcher) {
-                                                    refreshFromDatabase(medicationList)
-                                                }
-                                            })
-
-                                        Toast.makeText(
-                                            applicationContext,
-                                            getString(R.string.database_restored),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            if (result.resultCode != RESULT_OK) return@registerForActivityResult
+            val restoreUri = result.data?.data ?: return@registerForActivityResult
+            restoreJob = lifecycleScope.launch(lifecycleDispatcher) {
+                doRestore(this@MainActivity, restoreUri, tempDir, imageDir)
             }
         }
 
     private val backUpResultStarter =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val backupUri: Uri? = result.data?.data
-
-            val tempFolder = tempDir
-            val imageFolder = imageDir
-
-            if (result.resultCode == Activity.RESULT_OK && backupUri != null && backupUri.path != null && tempFolder != null && imageFolder != null) {
+            if (result.resultCode != RESULT_OK) return@registerForActivityResult
+            val backupUri =  result.data?.data ?: return@registerForActivityResult
+            if (backupUri.path != null) {
                 backupJob = lifecycleScope.launch(lifecycleDispatcher) {
-
-                    stopRefresherLoop(refreshJob)
-                    runCatching {
-                        MedicationDB.getInstance(context).close()
-                        MedicationDB.wipeInstance()
-
-                        if (!tempFolder.exists()) {
-                            tempFolder.mkdir()
-                        }
-
-                        tempFolder.listFiles()?.iterator()?.forEach { entry ->
-                            entry.deleteRecursively()
-                        }
-
-                        val databaseFile = getDatabasePath(MedicationDB.DATABASE_NAME)
-                        databaseFile.copyTo(File(tempFolder.path + File.separator + databaseFile.name))
-
-                        imageFolder.copyRecursively(File(tempFolder.path + File.separator + imageFolder.name), true)
-
-                        contentResolver.openOutputStream(backupUri)?.use { outputStream ->
-                            ZipFileManager.streamFolderToZip(tempFolder, outputStream)
-                        }
-
-                        tempFolder.deleteRecursively()
-                    }.onFailure { exception ->
-                        exception.printStackTrace()
-                        if (refreshJob == null || !refreshJob!!.isActive) {
-                            refreshJob = startRefresherLoop()
-                        }
-                        mainScope.launch {
-                            Toast.makeText(context, getString(R.string.back_up_failed), Toast.LENGTH_SHORT).show()
-                        }
-                    }.onSuccess {
-                        if (refreshJob == null || !refreshJob!!.isActive) {
-                            refreshJob = startRefresherLoop()
-                        }
-                        mainScope.launch {
-                            Toast.makeText(context, getString(R.string.back_up_successful), Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    doBackup(context, backupUri, tempDir, imageDir)
                 }
             }
         }
 
 
 
-    private fun createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.channel_name)
-            val descriptionText = getString(R.string.channel_description)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(name, name, importance).apply {
-                description = descriptionText
-            }
-            // Register the channel with the system
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-
-        }
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        createNotificationChannel()
-        tempDir = File(filesDir.path + File.separator + getString(R.string.temp_dir))
-        imageDir = File(filesDir.path + File.separator + getString(R.string.image_path))
         setSupportActionBar(binding.appbar.toolbar)
         binding.appbar.toolbar.logo = AppCompatResources.getDrawable(this, R.drawable.bar_logo)
         supportActionBar?.title = getString(R.string.app_name)
@@ -304,11 +112,7 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
         }
 
         // imageDir needs to exist for backup to work
-        imageDir?.let {
-            if (!it.exists()) {
-                it.mkdir()
-            }
-        }
+        if (!imageDir.exists()) imageDir.mkdirs()
 
         val footerPadding = Space(this)
         footerPadding.minimumHeight = TypedValue.applyDimension(
@@ -318,10 +122,8 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
         ).toInt()
         binding.medListView.addFooterView(footerPadding)
         binding.medListView.setFooterDividersEnabled(false)
-        medicationDao(applicationContext).getAll().observe(context) { medicationList ->
-            lifecycleScope.launch(lifecycleDispatcher) {
-                refreshFromDatabase(medicationList)
-            }
+        mainScope.launch {
+            launchMedicationsObserve()
         }
     }
 
@@ -330,7 +132,6 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
 
         lifecycleScope.launch(lifecycleDispatcher) {
 
-            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val sharedPref = getPreferences(Context.MODE_PRIVATE)
             sortType = sharedPref.getString(getString(R.string.sort_key), TIME_SORT)!!
             mainScope.launch {
@@ -340,30 +141,8 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
                     }
             }
 
-            if (BuildConfig.VERSION_CODE > sharedPref.getInt(
-                    getString(R.string.last_version_used_key),
-                    0
-                )
-            ) {
-                var alarmIntent: PendingIntent
-                medicationDao(context).getAllRaw()
-                    .forEach { medication ->
-                        if (medication.notify) {
-                            lifecycleScope.launch(lifecycleDispatcher) {
-                                //Create alarm
-                                alarmIntent =
-                                    AlarmIntentManager.buildNotificationAlarm(context, medication)
-
-                                alarmManager.cancel(alarmIntent)
-
-                                AlarmIntentManager.setExact(
-                                    alarmManager,
-                                    alarmIntent,
-                                    medication.calculateNextDose().timeInMillis
-                                )
-                            }
-                        }
-                    }
+            if (BuildConfig.VERSION_CODE > sharedPref.getInt(getString(R.string.last_version_used_key), 0)) {
+                ensureAlarmsScheduled()
             }
             with(sharedPref.edit()) {
                 putInt(getString(R.string.last_version_used_key), BuildConfig.VERSION_CODE)
@@ -378,6 +157,32 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
         }
     }
 
+    private fun ensureAlarmsScheduled() {
+        medicationDao(context).getAllRaw()
+            .forEach { medication ->
+                if (medication.notify) {
+                    lifecycleScope.launch(lifecycleDispatcher) {
+                        //Create alarm
+                        scheduleMedicationAlarm(medication)
+                    }
+                }
+            }
+    }
+
+    private fun scheduleMedicationAlarm(
+        medication: Medication,
+    ) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmIntent = AlarmIntentManager.buildNotificationAlarm(this@MainActivity, medication)
+        alarmManager.cancel(alarmIntent)
+
+        AlarmIntentManager.setExact(
+            alarmManager,
+            alarmIntent,
+            medication.calculateNextDose().timeInMillis
+        )
+    }
+
     private fun openMedDetailActivity(medId: Long, takeMed: Boolean) {
         val intent = Intent(this, MedDetailActivity::class.java)
         intent.putExtra(getString(R.string.med_id_key), medId)
@@ -387,9 +192,8 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
 
     override fun onResume() {
         medicationListAdapter?.notifyDataSetChanged()
-        if (!medications.isNullOrEmpty()) {
-            binding.listEmptyLabel.visibility = View.GONE
-        }
+        binding.listEmptyLabel.visibility = if(medications.isNullOrEmpty()) View.VISIBLE else View.GONE
+
         lifecycleScope.launch(lifecycleDispatcher) {
             refreshJob = startRefresherLoop()
         }
@@ -409,41 +213,7 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
                 true
             }
             R.id.sortType -> {
-                val sharedPref = getPreferences(Context.MODE_PRIVATE)
-                when (sortType) {
-                    TIME_SORT -> {
-                        sortType = NAME_SORT
-                        item.icon = AppCompatResources.getDrawable(this,
-                            R.drawable.ic_sort_by_alpha
-                        )
-                        with(sharedPref.edit()) {
-                            putString(getString(R.string.sort_key), NAME_SORT)
-                            apply()
-                        }
-                        medications!!.sortWith(Medication::compareByName)
-                        medicationListAdapter!!.notifyDataSetChanged()
-                    }
-                    NAME_SORT -> {
-                        sortType = TYPE_SORT
-                        item.icon = AppCompatResources.getDrawable(this, R.drawable.ic_sort_by_type)
-                        with(sharedPref.edit()) {
-                            putString(getString(R.string.sort_key), TYPE_SORT)
-                            apply()
-                        }
-                        medications!!.sortWith(Medication::compareByType)
-                        medicationListAdapter!!.notifyDataSetChanged()
-                    }
-                    else -> {
-                        sortType = TIME_SORT
-                        item.icon = AppCompatResources.getDrawable(this, R.drawable.ic_sort_by_time)
-                        with(sharedPref.edit()) {
-                            putString(getString(R.string.sort_key), TIME_SORT)
-                            apply()
-                        }
-                        medications!!.sortWith(Medication::compareByTime)
-                        medicationListAdapter!!.notifyDataSetChanged()
-                    }
-                }
+                onSortMenuItemTapped(item)
                 true
             }
             R.id.restore_database -> {
@@ -458,20 +228,39 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
         }
     }
 
-    @Synchronized
-    private fun refreshFromDatabase(localMedications: MutableList<Medication>) {
-        medications = localMedications
+    private fun onSortMenuItemTapped(item: MenuItem) {
         when (sortType) {
-            NAME_SORT -> {
-                medications!!.sortWith(Medication::compareByName)
+            TIME_SORT -> {
+                item.icon = AppCompatResources.getDrawable(this, R.drawable.ic_sort_by_alpha)
+                sortAndNotify(sortType, NAME_SORT)
             }
-            TYPE_SORT -> {
-                medications!!.sortWith(Medication::compareByType)
+            NAME_SORT -> {
+                item.icon = AppCompatResources.getDrawable(this, R.drawable.ic_sort_by_type)
+                sortAndNotify(sortType, TYPE_SORT)
             }
             else -> {
-                medications!!.sortWith(Medication::compareByTime)
+                item.icon = AppCompatResources.getDrawable(this, R.drawable.ic_sort_by_time)
+                sortAndNotify(sortType, TIME_SORT)
             }
         }
+    }
+
+    private fun sortAndNotify(sortType: String, nextSortType: String) {
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+        val comparator = getMedicationSortComparator(sortType)
+        this.sortType = nextSortType
+        with(sharedPref.edit()) {
+            putString(getString(R.string.sort_key), sortType)
+            apply()
+        }
+        medications?.sortWith(comparator)
+        medicationListAdapter?.notifyDataSetChanged()
+    }
+
+    @Synchronized
+    private fun refreshFromDatabase(localMedications: MutableList<Medication>) {
+        val comparator = getMedicationSortComparator(sortType)
+        medications = localMedications.sortedWith(comparator).toMutableList()
         medicationListAdapter = MedListAdapter(context, medications!!, medicationTypeDao(context).getAllRaw())
         mainScope.launch {
             binding.medListView.adapter = medicationListAdapter
@@ -479,6 +268,20 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
                 binding.listEmptyLabel.visibility = View.GONE
             else
                 binding.listEmptyLabel.visibility = View.VISIBLE
+        }
+    }
+
+    private fun getMedicationSortComparator(sortType: String): Comparator<Medication> {
+        return when (this.sortType) {
+            NAME_SORT -> {
+                Comparator(Medication::compareByName)
+            }
+            TYPE_SORT -> {
+                Comparator(Medication::compareByType)
+            }
+            else -> {
+                Comparator(Medication::compareByTime)
+            }
         }
     }
 
@@ -565,6 +368,161 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding:
             refresher?.cancelAndJoin()
         }.onFailure { throwable ->
             throwable.printStackTrace()
+        }
+    }
+
+
+    private suspend fun doRestore(context: Context, restoreUri: Uri, tempFolder: File, imageFolder: File) {
+        if (MedicationDB.databaseFileIsValid(applicationContext, restoreUri)) {
+            doRestoreDb(restoreUri)
+        } else {
+            doCleanupDb(restoreUri, tempFolder, imageFolder, context)
+        }
+    }
+
+    private suspend fun doBackup(context: Context, backupUri: Uri, tempFolder: File, imageFolder: File) {
+        stopRefresherLoop(refreshJob)
+        runCatching {
+            MedicationDB.getInstance(context).close()
+            MedicationDB.wipeInstance()
+
+            if (!tempFolder.exists()) tempFolder.mkdirs()
+
+            tempFolder.listFiles()?.iterator()?.forEach { entry ->
+                entry.deleteRecursively()
+            }
+
+            val databaseFile = getDatabasePath(MedicationDB.DATABASE_NAME)
+            databaseFile.copyTo(File(tempFolder.path + File.separator + databaseFile.name))
+
+            imageFolder.copyRecursively(File(tempFolder.path + File.separator + imageFolder.name), true)
+
+            contentResolver.openOutputStream(backupUri)?.use { outputStream ->
+                ZipFileManager.streamFolderToZip(tempFolder, outputStream)
+            }
+
+            tempFolder.deleteRecursively()
+        }.onFailure { exception ->
+            exception.printStackTrace()
+            ensureRefresherLoop()
+            mainScope.launch {
+                Toast.makeText(context, getString(R.string.back_up_failed), Toast.LENGTH_SHORT).show()
+            }
+        }.onSuccess {
+            ensureRefresherLoop()
+            mainScope.launch {
+                Toast.makeText(context, getString(R.string.back_up_successful), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private suspend fun doRestoreDb(restoreUri: Uri) {
+        stopRefresherLoop(refreshJob)
+        MedicationDB.getInstance(applicationContext).close()
+        MedicationDB.wipeInstance()
+
+        withContext(Dispatchers.IO) {
+            runCatching {
+                contentResolver.openInputStream(restoreUri)?.use { inputStream ->
+                    applicationContext.getDatabasePath(MedicationDB.DATABASE_NAME).outputStream().use { outputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                }
+            }.onSuccess {
+                ensureRefresherLoop()
+                mainScope.launch {
+                    Toast.makeText(applicationContext, getString(R.string.database_restored), Toast.LENGTH_SHORT).show()
+                }
+            }.onFailure { exception ->
+                exception.printStackTrace()
+                ensureRefresherLoop()
+                mainScope.launch {
+                    Toast.makeText(applicationContext, getString(R.string.database_is_invalid), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        mainScope.launch {
+           launchMedicationsObserve()
+        }
+    }
+
+    private suspend fun doCleanupDb(
+        restoreUri: Uri,
+        tempFolder: File,
+        imageFolder: File,
+        context: Context
+    ) {
+        withContext(Dispatchers.IO) {
+            tempFolder.deleteRecursively()
+            runCatching {
+                contentResolver.openInputStream(restoreUri)?.use { inputStream ->
+                    ZipFileManager.streamZipToFolder(
+                        inputStream,
+                        tempFolder
+                    )
+                }
+
+                val tempFiles = tempFolder.listFiles()
+
+                val databaseFile =
+                    tempFiles?.find { file -> file.name == MedicationDB.DATABASE_NAME }
+
+                databaseFile?.inputStream()?.use { databaseStream ->
+                    if (MedicationDB.databaseFileIsValid(context, databaseFile.toUri())) {
+                        stopRefresherLoop(refreshJob)
+                        MedicationDB.getInstance(applicationContext).close()
+                        MedicationDB.wipeInstance()
+                        context.getDatabasePath(MedicationDB.DATABASE_NAME).outputStream()
+                            .use { outStream ->
+                                databaseStream.copyTo(outStream)
+                            }
+                    }
+                }
+
+                imageFolder.listFiles()?.forEach { file ->
+                    if (file.exists()) file.deleteRecursively()
+                }
+
+                val tempImageFolder =
+                    tempFiles?.find { file -> file.isDirectory && file.name == imageFolder.name }
+
+                tempImageFolder?.copyRecursively(imageFolder)
+
+                if (tempFolder.exists()) {
+                    tempFolder.deleteRecursively()
+                }
+            }.onFailure { exception ->
+                exception.printStackTrace()
+                ensureRefresherLoop()
+                mainScope.launch {
+                    Toast.makeText(applicationContext, getString(R.string.database_is_invalid), Toast.LENGTH_SHORT).show()
+                }
+            }.onSuccess {
+                ensureRefresherLoop()
+                mainScope.launch {
+                    launchMedicationsObserve {
+                        Toast.makeText(applicationContext, getString(R.string.database_restored), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun launchMedicationsObserve(additionalAction: (() -> Unit)? = null) {
+        medicationDao(applicationContext).getAll()
+            .observe(this@MainActivity) { medicationList ->
+                lifecycleScope.launch(lifecycleDispatcher) {
+                    refreshFromDatabase(medicationList)
+                }
+            }
+
+        additionalAction?.invoke()
+
+    }
+    private fun ensureRefresherLoop() {
+        if (refreshJob?.isActive != true) {
+            refreshJob = startRefresherLoop()
         }
     }
 }

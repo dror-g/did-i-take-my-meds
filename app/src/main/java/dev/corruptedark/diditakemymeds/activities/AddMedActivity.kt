@@ -28,14 +28,10 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.*
-import android.widget.AutoCompleteTextView
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.widget.LinearLayoutCompat
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.timepicker.TimeFormat
 import androidx.lifecycle.lifecycleScope
 import dev.corruptedark.diditakemymeds.util.ActionReceiver
@@ -43,7 +39,7 @@ import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.listadapters.DoseUnitListAdapter
 import dev.corruptedark.diditakemymeds.listadapters.MedTypeListAdapter
 import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.activities.base.BaseBoundActivity
+import com.siravorona.utils.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.data.models.RepeatSchedule
 import dev.corruptedark.diditakemymeds.dialogs.RepeatScheduleDialog
 import dev.corruptedark.diditakemymeds.data.models.DoseUnit

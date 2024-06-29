@@ -20,17 +20,12 @@
 package dev.corruptedark.diditakemymeds.activities
 
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.TypedValue
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textview.MaterialTextView
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.BuildConfig
-import dev.corruptedark.diditakemymeds.activities.base.BaseBoundActivity
+import com.siravorona.utils.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.databinding.ActivityAboutBinding
 
 class AboutActivity : BaseBoundActivity<ActivityAboutBinding>(ActivityAboutBinding::class) {
