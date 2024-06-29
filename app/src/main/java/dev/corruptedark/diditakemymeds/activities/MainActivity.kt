@@ -42,22 +42,20 @@ import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.listadapters.MedListAdapter
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.BuildConfig
+import dev.corruptedark.diditakemymeds.activities.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.util.ZipFileManager
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.medicationTypeDao
+import dev.corruptedark.diditakemymeds.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import java.io.File
 //import kotlinx.coroutines.*
 import java.util.concurrent.Executors
 
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var toolbar: MaterialToolbar
-    private lateinit var medListView: ListView
-    private lateinit var listEmptyLabel: AppCompatTextView
-    private lateinit var addMedButton: FloatingActionButton
+class MainActivity : BaseBoundActivity<ActivityMainBinding>(ActivityMainBinding::class) {
     private var medicationListAdapter: MedListAdapter? = null
     private lateinit var sortType: String
     private val TIME_SORT = "time"
@@ -295,20 +293,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         createNotificationChannel()
-        setContentView(R.layout.activity_main)
         tempDir = File(filesDir.path + File.separator + getString(R.string.temp_dir))
         imageDir = File(filesDir.path + File.separator + getString(R.string.image_path))
-        medListView = findViewById(R.id.med_list_view)
-        listEmptyLabel = findViewById(R.id.list_empty_label)
-        addMedButton = findViewById(R.id.add_med_button)
-        toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        toolbar.background =
-            ColorDrawable(ResourcesCompat.getColor(resources, R.color.purple_700, null))
-        toolbar.logo = AppCompatResources.getDrawable(this, R.drawable.bar_logo)
+        setSupportActionBar(binding.appbar.toolbar)
+        binding.appbar.toolbar.logo = AppCompatResources.getDrawable(this, R.drawable.bar_logo)
         supportActionBar?.title = getString(R.string.app_name)
 
-        addMedButton.setOnClickListener {
+        binding.addMedButton.setOnClickListener {
             openAddMedActivity()
         }
 
@@ -325,14 +316,13 @@ class MainActivity : AppCompatActivity() {
             FOOTER_PADDING_DP,
             resources.displayMetrics
         ).toInt()
-        medListView.addFooterView(footerPadding)
-        medListView.setFooterDividersEnabled(false)
-        medicationDao(applicationContext).getAll()
-            .observe(context, { medicationList ->
-                lifecycleScope.launch(lifecycleDispatcher) {
-                    refreshFromDatabase(medicationList)
-                }
-            })
+        binding.medListView.addFooterView(footerPadding)
+        binding.medListView.setFooterDividersEnabled(false)
+        medicationDao(applicationContext).getAll().observe(context) { medicationList ->
+            lifecycleScope.launch(lifecycleDispatcher) {
+                refreshFromDatabase(medicationList)
+            }
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -344,7 +334,7 @@ class MainActivity : AppCompatActivity() {
             val sharedPref = getPreferences(Context.MODE_PRIVATE)
             sortType = sharedPref.getString(getString(R.string.sort_key), TIME_SORT)!!
             mainScope.launch {
-                medListView.onItemClickListener =
+                binding.medListView.onItemClickListener =
                     AdapterView.OnItemClickListener { adapterView, view, i, l ->
                         openMedDetailActivity(medications!![i].id, false)
                     }
@@ -398,7 +388,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         medicationListAdapter?.notifyDataSetChanged()
         if (!medications.isNullOrEmpty()) {
-            listEmptyLabel.visibility = View.GONE
+            binding.listEmptyLabel.visibility = View.GONE
         }
         lifecycleScope.launch(lifecycleDispatcher) {
             refreshJob = startRefresherLoop()
@@ -484,11 +474,11 @@ class MainActivity : AppCompatActivity() {
         }
         medicationListAdapter = MedListAdapter(context, medications!!, medicationTypeDao(context).getAllRaw())
         mainScope.launch {
-            medListView.adapter = medicationListAdapter
+            binding.medListView.adapter = medicationListAdapter
             if (!medications.isNullOrEmpty())
-                listEmptyLabel.visibility = View.GONE
+                binding.listEmptyLabel.visibility = View.GONE
             else
-                listEmptyLabel.visibility = View.VISIBLE
+                binding.listEmptyLabel.visibility = View.VISIBLE
         }
     }
 

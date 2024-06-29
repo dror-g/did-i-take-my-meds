@@ -22,7 +22,6 @@ package dev.corruptedark.diditakemymeds.activities
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.TypedValue
 import com.google.android.material.appbar.MaterialToolbar
@@ -31,36 +30,24 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.BuildConfig
+import dev.corruptedark.diditakemymeds.activities.base.BaseBoundActivity
+import dev.corruptedark.diditakemymeds.databinding.ActivityAboutBinding
 
-class AboutActivity : AppCompatActivity() {
-    private lateinit var toolbar: MaterialToolbar
-    private lateinit var githubButton: MaterialButton
-    private lateinit var supportButton: MaterialButton
-    private lateinit var appDescriptionView: MaterialTextView
-
+class AboutActivity : BaseBoundActivity<ActivityAboutBinding>(ActivityAboutBinding::class) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_about)
-        toolbar = findViewById(R.id.toolbar)
-        githubButton = findViewById(R.id.view_github_button)
-        supportButton = findViewById(R.id.support_button)
-        appDescriptionView = findViewById(R.id.app_description_view)
-        setSupportActionBar(toolbar)
-        val tvColorPrimary = TypedValue()
-        theme.resolveAttribute(R.attr.colorPrimary, tvColorPrimary, true)
-        toolbar.background = ColorDrawable(tvColorPrimary.data)
-//        toolbar.background = ColorDrawable(ResourcesCompat.getColor(resources, R.color.purple_700, null))
+        setSupportActionBar(binding.appbar.toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener {
+        binding.appbar.toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
-        githubButton.setOnClickListener {
+        binding.viewGithubButton.setOnClickListener {
             val webpage = Uri.parse(getString(R.string.github_link))
             val intent = Intent(Intent.ACTION_VIEW, webpage)
             startActivity(intent)
         }
-        supportButton.setOnClickListener {
+        binding.supportButton.setOnClickListener {
             if (BuildConfig.BUILD_TYPE == getString(R.string.play_release)) {
                 MaterialAlertDialogBuilder(this)
                     .setTitle(getString(R.string.sorry))
@@ -76,7 +63,7 @@ class AboutActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-        appDescriptionView.text = getString(R.string.app_description, BuildConfig.VERSION_NAME)
+        binding.appDescriptionView.text = getString(R.string.app_description, BuildConfig.VERSION_NAME)
     }
 
 

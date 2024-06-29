@@ -25,10 +25,7 @@ import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.drawable.ColorDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.core.content.res.ResourcesCompat
 import android.text.format.DateFormat
 import android.view.*
 import android.widget.AutoCompleteTextView
@@ -46,6 +43,7 @@ import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.listadapters.DoseUnitListAdapter
 import dev.corruptedark.diditakemymeds.listadapters.MedTypeListAdapter
 import dev.corruptedark.diditakemymeds.R
+import dev.corruptedark.diditakemymeds.activities.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.data.models.RepeatSchedule
 import dev.corruptedark.diditakemymeds.dialogs.RepeatScheduleDialog
 import dev.corruptedark.diditakemymeds.data.models.DoseUnit
@@ -54,6 +52,7 @@ import dev.corruptedark.diditakemymeds.data.models.MedicationType
 import dev.corruptedark.diditakemymeds.data.db.doseUnitDao
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.medicationTypeDao
+import dev.corruptedark.diditakemymeds.databinding.ActivityAddOrEditMedBinding
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -61,28 +60,13 @@ import java.util.*
 import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 
-class AddMedActivity() : AppCompatActivity() {
+class AddMedActivity : BaseBoundActivity<ActivityAddOrEditMedBinding>(ActivityAddOrEditMedBinding::class) {
     private val ONE_WEEK = 7
     private val THREE_WEEKS = 21
     private val NINE_WEEKS = 63
 
-    private lateinit var toolbar: MaterialToolbar
-    private lateinit var nameInput: TextInputEditText
-    private lateinit var rxNumberInput : TextInputEditText
-    private lateinit var typeInput: AutoCompleteTextView
-    private lateinit var takeWithFoodSwitch: SwitchMaterial
-    private lateinit var doseAmountInput: TextInputEditText
-    private lateinit var doseUnitInput: AutoCompleteTextView
-    private lateinit var remainingDosesInput: TextInputEditText
-    private lateinit var asNeededSwitch: SwitchMaterial
-    private lateinit var requirePhotoProofSwitch: SwitchMaterial
-    private lateinit var repeatScheduleButton: MaterialButton
-    private lateinit var notificationSwitch: SwitchMaterial
-    private lateinit var pharmacyInput: TextInputEditText
-    private lateinit var detailInput: TextInputEditText
-    private lateinit var scheduleButtonsLayout: LinearLayoutCompat
-    private lateinit var scheduleButtonsRows: ArrayList<LinearLayoutCompat>
-    private lateinit var extraDoseButton: MaterialButton
+
+    private val scheduleButtonsRows = mutableListOf<LinearLayoutCompat>()
     private var isSystem24Hour: Boolean = false
     private var clockFormat: Int = TimeFormat.CLOCK_12H
     private lateinit var schedulePicker: RepeatScheduleDialog
@@ -112,42 +96,22 @@ class AddMedActivity() : AppCompatActivity() {
     @SuppressLint("CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_or_edit_med)
         alarmManager = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        nameInput = findViewById(R.id.med_name)
-        rxNumberInput = findViewById(R.id.rx_number_input)
-        typeInput = findViewById(R.id.med_type_input)
-        takeWithFoodSwitch = findViewById(R.id.take_with_food_switch)
-        doseAmountInput = findViewById(R.id.dose_amount_input)
-        doseUnitInput = findViewById(R.id.dose_unit_input)
-        remainingDosesInput = findViewById(R.id.remaining_doses_input)
-        asNeededSwitch = findViewById(R.id.as_needed_switch)
-        requirePhotoProofSwitch = findViewById(R.id.require_photo_proof_switch)
-        repeatScheduleButton = findViewById(R.id.repeat_schedule_button)
-        notificationSwitch = findViewById(R.id.notification_switch)
-        pharmacyInput = findViewById(R.id.pharmacy_input)
-        detailInput = findViewById(R.id.med_detail)
-        toolbar = findViewById(R.id.toolbar)
+        binding.extraDoseButton.visibility = View.GONE
 
-        scheduleButtonsLayout = findViewById(R.id.schedule_buttons_layout)
-        scheduleButtonsRows = ArrayList()
-        extraDoseButton = findViewById(R.id.extra_dose_button)
-        extraDoseButton.visibility = View.GONE
-
-        setSupportActionBar(toolbar)
-        toolbar.background = ColorDrawable(ResourcesCompat.getColor(resources,
-            R.color.purple_700, null))
+        setSupportActionBar(binding.appbar.toolbar)
 
         lifecycleScope.launch(lifecycleDispatcher) {
             val medTypeListAdapter = MedTypeListAdapter(context, medicationTypeDao(context).getAllRaw())
             val doseUnitListAdapter = DoseUnitListAdapter(context, doseUnitDao(context).getAllRaw())
 
             mainScope.launch {
+                val typeInput = binding.medTypeInput
                 typeInput.setAdapter(medTypeListAdapter)
                 typeInput.setOnItemClickListener { parent, view, position, id ->
                     typeInput.setText((typeInput.adapter.getItem(position) as MedicationType).name)
                 }
-
+                val doseUnitInput = binding.doseUnitInput
                 doseUnitInput.setAdapter(doseUnitListAdapter)
                 doseUnitInput.setOnItemClickListener { parent, view, position, id ->
                     doseUnitInput.setText((doseUnitInput.adapter.getItem(position) as DoseUnit).unit)
@@ -155,20 +119,20 @@ class AddMedActivity() : AppCompatActivity() {
             }
         }
 
-        asNeededSwitch.setOnCheckedChangeListener { switchView, isChecked ->
+        binding.asNeededSwitch.setOnCheckedChangeListener { switchView, isChecked ->
             if (isChecked) {
-                notificationSwitch.isChecked = false
+                binding.notificationSwitch.isChecked = false
                 notify = false
-                notificationSwitch.visibility = View.GONE
+                binding.notificationSwitch.visibility = View.GONE
 
-                scheduleButtonsLayout.removeAllViews()
+                binding.scheduleButtonsLayout.removeAllViews()
                 scheduleButtonsRows.clear()
                 repeatScheduleList.clear()
 
-                extraDoseButton.visibility = View.GONE
+                binding.extraDoseButton.visibility = View.GONE
 
-                repeatScheduleButton.text = getText(R.string.schedule_dose)
-                repeatScheduleButton.visibility = View.GONE
+                binding.repeatScheduleButton.text = getText(R.string.schedule_dose)
+                binding.repeatScheduleButton.visibility = View.GONE
 
                 hour = -1
                 minute = -1
@@ -181,11 +145,12 @@ class AddMedActivity() : AppCompatActivity() {
                 yearsBetween = 0
             }
             else {
-                notificationSwitch.visibility = View.VISIBLE
-                repeatScheduleButton.visibility = View.VISIBLE
+                binding.notificationSwitch.visibility = View.VISIBLE
+                binding.repeatScheduleButton.visibility = View.VISIBLE
             }
         }
 
+        val requirePhotoProofSwitch = binding.requirePhotoProofSwitch
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             requirePhotoProofSwitch.visibility = View.VISIBLE
         }
@@ -199,19 +164,19 @@ class AddMedActivity() : AppCompatActivity() {
             requirePhotoProof = isChecked
         }
 
-        repeatScheduleButton.setOnClickListener {   view ->
+        binding.repeatScheduleButton.setOnClickListener {   view ->
             openSchedulePicker(view)
         }
 
-        notificationSwitch.setOnCheckedChangeListener { switchView, isChecked ->
+        binding.notificationSwitch.setOnCheckedChangeListener { switchView, isChecked ->
             notify = isChecked
         }
 
-        extraDoseButton.setOnClickListener {
-            val view = LayoutInflater.from(this).inflate(R.layout.extra_dose_template, scheduleButtonsLayout, false)
+        binding.extraDoseButton.setOnClickListener {
+            val view = LayoutInflater.from(this).inflate(R.layout.extra_dose_template, binding.scheduleButtonsLayout, false)
             repeatScheduleList.add(RepeatSchedule(-1, -1, -1, -1, -1))
             scheduleButtonsRows.add(view as LinearLayoutCompat)
-            scheduleButtonsLayout.addView(view)
+            binding.scheduleButtonsLayout.addView(view)
 
             val selectButton: MaterialButton = view.findViewById(R.id.schedule_dose_button)
             val deleteButton: ImageButton = view.findViewById(R.id.delete_dose_button)
@@ -225,14 +190,14 @@ class AddMedActivity() : AppCompatActivity() {
                 if (repeatScheduleList.count() > callingIndex)
                     repeatScheduleList.removeAt(callingIndex)
                 scheduleButtonsRows.remove(view)
-                scheduleButtonsLayout.removeView(view)
+                binding.scheduleButtonsLayout.removeView(view)
             }
 
         }
 
-        takeWithFoodSwitch.isChecked = takeWithFood
+        binding.takeWithFoodSwitch.isChecked = takeWithFood
 
-        takeWithFoodSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.takeWithFoodSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             takeWithFood = isChecked
         }
 
@@ -247,7 +212,7 @@ class AddMedActivity() : AppCompatActivity() {
             }
             else if (schedulePicker.scheduleIsValid()) {
                 val calendar = Calendar.getInstance()
-                if (schedulePickerCaller == repeatScheduleButton) {
+                if (schedulePickerCaller == binding.repeatScheduleButton) {
                     hour = schedulePicker.hour
                     minute = schedulePicker.minute
                     startDay = schedulePicker.startDay
@@ -308,7 +273,7 @@ class AddMedActivity() : AppCompatActivity() {
                     schedulePicker.monthsBetween,
                     schedulePicker.yearsBetween
                 )
-                extraDoseButton.visibility = View.VISIBLE
+                binding.extraDoseButton.visibility = View.VISIBLE
                 pickerIsOpen = false
                 schedulePicker.dismiss()
             }
@@ -358,7 +323,7 @@ class AddMedActivity() : AppCompatActivity() {
 
         val calendar = Calendar.getInstance()
         // if else sets schedule for clicked button, whatever it is
-        if (schedulePickerCaller == repeatScheduleButton) {
+        if (schedulePickerCaller == binding.repeatScheduleButton) {
             hour = schedulePicker.hour
             minute = schedulePicker.minute
             startDay = schedulePicker.startDay
@@ -433,7 +398,7 @@ class AddMedActivity() : AppCompatActivity() {
 
             formattedDate = DateFormat.format(getString(R.string.date_format), calendar)
 
-            val view = LayoutInflater.from(this).inflate(R.layout.extra_dose_template, scheduleButtonsLayout, false)
+            val view = LayoutInflater.from(this).inflate(R.layout.extra_dose_template, binding.scheduleButtonsLayout, false)
             repeatScheduleList.add(RepeatSchedule(schedulePicker.hour, schedulePicker.minute, startDay, schedulePicker.startMonth, schedulePicker.startYear, daysBetween = activeDays + ONE_WEEK))
             val selectButton = view.findViewById<MaterialButton>(R.id.schedule_dose_button);
             val deleteButton: ImageButton = view.findViewById(R.id.delete_dose_button)
@@ -457,32 +422,33 @@ class AddMedActivity() : AppCompatActivity() {
                 if (repeatScheduleList.count() > callingIndex)
                     repeatScheduleList.removeAt(callingIndex)
                 scheduleButtonsRows.remove(view)
-                scheduleButtonsLayout.removeView(view)
+                binding.scheduleButtonsLayout.removeView(view)
             }
 
             scheduleButtonsRows.add(view as LinearLayoutCompat)
-            scheduleButtonsLayout.addView(view)
+            binding.scheduleButtonsLayout.addView(view)
         }
 
-        extraDoseButton.visibility = View.VISIBLE
+        binding.extraDoseButton.visibility = View.VISIBLE
         pickerIsOpen = false
         schedulePicker.dismiss()
     }
 
     private fun saveMedication(): Boolean {
-        return if (nameInput.text.isNullOrBlank()) {
+        return if (binding.medName.text.isNullOrBlank()) {
             mainScope.launch {
                 Toast.makeText(context, getString(R.string.fill_fields), Toast.LENGTH_SHORT).show()
             }
             false
         }
-        else if (!allSchedulesAreValid() && !asNeededSwitch.isChecked) {
+        else if (!allSchedulesAreValid() && !binding.asNeededSwitch.isChecked) {
             mainScope.launch {
                 Toast.makeText(context, getString(R.string.fill_out_all_schedules), Toast.LENGTH_SHORT).show()
             }
             false
         }
         else {
+            val typeInput = binding.medTypeInput
             val medTypeExists = medicationTypeDao(context).typeExists(typeInput.text.toString())
 
             val typeId = if (medTypeExists) {
@@ -495,7 +461,7 @@ class AddMedActivity() : AppCompatActivity() {
                 medicationType.id
             }
 
-            val doseAmountString = doseAmountInput.text.toString()
+            val doseAmountString = binding.doseAmountInput.text.toString()
             val doseAmount = if (doseAmountString.toDoubleOrNull() != null) {
                 doseAmountString.toDouble()
             }
@@ -503,7 +469,7 @@ class AddMedActivity() : AppCompatActivity() {
                 Medication.UNDEFINED_AMOUNT
             }
 
-            val remainingDosesString = remainingDosesInput.text.toString()
+            val remainingDosesString = binding.remainingDosesInput.text.toString()
             val remainingDoses = if (remainingDosesString.toIntOrNull() != null) {
                 remainingDosesString.toInt()
             }
@@ -511,6 +477,7 @@ class AddMedActivity() : AppCompatActivity() {
                 Medication.UNDEFINED_REMAINING
             }
 
+            val doseUnitInput = binding.doseUnitInput
             val doseUnitExists = doseUnitDao(context).unitExists(doseUnitInput.text.toString())
             val doseUnitId = if (doseUnitExists) {
                 val doseUnit = doseUnitDao(context).get(doseUnitInput.text.toString())
@@ -524,10 +491,10 @@ class AddMedActivity() : AppCompatActivity() {
             }
 
             var medication = Medication(
-                nameInput.text.toString(),
+                binding.medName.text.toString(),
                 hour,
                 minute,
-                detailInput.text.toString(),
+                binding.medDetail.text.toString(),
                 startDay,
                 startMonth,
                 startYear,
@@ -538,8 +505,8 @@ class AddMedActivity() : AppCompatActivity() {
                 notify = notify,
                 requirePhotoProof = requirePhotoProof,
                 typeId = typeId,
-                rxNumber = rxNumberInput.text.toString(),
-                pharmacy = pharmacyInput.text.toString(),
+                rxNumber = binding.rxNumberInput.text.toString(),
+                pharmacy = binding.pharmacyInput.text.toString(),
                 amountPerDose = doseAmount,
                 doseUnitId = doseUnitId,
                 remainingDoses = remainingDoses,
@@ -581,7 +548,7 @@ class AddMedActivity() : AppCompatActivity() {
             pickerIsOpen = true
             schedulePickerCaller = view
 
-            if (view == repeatScheduleButton) {
+            if (view == binding.repeatScheduleButton) {
                 schedulePicker.hour = hour
                 schedulePicker.minute = minute
                 schedulePicker.startDay = startDay

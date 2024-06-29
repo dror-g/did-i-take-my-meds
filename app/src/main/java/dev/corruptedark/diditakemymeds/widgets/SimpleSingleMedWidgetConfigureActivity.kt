@@ -32,6 +32,7 @@ import dev.corruptedark.diditakemymeds.databinding.SimpleSingleMedWidgetConfigur
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
 import dev.corruptedark.diditakemymeds.R
+import dev.corruptedark.diditakemymeds.activities.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.listadapters.MedListAdapter
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
@@ -44,13 +45,10 @@ import kotlinx.coroutines.launch
 /**
  * The configuration screen for the [SimpleSingleMedWidget] AppWidget.
  */
-class SimpleSingleMedWidgetConfigureActivity : AppCompatActivity() {
+class SimpleSingleMedWidgetConfigureActivity : BaseBoundActivity<SimpleSingleMedWidgetConfigureBinding>(SimpleSingleMedWidgetConfigureBinding::class) {
     val context = this
     val mainScope = MainScope()
-    private lateinit var toolbar: MaterialToolbar
-    private lateinit var medListView: ListView
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
-    private lateinit var binding: SimpleSingleMedWidgetConfigureBinding
 
     public override fun onCreate(icicle: Bundle?) {
         super.onCreate(icicle)
@@ -59,17 +57,10 @@ class SimpleSingleMedWidgetConfigureActivity : AppCompatActivity() {
         // out of the widget placement if the user presses the back button.
         setResult(RESULT_CANCELED)
 
-        binding = SimpleSingleMedWidgetConfigureBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        toolbar = binding.appbar.toolbar
-        setSupportActionBar(toolbar)
-        toolbar.background =
-            ColorDrawable(ResourcesCompat.getColor(resources, R.color.purple_700, null))
+        setSupportActionBar(binding.appbar.toolbar)
         supportActionBar?.title = getString(R.string.choose_a_medication)
 
 
-        medListView = binding.medListView
         lifecycleScope.launch(Dispatchers.Default) {
             val medListAdapter = MedListAdapter(
                 context,
@@ -78,8 +69,8 @@ class SimpleSingleMedWidgetConfigureActivity : AppCompatActivity() {
             )
 
             mainScope.launch(Dispatchers.Main) {
-                medListView.adapter = medListAdapter
-                medListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+                binding.medListView.adapter = medListAdapter
+                binding.medListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
                     val medId = medListAdapter.getItem(position).id
 
                     saveMedIdPref(context, appWidgetId, medId)

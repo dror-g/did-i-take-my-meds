@@ -37,7 +37,7 @@ interface ProofImageDao {
     fun delete(proofImage: ProofImage)
 
     @Query("SELECT * FROM $IMAGE_TABLE WHERE medId = :medId AND doseTime = :doseTime LIMIT 1")
-    fun get(medId: Long, doseTime: Long): ProofImage
+    fun get(medId: Long, doseTime: Long): ProofImage?
 
     @Query("SELECT * FROM $IMAGE_TABLE")
     fun getAll(): LiveData<MutableList<ProofImage>>

@@ -52,6 +52,7 @@ import dev.corruptedark.diditakemymeds.util.ActionReceiver
 import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.R
+import dev.corruptedark.diditakemymeds.activities.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.ProofImage
@@ -60,6 +61,8 @@ import dev.corruptedark.diditakemymeds.listadapters.DoseRecordListAdapter
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.medicationTypeDao
 import dev.corruptedark.diditakemymeds.data.db.proofImageDao
+import dev.corruptedark.diditakemymeds.databinding.ActivityMainBinding
+import dev.corruptedark.diditakemymeds.databinding.ActivityMedDetailBinding
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.IOException
@@ -69,24 +72,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.jvm.Throws
 import kotlinx.coroutines.launch
 
-class MedDetailActivity : AppCompatActivity() {
-    private lateinit var toolbar: MaterialToolbar
-    private lateinit var outerScroll: NestedScrollView
-    private lateinit var nameLabel: MaterialTextView
-    private lateinit var rxNumberLabel: MaterialTextView
-    private lateinit var typelabel: MaterialTextView
-    private lateinit var takeWithFoodLabel: MaterialTextView
-    private lateinit var doseAmountLabel: MaterialTextView
-    private lateinit var remainingDosesLabel: MaterialTextView
-    private lateinit var timeLabel: MaterialTextView
-    private lateinit var activeSwitch: SwitchMaterial
-    private lateinit var notificationSwitch: SwitchMaterial
-    private lateinit var pharmacyLabel: MaterialTextView
-    private lateinit var detailLabel: MaterialTextView
-    private lateinit var closestDoseLabel: MaterialTextView
-    private lateinit var justTookItButton: MaterialButton
-    private lateinit var timeSinceDoseLabel: MaterialTextView
-    private lateinit var previousDosesList: ListView
+class MedDetailActivity : BaseBoundActivity<ActivityMedDetailBinding>(ActivityMedDetailBinding::class) {
     private var medication: Medication? = null
     private lateinit var doseRecordAdapter: DoseRecordListAdapter
     private val calendar = Calendar.getInstance()
@@ -129,19 +115,19 @@ class MedDetailActivity : AppCompatActivity() {
                 }
 
                 mainScope.launch {
-                    nameLabel.text = medication!!.name
-                    rxNumberLabel.text = rxNumberText
-                    typelabel.text = getString(R.string.type_label_format, typeName)
+                    binding.nameLabel.text = medication!!.name
+                    binding.rxNumberLabel.text = rxNumberText
+                    binding.typeLabel.text = getString(R.string.type_label_format, typeName)
 
                     if (medication!!.isAsNeeded()) {
-                        timeLabel.visibility = View.GONE
-                        closestDoseLabel.visibility = View.GONE
-                        notificationSwitch.visibility = View.GONE
-                        notificationSwitch.isChecked = false
+                        binding.timeLabel.visibility = View.GONE
+                        binding.closestDoseLabel.visibility = View.GONE
+                        binding.notificationSwitch.visibility = View.GONE
+                        binding.notificationSwitch.isChecked = false
                     } else {
-                        timeLabel.visibility = View.VISIBLE
+                        binding.timeLabel.visibility = View.VISIBLE
                         val nextDose = medication!!.calculateNextDose().timeInMillis
-                        timeLabel.text =
+                        binding.timeLabel.text =
                             getString(
                                 R.string.next_dose_label,
                                 Medication.doseString(
@@ -154,9 +140,9 @@ class MedDetailActivity : AppCompatActivity() {
                                     locale
                                 )
                             )
-                        closestDoseLabel.visibility = View.VISIBLE
+                        binding.closestDoseLabel.visibility = View.VISIBLE
                         closestDose = medication!!.calculateClosestDose().timeInMillis
-                        closestDoseLabel.text = getString(
+                        binding.closestDoseLabel.text = getString(
                             R.string.closest_dose_label,
                             Medication.doseString(
                                 yesterdayString,
@@ -168,8 +154,8 @@ class MedDetailActivity : AppCompatActivity() {
                                 locale
                             )
                         )
-                        notificationSwitch.visibility = View.VISIBLE
-                        notificationSwitch.isChecked = medication!!.notify
+                        binding.notificationSwitch.visibility = View.VISIBLE
+                        binding.notificationSwitch.isChecked = medication!!.notify
                     }
 
                     val pharmacyText = if (medication!!.pharmacy == Medication.UNDEFINED) {
@@ -179,14 +165,14 @@ class MedDetailActivity : AppCompatActivity() {
                     else {
                         getString(R.string.pharmacy_label_format, medication!!.pharmacy)
                     }
-                    pharmacyLabel.text = pharmacyText
+                    binding.pharmacyLabel.text = pharmacyText
 
-                    detailLabel.text = medication!!.description
+                    binding.detailLabel.text = medication!!.description
 
                     if (medication!!.closestDoseAlreadyTaken() && !medication!!.isAsNeeded()) {
-                        justTookItButton.text = getString(R.string.took_this_already)
+                        binding.justTookItButton.text = getString(R.string.took_this_already)
                     } else {
-                        justTookItButton.text = getString(R.string.i_just_took_it)
+                        binding.justTookItButton.text = getString(R.string.i_just_took_it)
                     }
 
                     alarmIntent = AlarmIntentManager.buildNotificationAlarm(context, medication!!)
@@ -255,31 +241,12 @@ class MedDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_med_detail)
         imageFolder = File(filesDir.path + File.separator + getString(R.string.image_path))
         alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        toolbar = findViewById(R.id.toolbar)
-        nameLabel = findViewById(R.id.name_label)
-        rxNumberLabel = findViewById(R.id.rx_number_label)
-        typelabel = findViewById(R.id.type_label)
-        takeWithFoodLabel = findViewById(R.id.take_with_food_label)
-        doseAmountLabel = findViewById(R.id.dose_amount_label)
-        remainingDosesLabel = findViewById(R.id.remaining_doses_label)
-        timeLabel = findViewById(R.id.time_label)
-        activeSwitch = findViewById(R.id.active_switch)
-        notificationSwitch = findViewById(R.id.notification_switch)
-        pharmacyLabel = findViewById(R.id.pharmacy_label)
-        detailLabel = findViewById(R.id.detail_label)
-        closestDoseLabel = findViewById(R.id.closest_dose_label)
-        justTookItButton = findViewById(R.id.just_took_it_button)
-        timeSinceDoseLabel = findViewById(R.id.time_since_dose_label)
-        previousDosesList = findViewById(R.id.previous_doses_list)
-        setSupportActionBar(toolbar)
-        toolbar.background =
-            ColorDrawable(ResourcesCompat.getColor(resources, R.color.purple_700, null))
+        setSupportActionBar(binding.appbar.toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener {
+        binding.appbar.toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
 
@@ -303,7 +270,7 @@ class MedDetailActivity : AppCompatActivity() {
             Resources.getSystem().configuration.locale
         }
 
-        previousDosesList.onItemLongClickListener = AdapterView.OnItemLongClickListener { adapterView, view, i, l ->
+        binding.previousDosesList.onItemLongClickListener = AdapterView.OnItemLongClickListener { adapterView, view, i, l ->
             val dialogBuilder = MaterialAlertDialogBuilder(this)
                 .setTitle(getString(R.string.are_you_sure))
                 .setMessage(
@@ -339,10 +306,12 @@ class MedDetailActivity : AppCompatActivity() {
 
                                 if (proofImageDao(context).proofImageExists(medId, doseTime)) {
                                     val proofImage = proofImageDao(context).get(medId, doseTime)
-                                    imageFolder?.apply {
-                                        proofImage.deleteImageFile(imageFolder!!)
+                                    if (proofImage != null) {
+                                        imageFolder?.apply {
+                                            proofImage.deleteImageFile(imageFolder!!)
+                                        }
+                                        proofImageDao(context).delete(proofImage)
                                     }
-                                    proofImageDao(context).delete(proofImage)
                                 }
 
                                 medication!!.removeTakenDose(i, realDose)
@@ -357,7 +326,7 @@ class MedDetailActivity : AppCompatActivity() {
             true
         }
 
-        previousDosesList.setOnItemClickListener { parent, view, position, id ->
+        binding.previousDosesList.setOnItemClickListener { parent, view, position, id ->
             val intent = Intent(context, DoseDetailActivity::class.java)
             intent.putExtra(getString(R.string.med_id_key), medication!!.id)
             intent.putExtra(getString(R.string.dose_time_key), medication!!.doseRecord[position].doseTime)
@@ -365,7 +334,6 @@ class MedDetailActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        outerScroll = findViewById(R.id.outer_scroll)
         takeMed = intent.getBooleanExtra(getString(R.string.take_med_key), false)
     }
 
@@ -460,24 +428,24 @@ class MedDetailActivity : AppCompatActivity() {
             }
 
             mainScope.launch {
-                nameLabel.text = medication!!.name
-                rxNumberLabel.text = rxNumberText
-                typelabel.text = getString(R.string.type_label_format, typeName)
+                binding.nameLabel.text = medication!!.name
+                binding.rxNumberLabel.text = rxNumberText
+                binding.typeLabel.text = getString(R.string.type_label_format, typeName)
 
-                takeWithFoodLabel.visibility = if (medication!!.takeWithFood) {
+                binding.takeWithFoodLabel.visibility = if (medication!!.takeWithFood) {
                     View.VISIBLE
                 }
                 else {
                     View.GONE
                 }
 
-                doseAmountLabel.text = doseAmountLabelString
-                doseAmountLabel.visibility = doseAmountLabelVisibility
-                remainingDosesLabel.text = remainingDosesLabelString
-                remainingDosesLabel.visibility = remainingDosesLabelVisibility
+                binding.doseAmountLabel.text = doseAmountLabelString
+                binding.doseAmountLabel.visibility = doseAmountLabelVisibility
+                binding.remainingDosesLabel.text = remainingDosesLabelString
+                binding.remainingDosesLabel.visibility = remainingDosesLabelVisibility
 
-                activeSwitch.isChecked = medication!!.active
-                activeSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+                binding.activeSwitch.isChecked = medication!!.active
+                binding.activeSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
                     medication!!.active = isChecked
                     lifecycleScope.launch(lifecycleDispatcher) {
                         medicationDao(context)
@@ -486,14 +454,14 @@ class MedDetailActivity : AppCompatActivity() {
                 }
 
                 if (medication!!.isAsNeeded()) {
-                    timeLabel.visibility = View.GONE
-                    closestDoseLabel.visibility = View.GONE
-                    notificationSwitch.visibility = View.GONE
-                    notificationSwitch.isChecked = false
+                    binding.timeLabel.visibility = View.GONE
+                    binding.closestDoseLabel.visibility = View.GONE
+                    binding.notificationSwitch.visibility = View.GONE
+                    binding.notificationSwitch.isChecked = false
                 } else {
-                    timeLabel.visibility = View.VISIBLE
+                    binding.timeLabel.visibility = View.VISIBLE
                     val nextDose = medication!!.calculateNextDose().timeInMillis
-                    timeLabel.text =
+                    binding.timeLabel.text =
                         getString(
                             R.string.next_dose_label,
                             Medication.doseString(
@@ -506,9 +474,9 @@ class MedDetailActivity : AppCompatActivity() {
                                 locale
                             )
                         )
-                    closestDoseLabel.visibility = View.VISIBLE
+                    binding.closestDoseLabel.visibility = View.VISIBLE
                     closestDose = medication!!.calculateClosestDose().timeInMillis
-                    closestDoseLabel.text = getString(
+                    binding.closestDoseLabel.text = getString(
                         R.string.closest_dose_label,
                         Medication.doseString(
                             yesterdayString,
@@ -520,9 +488,9 @@ class MedDetailActivity : AppCompatActivity() {
                             locale
                         )
                     )
-                    notificationSwitch.visibility = View.VISIBLE
-                    notificationSwitch.isChecked = medication!!.notify
-                    notificationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+                    binding.notificationSwitch.visibility = View.VISIBLE
+                    binding.notificationSwitch.isChecked = medication!!.notify
+                    binding.notificationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
                         medication!!.notify = isChecked
                         lifecycleScope.launch(lifecycleDispatcher) {
                             medicationDao(context)
@@ -567,51 +535,51 @@ class MedDetailActivity : AppCompatActivity() {
                 else {
                     getString(R.string.pharmacy_label_format, medication!!.pharmacy)
                 }
-                pharmacyLabel.text = pharmacyText
+                binding.pharmacyLabel.text = pharmacyText
 
-                detailLabel.text = medication!!.description
+                binding.detailLabel.text = medication!!.description
                 if (medication!!.description.isEmpty()) {
-                    detailLabel.visibility = View.GONE
+                    binding.detailLabel.visibility = View.GONE
                 }
                 else {
-                    detailLabel.visibility = View.VISIBLE
+                    binding.detailLabel.visibility = View.VISIBLE
                 }
 
                 doseRecordAdapter = DoseRecordListAdapter(context, medication!!.doseRecord)
 
                 if (!doseRecordAdapter.isEmpty) {
-                    val sampleView = doseRecordAdapter.getView(0, null, previousDosesList)
+                    val sampleView = doseRecordAdapter.getView(0, null, binding.previousDosesList)
                     sampleView.measure(0, 0)
                     val height =
-                        doseRecordAdapter.count * sampleView.measuredHeight + previousDosesList.dividerHeight * (doseRecordAdapter.count - 1)
-                    previousDosesList.layoutParams =
+                        doseRecordAdapter.count * sampleView.measuredHeight + binding.previousDosesList.dividerHeight * (doseRecordAdapter.count - 1)
+                    binding.previousDosesList.layoutParams =
                         LinearLayoutCompat.LayoutParams(
                             LinearLayoutCompat.LayoutParams.MATCH_PARENT,
                             height
                         )
                 }
 
-                previousDosesList.adapter = doseRecordAdapter
-                ViewCompat.setNestedScrollingEnabled(outerScroll, true)
-                ViewCompat.setNestedScrollingEnabled(previousDosesList, true)
+                binding.previousDosesList.adapter = doseRecordAdapter
+                ViewCompat.setNestedScrollingEnabled(binding.outerScroll, true)
+                ViewCompat.setNestedScrollingEnabled(binding.previousDosesList, true)
 
-                justTookItButton.setOnClickListener {
+                binding.justTookItButton.setOnClickListener {
                     justTookItButtonPressed()
                 }
 
                 medication?.let {
                     if (it.doseRecord.isNotEmpty()) {
-                        timeSinceDoseLabel.text =
+                        binding.timeSinceDoseLabel.text =
                             getString(R.string.time_since_dose_template, days, hours, minutes)
-                        timeSinceDoseLabel.visibility = View.VISIBLE
+                        binding.timeSinceDoseLabel.visibility = View.VISIBLE
                     } else {
-                        timeSinceDoseLabel.visibility = View.GONE
+                        binding.timeSinceDoseLabel.visibility = View.GONE
                     }
                 }
                 if (medication!!.closestDoseAlreadyTaken() && !medication!!.isAsNeeded()) {
-                    justTookItButton.text = getString(R.string.took_this_already)
+                    binding.justTookItButton.text = getString(R.string.took_this_already)
                 } else {
-                    justTookItButton.text = getString(R.string.i_just_took_it)
+                    binding.justTookItButton.text = getString(R.string.i_just_took_it)
                 }
             }
             medication!!.doseRecord.sort()
@@ -738,7 +706,7 @@ class MedDetailActivity : AppCompatActivity() {
         medication!!.addNewTakenDose(newDose)
 
         if (!medication!!.isAsNeeded()) {
-            justTookItButton.text = getString(R.string.took_this_already)
+            binding.justTookItButton.text = getString(R.string.took_this_already)
         }
 
         doseRecordAdapter.notifyDataSetChanged()
@@ -751,11 +719,11 @@ class MedDetailActivity : AppCompatActivity() {
         }
 
         if (!doseRecordAdapter.isEmpty) {
-            val sampleView = doseRecordAdapter.getView(0, null, previousDosesList)
+            val sampleView = doseRecordAdapter.getView(0, null, binding.previousDosesList)
             sampleView.measure(0, 0)
             val height =
-                doseRecordAdapter.count * sampleView.measuredHeight + previousDosesList.dividerHeight * (doseRecordAdapter.count - 1)
-            previousDosesList.layoutParams =
+                doseRecordAdapter.count * sampleView.measuredHeight + binding.previousDosesList.dividerHeight * (doseRecordAdapter.count - 1)
+            binding.previousDosesList.layoutParams =
                 LinearLayoutCompat.LayoutParams(
                     LinearLayoutCompat.LayoutParams.MATCH_PARENT,
                     height

@@ -26,6 +26,7 @@
             app:zeroContentInsetStart="@{noStartInset}"
             app:zeroNavigationContentInsetStart="@{noNavigationStartInset}"
             app:layout_scrollFlags="scroll|enterAlways|snap"
+            android:theme="@style/Theme.Toolbar"
             app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
             tools:title="some text" />
 
