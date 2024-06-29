@@ -19,7 +19,6 @@
 
 package dev.corruptedark.diditakemymeds
 
-import android.Manifest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 
@@ -27,10 +26,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import org.junit.Assert.*
-import android.text.format.DateFormat
-import androidx.test.rule.GrantPermissionRule
-import com.google.android.things.device.TimeManager
-import org.junit.Rule
+import dev.corruptedark.diditakemymeds.data.models.Medication
 import java.util.*
 
 /**

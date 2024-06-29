@@ -16,6 +16,10 @@
     along with this program.  If not, see https://www.gnu.org/licenses.-->
 <resources>
 
+    <style name="TextLabel" parent="TextAppearance.Design.Hint">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="Widget.DidITakeMyMeds.AppWidget.Container" parent="android:Widget">
         <item name="android:id">@android:id/background</item>
         <item name="android:background">?android:attr/colorBackground</item>
@@ -24,5 +28,52 @@
     <style name="Widget.DidITakeMyMeds.AppWidget.InnerView" parent="android:Widget">
         <item name="android:background">?android:attr/colorBackground</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+
+    <style name="Widget.TextInput.Accented" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="colorControlActivated">?colorAccent</item>
+        <item name="hintTextColor">?colorAccent</item>
+        <item name="android:textColorHint">?colorAccent</item>
+        <item name="boxStrokeColor">?ditmm_colorBorder</item>
+        <item name="boxBackgroundColor">?ditmm_colorBackground</item>
+        <item name="hintTextAppearance">@style/TextLabel</item>
+    </style>
+
+    <style name="Widget.TextInput.Dropdown" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="colorControlActivated">?colorAccent</item>
+        <item name="hintTextColor">?colorAccent</item>
+        <item name="android:textColorHint">?colorAccent</item>
+        <item name="endIconTint">?colorAccent</item>
+        <item name="boxStrokeColor">?colorAccent</item>
+        <item name="boxBackgroundColor">?ditmm_colorItemBackground</item>
+        <item name="hintTextAppearance">@style/TextLabel</item>
+    </style>
+
+    <style name="Widget.Switch.Accented" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="android:textColor">?colorAccent</item>
+        <item name="autoSizeTextType">uniform</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">15dp</item>
+    </style>
+
+    <style name="Widget.Button.Accented.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textColor">?colorAccent</item>
+        <item name="strokeColor">?ditmm_colorBorder</item>
+    </style>
+
+
+    <style name="Widget.Button.Accented.Outlined.Filled" >
+        <item name="backgroundTint">?colorPrimary</item>
+    </style>
+
+    <style name="ScreenHintLabel">
+        <item name="android:textColor">?colorAccent</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
+        <item name="android:gravity">center</item>
+        <item name="autoSizeTextType">uniform</item>
     </style>
 </resources>

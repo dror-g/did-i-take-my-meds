@@ -19,24 +19,18 @@
 
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
 }
 
-repositories {
-    google()
-    mavenCentral()
-    maven { url 'https://jitpack.io' }
-}
-
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
+    compileSdk 34
+    namespace "dev.corruptedark.diditakemymeds"
 
     defaultConfig {
         applicationId "dev.corruptedark.diditakemymeds"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 34
         versionCode 35
         versionName "1.6.6"
 
@@ -76,9 +70,10 @@ android {
         jvmTarget = '1.8'
     }
     buildFeatures {
+        dataBinding true
         viewBinding true
+        buildConfig true
     }
-    namespace 'dev.corruptedark.diditakemymeds'
 }
 
 dependencies {

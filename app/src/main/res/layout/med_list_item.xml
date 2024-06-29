@@ -20,7 +20,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:orientation="vertical"
-    android:background="@color/item_background"
+    android:background="?ditmm_colorBackground"
     android:paddingVertical="10dp"
     android:paddingHorizontal="20dp">
 
@@ -28,7 +28,7 @@
         android:id="@+id/name_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/purple_200"
+        android:textColor="?colorAccent"
         android:textSize="@dimen/large_text_size"
         android:text="@string/sample_medicine"/>
 
@@ -36,7 +36,6 @@
         android:id="@+id/type_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
         android:textSize="@dimen/medium_text_size"
         android:text="@string/sample_type_label"/>
 
@@ -49,23 +48,23 @@
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/sub_purple"
+            android:textColor="?colorAccentSecondary"
             android:textSize="@dimen/medium_text_size"
             android:text="@string/midnight"
-            android:gravity="left"
-            android:layout_gravity="left"/>
+            android:gravity="start"
+            android:layout_gravity="start"/>
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_weight="1"
             android:id="@+id/taken_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/sub_purple"
+            android:textColor="?colorAccentSecondary"
             autoSizeTextType="uniform"
             android:textSize="@dimen/medium_text_size"
             android:text="@string/not_taken"
-            android:gravity="right"
-            android:layout_gravity="right"/>
+            android:gravity="end"
+            android:layout_gravity="end"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

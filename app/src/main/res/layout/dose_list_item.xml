@@ -19,7 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/item_background"
+    android:background="?ditmm_colorBackground"
     android:paddingVertical="10dp"
     android:paddingHorizontal="20dp">
 
@@ -27,7 +27,7 @@
         android:id="@+id/dose_taken_time_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/purple_200"
+        android:textColor="?colorAccent"
         autoSizeTextType="uniform"
         android:textSize="@dimen/medium_text_size"
         android:text="@string/midnight"/>
@@ -36,7 +36,7 @@
         android:id="@+id/closest_dose_time_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/sub_purple"
+        android:textColor="?colorAccentSecondary"
         autoSizeTextType="uniform"
         android:textSize="@dimen/small_text_size"
         android:text="@string/midnight"/>

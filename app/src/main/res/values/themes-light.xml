@@ -1,0 +1,56 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--Did I Take My Meds? is a FOSS app to keep track of medications
+    Did I Take My Meds? is designed to help prevent a user from skipping doses and/or overdosing
+    Copyright (C) 2021  Noah Stanford <noahstandingford@gmail.com>
+
+    Did I Take My Meds? is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Did I Take My Meds? is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see https://www.gnu.org/licenses.-->
+    <!-- Base application theme. -->
+    <style name="Theme.DidITakeMyMeds.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/notification_bar</item>
+        <item name="colorAccent">@color/purple_700</item>
+        <item name="clockNumberTextColor">@color/purple_700</item>
+        <item name="dialogTheme">@style/Theme.Dialog.Light</item>
+        <item name="alertDialogTheme">@style/Theme.Dialog.Light</item>
+        <item name="materialAlertDialogTheme">@style/Theme.Dialog.Light</item>
+        <item name="materialTimePickerTheme">@style/Theme.TimePicker.Light</item>
+        <item name="materialCalendarTheme">@style/Theme.Calendar.Light</item>
+        <item name="android:textColor">@color/text_color_light_theme</item>
+        <item name="actionBarTheme">@style/Theme.Toolbar</item>
+        <!-- Customize your theme here. -->
+
+        <item name="ditmm_colorItemBackground">@color/item_background_light_theme</item>
+        <item name="ditmm_colorBackground">@color/background_light_theme</item>
+        <item name="ditmm_colorBorder">@color/purple_700</item>
+        <item name="colorAccentSecondary">@color/sub_purple_darker</item>
+    </style>
+
+    <style name="Theme.Dialog.Light" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="colorPrimary">@color/purple_700</item>
+        <item name="colorAccent">@color/purple_700</item>
+    </style>
+
+    <style name="Theme.TimePicker.Light" parent="ThemeOverlay.MaterialComponents.TimePicker">
+        <item name="colorPrimary">@color/purple_700</item>
+        <item name="colorAccent">@color/purple_700</item>
+    </style>
+
+    <style name="Theme.Calendar.Light" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <item name="colorPrimary">@color/purple_700</item>
+        <item name="colorAccent">@color/purple_700</item>
+    </style>
+
+
+</resources>

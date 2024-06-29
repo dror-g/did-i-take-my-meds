@@ -20,15 +20,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="?ditmm_colorBackground"
     android:orientation="vertical"
-    tools:context=".DoseDetailActivity">
+    tools:context=".activities.DoseDetailActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <include
+        android:id="@+id/appbar"
+        layout="@layout/view_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?android:actionBarSize"
-        android:gravity="center_vertical" />
+        android:layout_height="wrap_content" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
                     android:text="@string/midnight"
-                    android:textColor="@color/purple_200"
+                    android:textColor="?colorAccent"
                     android:textSize="@dimen/medium_text_size"
                     android:layout_gravity="center_vertical|start"/>
 
@@ -72,6 +72,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginVertical="10dp"
                 android:visibility="gone"
+                tools:visibility="visible"
                 android:orientation="horizontal">
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/taken_time_button"
@@ -81,9 +82,7 @@
                     android:layout_marginEnd="5dp"
                     android:textSize="@dimen/medium_text_size"
                     android:text="@string/midnight"
-                    android:textColor="@color/purple_200"
-                    app:strokeColor="@color/purple_500"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                    style="@style/Widget.Button.Accented.Outlined" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/taken_date_button"
@@ -94,9 +93,7 @@
                     android:layout_marginHorizontal="5dp"
                     android:textSize="@dimen/medium_text_size"
                     android:text="@string/date_format"
-                    android:textColor="@color/purple_200"
-                    app:strokeColor="@color/purple_500"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                    style="@style/Widget.Button.Accented.Outlined" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/taken_time_confirm_button"
@@ -124,7 +121,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginVertical="10dp"
                 android:text="@string/midnight"
-                android:textColor="@color/sub_purple"
+                android:textColor="?colorAccentSecondary"
                 android:textSize="@dimen/medium_text_size" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -142,7 +139,7 @@
                 android:layout_gravity="center_horizontal"
                 android:padding="20dp"
                 android:text="@string/no_image_available"
-                android:textColor="@color/sub_purple"
+                android:textColor="?colorAccentSecondary"
                 android:textSize="@dimen/medium_text_size"
                 app:autoSizeTextType="uniform" />
         </androidx.appcompat.widget.LinearLayoutCompat>

@@ -20,14 +20,14 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:theme="@style/Theme.DidITakeMyMeds.AppWidgetContainer"
-    android:background="@color/background"
+    android:background="?ditmm_colorBackground"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/name_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/sub_purple"
+        android:textColor="?colorAccentSecondary"
         android:textSize="@dimen/large_text_size"
         android:paddingTop="15dp"
         android:paddingHorizontal="10dp"
@@ -38,14 +38,14 @@
         android:id="@+id/time_since_dose_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/purple_200"
+        android:textColor="?colorAccent"
         android:textSize="@dimen/medium_text_size"
         android:paddingVertical="5dp"
         android:paddingHorizontal="10dp"
         android:gravity="center_horizontal"
         android:text="@string/time_since_dose_sample"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/just_took_it_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,11 +54,9 @@
         android:padding="15dp"
         android:textSize="@dimen/medium_text_size"
         android:text="@string/i_just_took_it"
-        android:textColor="@color/purple_200"
         android:textStyle="bold"
         android:textAllCaps="true"
-        android:background="@drawable/widget_button_border"/>
-
+        style="@style/Widget.Button.Accented.Outlined.Filled" />
 
 
 </LinearLayout>

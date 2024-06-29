@@ -23,10 +23,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="sub_purple">#FFF684FE</color>
-    <color name="background">#FF101010</color>
     <color name="liberapay">#FFFFE931</color>
     <color name="github">#FF69A4EF</color>
-    <color name="item_background">#FF252525</color>
     <color name="notification_bar">#FF2B00A7</color>
     <color name="notification_icon_color">#FF511D9A</color>
     <color name="floating_action_button">#FF6200EE</color>
@@ -34,4 +32,15 @@
     <color name="light_blue_200">#FF81D4FA</color>
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
+
+
+
+    <color name="background">#FF101010</color>
+    <color name="item_background">#FF252525</color>
+
+    <color name="item_background_light_theme">#fff</color>
+    <color name="background_light_theme">#fff</color>
+    <color name="text_color_light_theme">#000</color>
+    <color name="text_color_dark_theme">#fff</color>
+    <color name="sub_purple_darker">#D070D6</color>
 </resources>

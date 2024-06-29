@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see https://www.gnu.org/licenses.-->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:configure="dev.corruptedark.diditakemymeds.SimpleSingleMedWidgetConfigureActivity"
+    android:configure="dev.corruptedark.diditakemymeds.widgets.SimpleSingleMedWidgetConfigureActivity"
     android:description="@string/app_widget_description"
     android:initialKeyguardLayout="@layout/simple_single_med_widget"
     android:initialLayout="@layout/simple_single_med_widget"

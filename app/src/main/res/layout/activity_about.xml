@@ -15,74 +15,82 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see https://www.gnu.org/licenses.-->
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background"
-    tools:context=".AboutActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?android:actionBarSize"
-        android:gravity="center_vertical"
-        app:contentInsetStartWithNavigation="0dp" />
+    <data>
 
-    <ScrollView
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
-            android:orientation="vertical"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="?ditmm_colorBackground"
+        tools:context=".activities.AboutActivity">
+
+        <include
+            android:id="@+id/appbar"
+            layout="@layout/view_toolbar"
+            app:noNavigationStartInset="@{true}"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/view_github_button"
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="15dp"
-                android:layout_marginVertical="5dp"
-                android:paddingVertical="12dp"
-                android:text="@string/view_the_project_on_github"
-                android:textColor="@android:color/black"
-                app:backgroundTint="@color/github"
-                android:textSize="@dimen/medium_text_size"/>
+                android:layout_height="wrap_content">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/support_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="15dp"
-                android:layout_marginVertical="5dp"
-                android:paddingVertical="12dp"
-                android:text="@string/support_me_on_liberapay"
-                android:textColor="@android:color/black"
-                app:backgroundTint="@color/liberapay"
-                android:textSize="@dimen/medium_text_size"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/view_github_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_marginVertical="5dp"
+                    android:paddingVertical="12dp"
+                    android:text="@string/view_the_project_on_github"
+                    android:textColor="@android:color/black"
+                    app:backgroundTint="@color/github"
+                    android:textSize="@dimen/medium_text_size" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/translation_credits_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/translation_credits"
-                android:textSize="@dimen/small_text_size"
-                android:paddingTop="20dp"
-                android:paddingHorizontal="20dp"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/support_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_marginVertical="5dp"
+                    android:paddingVertical="12dp"
+                    android:text="@string/support_me_on_liberapay"
+                    android:textColor="@android:color/black"
+                    app:backgroundTint="@color/liberapay"
+                    android:textSize="@dimen/medium_text_size" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/app_description_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/app_description"
-                android:textSize="@dimen/small_text_size"
-                android:paddingVertical="10dp"
-                android:paddingHorizontal="20dp"/>
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/translation_credits_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/translation_credits"
+                    android:textSize="@dimen/small_text_size"
+                    android:paddingTop="20dp"
+                    android:paddingHorizontal="20dp" />
 
-        </LinearLayout>
-    </ScrollView>
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/app_description_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_description"
+                    android:textSize="@dimen/small_text_size"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="20dp" />
+
+            </LinearLayout>
+        </ScrollView>
 
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

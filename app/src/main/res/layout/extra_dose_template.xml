@@ -15,15 +15,13 @@
         android:paddingVertical="15dp"
         android:textSize="@dimen/medium_text_size"
         android:text="@string/schedule_dose"
-        android:textColor="@color/purple_200"
-        app:strokeColor="@color/purple_500"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+        style="@style/Widget.Button.Accented.Outlined" />
     <androidx.appcompat.widget.AppCompatImageButton
         android:layout_weight="1.5"
         android:id="@+id/delete_dose_button"
         android:layout_width="0px"
         android:layout_height="wrap_content"
         android:src="@drawable/delete"
-        android:background="@color/background"
+        android:background="?ditmm_colorBackground"
         android:layout_gravity="center" />
     </androidx.appcompat.widget.LinearLayoutCompat>

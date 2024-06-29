@@ -19,6 +19,7 @@
 
 package dev.corruptedark.diditakemymeds
 
+import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import org.junit.Test
 
 import org.junit.Assert.*

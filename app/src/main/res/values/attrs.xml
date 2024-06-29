@@ -20,4 +20,9 @@
         <attr name="appWidgetInnerRadius" format="dimension" />
         <attr name="appWidgetRadius" format="dimension" />
     </declare-styleable>
+
+    <attr name="colorAccentSecondary" format="reference|color"/>
+    <attr name="ditmm_colorBackground" format="reference|color"/>
+    <attr name="ditmm_colorItemBackground" format="reference|color"/>
+    <attr name="ditmm_colorBorder" format="reference|color"/>
 </resources>
