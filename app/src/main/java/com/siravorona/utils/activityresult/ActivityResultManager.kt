@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 
@@ -83,4 +84,8 @@ suspend fun ActivityResultManager.openAppSettings(): Boolean {
 
 suspend fun ActivityResultManager.takePicture(destination: Uri): Boolean {
     return requestResult(ActivityResultContracts.TakePicture(), destination) ?: false
+}
+suspend fun ActivityResultManager.getActivityResult(intent: Intent): ActivityResult? {
+  val result = requestResult(ActivityResultContracts.StartActivityForResult(), intent)
+    return result
 }

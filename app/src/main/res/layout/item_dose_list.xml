@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Did I Take My Meds? is a FOSS app to keep track of medications
+    Did I Take My Meds? is designed to help prevent a user from skipping doses and/or overdosing
+    Copyright (C) 2021  Noah Stanford <noahstandingford@gmail.com>
+
+    Did I Take My Meds? is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Did I Take My Meds? is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see https://www.gnu.org/licenses.-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="item"
+            type="dev.corruptedark.diditakemymeds.activities.meddetails.DoseRecordItem" />
+        <import type="android.view.View"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="?ditmm_colorBackground"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="20dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/dose_taken_time_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?colorAccent"
+            autoSizeTextType="uniform"
+            android:textSize="@dimen/medium_text_size"
+            app:timeTaken="@{item.doseRecord}"
+            tools:text="@string/midnight" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/closest_dose_time_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?colorAccentSecondary"
+            autoSizeTextType="uniform"
+            android:textSize="@dimen/small_text_size"
+            android:visibility="@{item.showClosestDose ? View.VISIBLE : View.GONE}"
+            app:closestDose="@{item.doseRecord}"
+            tools:text="@string/midnight" />
+
+    </LinearLayout>
+</layout>

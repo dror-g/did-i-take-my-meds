@@ -163,6 +163,12 @@ abstract class BaseBindableAdapter(
                 onClick(holder)
             }
         }
+        val onLongClick = type.onLongClick
+        if (onLongClick != null) {
+            holder.itemView.setOnLongClickListener {
+                onLongClick(holder)
+            }
+        }
     }
     // endregion
 

@@ -26,7 +26,6 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
 import android.widget.*
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import android.net.Uri
 import androidx.core.net.toUri
@@ -39,6 +38,7 @@ import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.listadapters.MedListAdapter
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.BuildConfig
+import dev.corruptedark.diditakemymeds.activities.meddetails.MedDetailActivity
 import dev.corruptedark.diditakemymeds.util.ZipFileManager
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 import dev.corruptedark.diditakemymeds.data.models.Medication

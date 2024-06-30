@@ -32,32 +32,36 @@ import kotlin.math.abs
 import kotlin.math.sign
 
 @Entity(tableName = MedicationDB.MED_TABLE)
-data class Medication (var name: String,
-                       var hour: Int,
-                       var minute: Int,
-                       var description: String,
-                       var startDay: Int,
-                       var startMonth: Int,
-                       var startYear: Int,
-                       var daysBetween: Int = 1,
-                       var weeksBetween: Int = 0,
-                       var monthsBetween: Int = 0,
-                       var yearsBetween: Int = 0,
-                       var notify: Boolean = true,
-                       var requirePhotoProof: Boolean = true,
-                       var active: Boolean = true,
-                       var typeId: Long = DEFAULT_ID,
-                       var rxNumber: String = UNDEFINED,
-                       var pharmacy: String = UNDEFINED,
-                       var doseUnitId: Long = DEFAULT_ID,
-                       var amountPerDose: Double = UNDEFINED_AMOUNT,
-                       var remainingDoses: Int = UNDEFINED_REMAINING,
-                       var takeWithFood: Boolean = false
+data class Medication(
+    var name: String,
+    var hour: Int,
+    var minute: Int,
+    var description: String,
+    var startDay: Int,
+    var startMonth: Int,
+    var startYear: Int,
+    var daysBetween: Int = 1,
+    var weeksBetween: Int = 0,
+    var monthsBetween: Int = 0,
+    var yearsBetween: Int = 0,
+    var notify: Boolean = true,
+    var requirePhotoProof: Boolean = true,
+    var active: Boolean = true,
+    var typeId: Long = DEFAULT_ID,
+    var rxNumber: String = UNDEFINED,
+    var pharmacy: String = UNDEFINED,
+    var doseUnitId: Long = DEFAULT_ID,
+    var amountPerDose: Double = UNDEFINED_AMOUNT,
+    var remainingDoses: Int = UNDEFINED_REMAINING,
+    var takeWithFood: Boolean = false
 ) {
 
 
-    @PrimaryKey(autoGenerate = true) var id: Long = 0
-    @ColumnInfo(name = "dose_record") var doseRecord: ArrayList<DoseRecord> = ArrayList()
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
+
+    @ColumnInfo(name = "dose_record")
+    var doseRecord: ArrayList<DoseRecord> = ArrayList()
     var moreDosesPerDay: ArrayList<RepeatSchedule> = ArrayList()
 
     companion object {
@@ -69,7 +73,17 @@ data class Medication (var name: String,
         const val UNDEFINED_AMOUNT = -99.0
         const val UNDEFINED_REMAINING = -99
 
-        fun doseString(yesterdayString: String, todayString: String, tomorrowString: String, doseTime: Long, dateFormat: String, timeFormat: String, locale: Locale): String {
+        val BLANK = Medication("", 0, 0, "", 0, 0, 0)
+
+        fun doseString(
+            yesterdayString: String,
+            todayString: String,
+            tomorrowString: String,
+            doseTime: Long,
+            dateFormat: String,
+            timeFormat: String,
+            locale: Locale
+        ): String {
             val localizedFormatter = SimpleDateFormat(dateFormat, locale)
 
             val calendar = Calendar.getInstance()
@@ -82,18 +96,24 @@ data class Medication (var name: String,
             val tomorrow = calendar.clone() as Calendar
 
             val dayString: String =
-                if (doseCal.get(Calendar.DATE) == today.get(Calendar.DATE) &&
-                    doseCal.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
-                    doseCal.get(Calendar.YEAR) == today.get(Calendar.YEAR)) {
+                if (doseCal.get(Calendar.DATE) == today.get(Calendar.DATE) && doseCal.get(Calendar.MONTH) == today.get(
+                        Calendar.MONTH
+                    ) && doseCal.get(Calendar.YEAR) == today.get(Calendar.YEAR)
+                ) {
                     todayString
-                }
-                else if (doseCal.get(Calendar.DATE) == yesterday.get(Calendar.DATE) &&
-                    doseCal.get(Calendar.MONTH) == yesterday.get(Calendar.MONTH) &&
-                    doseCal.get(Calendar.YEAR) == yesterday.get(Calendar.YEAR)) {
+                } else if (doseCal.get(Calendar.DATE) == yesterday.get(Calendar.DATE) && doseCal.get(
+                        Calendar.MONTH
+                    ) == yesterday.get(Calendar.MONTH) && doseCal.get(Calendar.YEAR) == yesterday.get(
+                        Calendar.YEAR
+                    )
+                ) {
                     yesterdayString
-                } else if (doseCal.get(Calendar.DATE) == tomorrow.get(Calendar.DATE) &&
-                    doseCal.get(Calendar.MONTH) == tomorrow.get(Calendar.MONTH) &&
-                    doseCal.get(Calendar.YEAR) == tomorrow.get(Calendar.YEAR)) {
+                } else if (doseCal.get(Calendar.DATE) == tomorrow.get(Calendar.DATE) && doseCal.get(
+                        Calendar.MONTH
+                    ) == tomorrow.get(Calendar.MONTH) && doseCal.get(Calendar.YEAR) == tomorrow.get(
+                        Calendar.YEAR
+                    )
+                ) {
                     tomorrowString
                 } else {
                     localizedFormatter.format(doseCal.timeInMillis) as String
@@ -101,10 +121,7 @@ data class Medication (var name: String,
 
             val time = DateFormat.format(timeFormat, doseCal)
 
-            val builder: StringBuilder = StringBuilder()
-                .append(time)
-                .append(" ")
-                .append(dayString)
+            val builder: StringBuilder = StringBuilder().append(time).append(" ").append(dayString)
 
             return builder.toString()
         }
@@ -114,8 +131,7 @@ data class Medication (var name: String,
 
             return if (byActive != 0) {
                 byActive
-            }
-            else {
+            } else {
                 a.name.compareTo(b.name)
             }
         }
@@ -146,8 +162,7 @@ data class Medication (var name: String,
 
             return if (byActive != 0) {
                 byActive
-            }
-            else {
+            } else {
                 (aTransition - bTransition).sign
             }
         }
@@ -192,7 +207,7 @@ data class Medication (var name: String,
      * It is recommended to call this before calculating next and closest doses
      */
     fun updateStartsToFuture() {
-        if(!isAsNeeded()) {
+        if (!isAsNeeded()) {
             val localCalendar = Calendar.getInstance()
             val currentTime = localCalendar.timeInMillis
 
@@ -258,8 +273,7 @@ data class Medication (var name: String,
         localCalendar.set(Calendar.MONTH, startMonth)
         localCalendar.set(Calendar.YEAR, startYear)
         scheduleTriple = ScheduleSortTriple(
-            localCalendar.timeInMillis,
-            RepeatSchedule(
+            localCalendar.timeInMillis, RepeatSchedule(
                 hour,
                 minute,
                 startDay,
@@ -269,8 +283,7 @@ data class Medication (var name: String,
                 weeksBetween,
                 monthsBetween,
                 yearsBetween
-            ),
-            -1
+            ), -1
         )
 
         nextDose = scheduleTriple
@@ -319,8 +332,7 @@ data class Medication (var name: String,
         localCalendar.set(Calendar.MONTH, startMonth)
         localCalendar.set(Calendar.YEAR, startYear)
         scheduleTriple = ScheduleSortTriple(
-            localCalendar.timeInMillis,
-            RepeatSchedule(
+            localCalendar.timeInMillis, RepeatSchedule(
                 hour,
                 minute,
                 startDay,
@@ -330,8 +342,7 @@ data class Medication (var name: String,
                 weeksBetween,
                 monthsBetween,
                 yearsBetween
-            ),
-            -1
+            ), -1
         )
 
         closestDose = scheduleTriple
@@ -343,8 +354,7 @@ data class Medication (var name: String,
         localCalendar.add(Calendar.MONTH, -monthsBetween)
         localCalendar.add(Calendar.YEAR, -yearsBetween)
         scheduleTriple = ScheduleSortTriple(
-            localCalendar.timeInMillis,
-            RepeatSchedule(
+            localCalendar.timeInMillis, RepeatSchedule(
                 hour,
                 minute,
                 startDay,
@@ -354,8 +364,7 @@ data class Medication (var name: String,
                 weeksBetween,
                 monthsBetween,
                 yearsBetween
-            ),
-            -1
+            ), -1
         )
 
         scheduleTripleList.add(scheduleTriple)
@@ -365,8 +374,7 @@ data class Medication (var name: String,
         localCalendar.add(Calendar.MONTH, 2 * monthsBetween)
         localCalendar.add(Calendar.YEAR, 2 * yearsBetween)
         scheduleTriple = ScheduleSortTriple(
-            localCalendar.timeInMillis,
-            RepeatSchedule(
+            localCalendar.timeInMillis, RepeatSchedule(
                 hour,
                 minute,
                 startDay,
@@ -376,8 +384,7 @@ data class Medication (var name: String,
                 weeksBetween,
                 monthsBetween,
                 yearsBetween
-            ),
-            -1
+            ), -1
         )
 
         scheduleTripleList.add(scheduleTriple)
@@ -423,8 +430,7 @@ data class Medication (var name: String,
     fun closestDoseAlreadyTaken(): Boolean {
         val lastDose: Long = try {
             doseRecord.first().closestDose
-        }
-        catch (except: NoSuchElementException) {
+        } catch (except: NoSuchElementException) {
             INVALID_MED_ID
         }
         val closestDose = calculateClosestDose().timeInMillis
@@ -439,19 +445,15 @@ data class Medication (var name: String,
         updateStartsToFuture()
         return if (!isAsNeeded()) {
             ((calculateClosestDose().timeInMillis.toBigInteger() + calculateNextDose().timeInMillis.toBigInteger()) / 2L.toBigInteger()).toLong() + 1L
-        }
-        else {
+        } else {
             FALLBACK_TRANSITION_TIME
         }
     }
 
     fun timeSinceLastTakenDose(): Long {
-
         return if (doseRecord.isNotEmpty()) {
             System.currentTimeMillis() - doseRecord.first().doseTime
-        }
-        else
-        {
+        } else {
             System.currentTimeMillis()
         }
     }

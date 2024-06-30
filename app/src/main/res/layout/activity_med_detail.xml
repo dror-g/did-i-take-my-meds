@@ -21,14 +21,18 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="vm"
+            type="dev.corruptedark.diditakemymeds.activities.meddetails.MedDetailViewModel" />
 
+        <import type="android.view.View"/>
     </data>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?ditmm_colorBackground"
-        tools:context=".activities.MedDetailActivity"
+        tools:context=".activities.meddetails.MedDetailActivity"
         android:orientation="vertical">
 
         <include
@@ -59,7 +63,8 @@
                     android:paddingTop="15dp"
                     android:paddingHorizontal="20dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/sample_medicine" />
+                    android:text="@{vm.medication.name}"
+                    tools:text="@string/sample_medicine" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/time_label"
@@ -70,7 +75,11 @@
                     android:textSize="@dimen/medium_text_size"
                     android:paddingVertical="5dp"
                     android:paddingHorizontal="20dp"
-                    android:text="@string/midnight" />
+                    tools:text="@string/midnight"
+                    app:nextDose="@{vm.medication}"
+                    tools:visibility="visible"
+                    android:visibility="@{vm.showTimeLabel ? View.VISIBLE : View.GONE}"
+                    />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/closest_dose_label"
@@ -81,7 +90,10 @@
                     android:textSize="@dimen/medium_text_size"
                     android:paddingVertical="5dp"
                     android:paddingHorizontal="20dp"
-                    android:text="@string/closest_dose_sample" />
+                    tools:text="@string/closest_dose_sample"
+                    app:closestDose="@{vm.medication}"
+                    tools:visibility="visible"
+                    android:visibility="@{vm.showClosestDose ? View.VISIBLE : View.GONE}" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/time_since_dose_label"
@@ -93,7 +105,10 @@
                     android:paddingVertical="10dp"
                     android:paddingHorizontal="20dp"
                     android:gravity="center_horizontal"
-                    android:text="@string/time_since_dose_sample" />
+                    app:sinceLastDose="@{vm.medication}"
+                    android:visibility="@{vm.showSinceLastDose ? View.VISIBLE : View.GONE}"
+                    tools:visibility="visible"
+                    tools:text="@string/time_since_dose_sample" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/just_took_it_button"
@@ -103,7 +118,9 @@
                     android:layout_marginHorizontal="20dp"
                     android:padding="15dp"
                     android:textSize="@dimen/medium_text_size"
-                    android:text="@string/i_just_took_it"
+                    tools:text="@string/i_just_took_it"
+                    app:justTookIt="@{vm.medication}"
+                    android:onClick="@{() -> vm.onJustTookItPressed()}"
                     style="@style/Widget.Button.Accented.Outlined" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
@@ -115,7 +132,9 @@
                     android:textSize="@dimen/medium_text_size"
                     android:paddingVertical="5dp"
                     android:paddingHorizontal="20dp"
-                    android:checked="true" />
+                    android:checked="@{vm.medication.active}"
+                    android:onCheckedChanged="@{(switch, checked) -> vm.onActiveCheckedChanged(switch, checked)}"
+                    tools:checked="true" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/notification_switch"
@@ -126,7 +145,11 @@
                     android:textSize="@dimen/medium_text_size"
                     android:paddingVertical="5dp"
                     android:paddingHorizontal="20dp"
-                    android:checked="true" />
+                    tools:checked="true"
+                    android:checked="@{vm.medication.notify}"
+                    android:onCheckedChanged="@{(switch, value) -> vm.onNotifyCheckedChanged(switch, value)}"
+                    tools:visibility="visible"
+                    android:visibility="@{vm.showNotificationSwitch ? View.VISIBLE : View.GONE}"/>
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/rx_number_label"
@@ -137,7 +160,8 @@
                     android:paddingTop="5dp"
                     android:paddingHorizontal="20dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/sample_rx_number_label" />
+                    app:rxNumber="@{vm.medication}"
+                    tools:text="@string/sample_rx_number_label" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/type_label"
@@ -147,10 +171,13 @@
                     android:textSize="@dimen/small_text_size"
                     android:paddingVertical="5dp"
                     android:paddingHorizontal="20dp"
-                    android:text="@string/sample_type_label" />
+                    app:medicationType="@{vm.medicationType}"
+                    tools:text="@string/sample_type_label" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/take_with_food_label"
+                    android:visibility="@{vm.medication.takeWithFood ? View.VISIBLE : View.GONE}"
+                    tools:visibility="visible"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:autoSizeTextType="uniform"
@@ -167,7 +194,11 @@
                     android:textSize="@dimen/small_text_size"
                     android:paddingVertical="5dp"
                     android:paddingHorizontal="20dp"
-                    android:text="@string/sample_dose_amount_label" />
+                    app:doseUnit="@{vm.doseUnit}"
+                    app:amountPerDose="@{vm.medication.amountPerDose}"
+                    android:visibility="@{vm.showDoseInfo ? View.VISIBLE : View.GONE}"
+                    tools:visibility="visible"
+                    tools:text="@string/sample_dose_amount_label" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/remaining_doses_label"
@@ -177,7 +208,10 @@
                     android:textSize="@dimen/small_text_size"
                     android:paddingVertical="5dp"
                     android:paddingHorizontal="20dp"
-                    android:text="@string/sample_remaining_doses_label" />
+                    app:remainingDoses="@{vm.medication.remainingDoses}"
+                    android:visibility="@{vm.showRemainingDoses ? View.VISIBLE : View.GONE}"
+                    tools:visibility="visible"
+                    tools:text="@string/sample_remaining_doses_label" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/pharmacy_label"
@@ -187,7 +221,8 @@
                     android:textSize="@dimen/small_text_size"
                     android:paddingVertical="5dp"
                     android:paddingHorizontal="20dp"
-                    android:text="@string/sample_pharmacy_label" />
+                    app:pharmacy="@{vm.medication}"
+                    tools:text="@string/sample_pharmacy_label" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/detail_label"
@@ -197,7 +232,10 @@
                     android:textSize="@dimen/small_text_size"
                     android:paddingVertical="5dp"
                     android:paddingHorizontal="20dp"
-                    android:text="@string/sample_description" />
+                    android:text="@{vm.medication.description}"
+                    android:visibility="@{vm.showDescription ? View.VISIBLE : View.GONE}"
+                    tools:visibility="visible"
+                    tools:text="@string/sample_description" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/previous_doses_label"
@@ -232,12 +270,12 @@
                     android:paddingBottom="20dp"
                     android:text="@string/record_detail_hint" />
 
-                <ListView
-                    android:id="@+id/previous_doses_list"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/doses_recycler"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_dose_list"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:divider="?ditmm_colorBackground"
-                    android:dividerHeight="5dp" />
+                    android:layout_height="wrap_content"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.core.widget.NestedScrollView>

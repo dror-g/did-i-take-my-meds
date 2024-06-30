@@ -23,6 +23,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB.Companion.MED_TABLE
 import dev.corruptedark.diditakemymeds.data.models.Medication
+import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 
 @Dao
 interface MedicationDao {
@@ -38,11 +39,20 @@ interface MedicationDao {
     @Query("SELECT * FROM $MED_TABLE WHERE id = :medId LIMIT 1")
     fun get(medId: Long): Medication
 
+    @Query("SELECT * FROM $MED_TABLE WHERE id = :medId LIMIT 1")
+    fun getFull(medId: Long): MedicationFull
+
     @Query("SELECT * FROM $MED_TABLE")
     fun getAll(): LiveData<MutableList<Medication>>
 
     @Query("SELECT * FROM $MED_TABLE")
+    fun getAllFull(): LiveData<MutableList<MedicationFull>>
+
+    @Query("SELECT * FROM $MED_TABLE")
     fun getAllRaw(): MutableList<Medication>
+
+    @Query("SELECT * FROM $MED_TABLE")
+    fun getAllRawFull(): MutableList<MedicationFull>
 
     @Query("SELECT EXISTS(SELECT * FROM $MED_TABLE WHERE id = :medId)")
     fun medicationExists(medId: Long): Boolean

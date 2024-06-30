@@ -20,16 +20,20 @@ package dev.corruptedark.diditakemymeds.activities
 
 import android.app.AlarmManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.*
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.timepicker.TimeFormat
 import androidx.lifecycle.lifecycleScope
+import com.siravorona.utils.activityresult.ActivityResultManager
+import com.siravorona.utils.activityresult.getActivityResult
 import dev.corruptedark.diditakemymeds.listadapters.DoseUnitListAdapter
 import dev.corruptedark.diditakemymeds.listadapters.MedTypeListAdapter
 import dev.corruptedark.diditakemymeds.R
@@ -434,13 +438,16 @@ class EditMedActivity : BaseBoundActivity<ActivityAddOrEditMedBinding>(ActivityA
         return when (item.itemId) {
             R.id.save -> {
                 lifecycleScope.launch(lifecycleDispatcher) {
-                    if (saveMedication())
+                    if (saveMedication()) {
+                        setResult(RESULT_OK)
                         finish()
+                    }
                 }
                 true
             }
             R.id.cancel -> {
                 Toast.makeText(context, getString(R.string.edit_cancelled), Toast.LENGTH_SHORT).show()
+                setResult(RESULT_CANCELED)
                 finish()
                 true
             }
@@ -708,5 +715,16 @@ class EditMedActivity : BaseBoundActivity<ActivityAddOrEditMedBinding>(ActivityA
         }
 
         return timesAreValid
+    }
+
+    companion object {
+        private const val EXTRA_MEDICATION_ID = "med_id"
+        suspend fun startForResult(launcherActivity: ComponentActivity, medication: Medication): Pair<Long, Boolean> {
+            val intent = Intent(launcherActivity, EditMedActivity::class.java).apply {
+                putExtra(EXTRA_MEDICATION_ID, medication.id)
+            }
+            val result = ActivityResultManager.getInstance().getActivityResult(intent)
+            return medication.id to (result?.resultCode == RESULT_OK)
+        }
     }
 }

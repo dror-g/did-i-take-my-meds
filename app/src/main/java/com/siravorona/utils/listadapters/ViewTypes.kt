@@ -30,10 +30,13 @@ open class ViewTypeInfo<B : ViewDataBinding>
     internal var onBind: Action<B>? = null; private set
     internal var onRecycle: Action<B>? = null; private set
     internal var onClick: Action<B>? = null; private set
+    internal var onLongClick: ActionBoolean<B>? = null; private set
     fun onCreate(action: Action<B>?) = apply { onCreate = action }
     fun onBind(action: Action<B>?) = apply { onBind = action }
     fun onRecycle(action: Action<B>?) = apply { onRecycle = action }
     fun onClick(action: Action<B>?) = apply { onClick = action }
+    fun onLongClick(action: ActionBoolean<B>?) = apply { onLongClick = action }
 }
 
 typealias Action<B> = (BaseBindableAdapter.Holder<B>) -> Unit
+typealias ActionBoolean<B> = (BaseBindableAdapter.Holder<B>) -> Boolean
