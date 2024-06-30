@@ -71,12 +71,6 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     private lateinit var alarmIntent: PendingIntent
     private val context = this
     private val mainScope = MainScope()
-    private var currentPhotoPath: String? = null
-
-    private val MAXIMUM_DELAY = 60000L // 1 minute in milliseconds
-    private val MINIMUM_DELAY = 1000L // 1 second in milliseconds
-    private val DAY_TO_HOURS = 24
-    private val HOUR_TO_MINUTES = 60
 
     private val IMAGE_NAME_SEPARATOR = "_"
     private val IMAGE_EXTENSION = ".jpg"
@@ -368,9 +362,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
             medIdString + IMAGE_NAME_SEPARATOR + doseTimeString,
             IMAGE_EXTENSION,
             storageDir
-        ).apply {
-            currentPhotoPath = name
-        }
+        )
     }
 
     private fun takeImageProof(medId: Long, doseTime: Long) {
@@ -388,7 +380,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
                 photoFile
             )
             val picTaken = ActivityResultManager.getInstance().takePicture(photoURI)
-            saveImageProof(picTaken)
+            saveImageProof(picTaken, photoFile.name)
         }
     }
 
@@ -428,11 +420,11 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         }
     }
 
-    private fun saveImageProof(pictureTaken: Boolean) {
+    private fun saveImageProof(pictureTaken: Boolean, filePath: String) {
         val medication = vm.medication
         if (pictureTaken) {
             val dose = createDose(medication)
-            val proofImage = ProofImage(medication.id, dose.doseTime, currentPhotoPath!!)
+            val proofImage = ProofImage(medication.id, dose.doseTime, filePath)
             saveDose(dose)
             lifecycleScope.launch (lifecycleDispatcher) {
                 proofImageDao(context).insertAll(proofImage)
