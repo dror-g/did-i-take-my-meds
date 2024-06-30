@@ -45,6 +45,7 @@ import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.medicationTypeDao
 import dev.corruptedark.diditakemymeds.databinding.ActivityMainBinding
+import dev.corruptedark.diditakemymeds.util.getThemeDrawableByAttr
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.Comparator
@@ -77,7 +78,8 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setSupportActionBar(binding.appbar.toolbar)
-        binding.appbar.toolbar.logo = AppCompatResources.getDrawable(this, R.drawable.bar_logo)
+        val logo = getThemeDrawableByAttr(R.attr.ditmm_bar_logo)
+        binding.appbar.toolbar.logo = logo
         supportActionBar?.title = getString(R.string.app_name)
 
         binding.addMedButton.setOnClickListener {

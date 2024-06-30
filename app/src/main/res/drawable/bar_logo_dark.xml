@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item android:drawable="@drawable/logo_circle_bg_dark"/>
+    <item android:drawable="@drawable/ic_launcher_circle_base" android:right="2dp"/>
+
+</layer-list>

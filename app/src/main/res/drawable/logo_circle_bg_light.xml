@@ -14,16 +14,16 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see https://www.gnu.org/licenses.-->
-<resources>
-    <declare-styleable name="AppWidgetAttrs">
-        <attr name="appWidgetPadding" format="dimension" />
-        <attr name="appWidgetInnerRadius" format="dimension" />
-        <attr name="appWidgetRadius" format="dimension" />
-    </declare-styleable>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="56dp"
+    android:height="56dp"
+    android:viewportWidth="28"
+    android:viewportHeight="28">
 
-    <attr name="colorAccentSecondary" format="reference|color"/>
-    <attr name="ditmm_colorBackground" format="reference|color"/>
-    <attr name="ditmm_colorItemBackground" format="reference|color"/>
-    <attr name="ditmm_colorBorder" format="reference|color"/>
-    <attr name="ditmm_bar_logo" format="reference"/>
-</resources>
+        <path
+            android:name="background"
+            android:fillAlpha="0.999795"
+            android:fillColor="#f4f4f4"
+            android:pathData="M14,14m-9.525,0a9.525,9.525 0,1 1,19.05 0a9.525,9.525 0,1 1,-19.05 0z" />
+
+</vector>
