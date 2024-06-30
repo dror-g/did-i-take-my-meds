@@ -1,5 +1,6 @@
 package dev.corruptedark.diditakemymeds.util
 
+import android.text.format.DateFormat
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.google.android.material.appbar.MaterialToolbar
@@ -121,6 +122,31 @@ fun setTimeTaken(view: TextView, doseRecord: DoseRecord) {
 fun setClosestDose(view: TextView, doseRecord: DoseRecord) {
     val context = view.context
     val doseString = medicationDoseString(context, doseRecord.closestDose)
+    val text = context.getString(R.string.closest_dose_label, doseString)
+    view.text = text
+}
+
+
+@BindingAdapter("nextDose")
+fun setNextDose(view: TextView, doseRecord: DoseRecord) {
+    val context = view.context
+    val doseString = medicationDoseString(context, doseRecord.closestDose)
     val text = context.getString(R.string.next_dose_label, doseString)
+    view.text = text
+}
+
+@BindingAdapter("timeFromMillis")
+fun setTimeFromMillis(view: TextView, millis: Long) {
+    val context = view.context
+    val systemIs24Hour = DateFormat.is24HourFormat(context)
+    val timeFormat = if (systemIs24Hour) context.getString(R.string.time_24) else context.getString(R.string.time_12)
+    val text = DateFormat.format(timeFormat, millis)
+    view.text = text
+}
+@BindingAdapter("dateFromMillis")
+fun setDateFromMillis(view: TextView, millis: Long) {
+    val context = view.context
+    val dateFormat = context.getString(R.string.date_format)
+    val text = DateFormat.format(dateFormat, millis)
     view.text = text
 }

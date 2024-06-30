@@ -68,7 +68,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.DoseDetailActivity"
+            android:name=".activities.dosedetails.DoseDetailActivity"
             android:label="@string/dose_details" />
         <activity
             android:name=".activities.AboutActivity"

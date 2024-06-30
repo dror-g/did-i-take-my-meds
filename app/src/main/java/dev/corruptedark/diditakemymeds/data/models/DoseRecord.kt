@@ -19,13 +19,18 @@
 
 package dev.corruptedark.diditakemymeds.data.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 import kotlin.math.sign
 
-data class DoseRecord(val doseTime: Long, val closestDose: Long = NONE): Comparable<DoseRecord> {
+@Parcelize
+data class DoseRecord(val doseTime: Long, val closestDose: Long = NONE): Comparable<DoseRecord>, Parcelable {
 
     companion object {
         const val NONE = -1L
         const val INVALID_TIME = -2L
+        val BLANK = DoseRecord(0, 0)
     }
 
     override fun compareTo(other: DoseRecord): Int {

@@ -31,7 +31,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
@@ -46,7 +45,7 @@ import com.siravorona.utils.base.BaseBoundInteractableVmActivity
 import dev.corruptedark.diditakemymeds.BR
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.StorageManager
-import dev.corruptedark.diditakemymeds.activities.DoseDetailActivity
+import dev.corruptedark.diditakemymeds.activities.dosedetails.DoseDetailActivity
 import dev.corruptedark.diditakemymeds.activities.EditMedActivity
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
@@ -58,6 +57,7 @@ import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ActivityMedDetailBinding
 import dev.corruptedark.diditakemymeds.util.ActionReceiver
 import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
+import dev.corruptedark.diditakemymeds.util.DialogUtil
 import dev.corruptedark.diditakemymeds.util.medicationDoseString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -164,6 +164,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         return when (item.itemId) {
             R.id.delete -> {
                 promptDeleteMedication(vm.medication)
+                true
             }
             R.id.edit -> {
                 lifecycleScope.launch(lifecycleDispatcher) {
@@ -206,19 +207,20 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
             finish()
         }
     }
-    private fun promptDeleteMedication(medication: Medication): Boolean {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.are_you_sure))
-            .setMessage(getString(R.string.medication_delete_warning))
-            .setNegativeButton(getString(R.string.cancel)) { dialog, which ->
-                dialog.dismiss()
+    private fun promptDeleteMedication(medication: Medication) {
+        lifecycleScope.launch(lifecycleDispatcher) {
+            val action = DialogUtil.showMaterialDialogSuspend(this@MedDetailActivity, this@MedDetailActivity,
+                title = getString(R.string.are_you_sure),
+                message = getString(R.string.medication_delete_warning),
+                positiveButtonText = getString(R.string.confirm)
+            )
+            when(action) {
+                DialogUtil.Action.POSITIVE -> {
+                    deleteMedication(medication)
+                }
+                else -> {}
             }
-            .setPositiveButton(getString(R.string.confirm)) { dialog, which ->
-                deleteMedication(medication)
-
-            }
-            .show()
-        return true
+        }
     }
     // endregion
 
@@ -271,11 +273,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     // endregion
 
     private fun openDoseDetail(medication: Medication, doseRecord: DoseRecord) {
-        val intent = Intent(context, DoseDetailActivity::class.java)
-        intent.putExtra(getString(R.string.med_id_key), medication.id)
-        intent.putExtra(getString(R.string.dose_time_key), doseRecord.doseTime)
-        intent.putExtra(getString(R.string.time_taken_key), doseRecord.closestDose)
-        startActivity(intent)
+        DoseDetailActivity.open(context, medication.id, doseRecord)
     }
 
     // region dose manipulation
@@ -435,17 +433,15 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         }
     }
 
-
-
     companion object {
         private const val EXTRA_MEDICATION_ID = "med_id"
         private const val EXTRA_TAKE_MED = "take_med"
-        fun start(launcherActivity: ComponentActivity, medicationId: Long, takeMed: Boolean) {
-            val intent = Intent(launcherActivity, MedDetailActivity::class.java).apply {
+        fun start(context: Context, medicationId: Long, takeMed: Boolean) {
+            val intent = Intent(context, MedDetailActivity::class.java).apply {
                 putExtra(EXTRA_MEDICATION_ID, medicationId)
                 putExtra(EXTRA_TAKE_MED, takeMed)
             }
-            launcherActivity.startActivity(intent)
+            context.startActivity(intent)
         }
     }
 }

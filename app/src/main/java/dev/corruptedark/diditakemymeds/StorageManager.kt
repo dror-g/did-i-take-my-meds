@@ -1,9 +1,12 @@
 package dev.corruptedark.diditakemymeds
 
 import android.content.Context
+import android.net.Uri
+import androidx.core.net.toUri
 import dev.corruptedark.diditakemymeds.data.models.ProofImage
 import java.io.File
 import java.io.IOException
+import java.net.URI
 
 object StorageManager {
     val IMAGE_PATH = "images"
@@ -22,5 +25,13 @@ object StorageManager {
         if (file.exists() && file.canWrite()) {
             file.delete()
         }
+    }
+
+    fun getImageUri(context: Context, proofImage: ProofImage): Uri? {
+        val folder = File(context.filesDir.path, IMAGE_PATH)
+        val file = File(folder, proofImage.filePath)
+        if (!file.exists()) return null
+        if (!file.canRead()) return null
+        return file.toUri()
     }
 }

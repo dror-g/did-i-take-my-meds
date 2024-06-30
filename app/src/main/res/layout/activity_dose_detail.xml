@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--Did I Take My Meds? is a FOSS app to keep track of medications
+<?xml version="1.0" encoding="utf-8"?><!--Did I Take My Meds? is a FOSS app to keep track of medications
     Did I Take My Meds? is designed to help prevent a user from skipping doses and/or overdosing
     Copyright (C) 2021  Noah Stanford <noahstandingford@gmail.com>
 
@@ -21,14 +20,19 @@
 
     <data>
 
+        <variable
+            name="vm"
+            type="dev.corruptedark.diditakemymeds.activities.dosedetails.DoseDetailViewModel" />
+
+        <import type="android.view.View" />
     </data>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?ditmm_colorBackground"
         android:orientation="vertical"
-        tools:context=".activities.DoseDetailActivity">
+        tools:context=".activities.dosedetails.DoseDetailActivity">
 
         <include
             android:id="@+id/appbar"
@@ -56,20 +60,22 @@
                         android:id="@+id/dose_taken_time_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|start"
                         android:layout_marginEnd="5dp"
-                        android:text="@string/midnight"
                         android:textColor="?colorAccent"
                         android:textSize="@dimen/medium_text_size"
-                        android:layout_gravity="center_vertical|start" />
+                        app:timeTaken="@{vm.doseRecord}"
+                        tools:text="@string/midnight" />
 
                     <androidx.appcompat.widget.AppCompatImageButton
                         android:id="@+id/start_taken_time_edit_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|end"
                         android:layout_marginStart="5dp"
-                        android:src="@drawable/edit"
                         android:background="#00000000"
-                        android:layout_gravity="center_vertical|end" />
+                        android:onClick="@{() -> vm.onEditTakeTimeButtonTapped()}"
+                        android:src="@drawable/edit" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -78,48 +84,54 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
                     android:layout_marginVertical="10dp"
-                    android:visibility="gone"
-                    tools:visibility="visible"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="@{vm.showEditTakenTime ? View.VISIBLE : View.GONE}"
+                    tools:visibility="visible">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/taken_time_button"
+                        style="@style/Widget.Button.Accented.Outlined"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="15dp"
                         android:layout_marginEnd="5dp"
+                        android:onClick="@{() -> vm.onTimeTapped()}"
+                        android:paddingVertical="15dp"
                         android:textSize="@dimen/medium_text_size"
-                        android:text="@string/midnight"
-                        style="@style/Widget.Button.Accented.Outlined" />
+                        app:timeFromMillis="@{vm.workingCalendar.timeInMillis}"
+                        tools:text="@string/midnight" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/taken_date_button"
+                        style="@style/Widget.Button.Accented.Outlined"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="15dp"
-                        android:paddingHorizontal="10dp"
                         android:layout_marginHorizontal="5dp"
+                        android:onClick="@{() -> vm.onDateTapped()}"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="15dp"
                         android:textSize="@dimen/medium_text_size"
-                        android:text="@string/date_format"
-                        style="@style/Widget.Button.Accented.Outlined" />
+                        app:dateFromMillis="@{vm.workingCalendar.timeInMillis}"
+                        tools:text="@string/date_format" />
 
                     <androidx.appcompat.widget.AppCompatImageButton
                         android:id="@+id/taken_time_confirm_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/done"
-                        android:background="#00000000"
+                        android:layout_gravity="center_vertical|end"
                         android:layout_marginHorizontal="5dp"
-                        android:layout_gravity="center_vertical|end" />
+                        android:background="#00000000"
+                        android:onClick="@{() -> vm.onApplyTimeChangesTapped()}"
+                        android:src="@drawable/done" />
 
                     <androidx.appcompat.widget.AppCompatImageButton
                         android:id="@+id/taken_time_cancel_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/close"
-                        android:background="#00000000"
+                        android:layout_gravity="center_vertical|end"
                         android:layout_marginStart="5dp"
-                        android:layout_gravity="center_vertical|end" />
+                        android:background="#00000000"
+                        android:onClick="@{() -> vm.onCancelTimeChangesTapped()}"
+                        android:src="@drawable/close" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <com.google.android.material.textview.MaterialTextView
@@ -128,9 +140,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
                     android:layout_marginVertical="10dp"
-                    android:text="@string/midnight"
                     android:textColor="?colorAccentSecondary"
-                    android:textSize="@dimen/medium_text_size" />
+                    android:textSize="@dimen/medium_text_size"
+                    android:visibility="@{vm.showClosestDose ? View.VISIBLE : View.GONE}"
+                    app:closestDose="@{vm.doseRecord}"
+                    tools:text="@string/midnight"
+                    tools:visibility="visible" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/proof_image_view"
@@ -138,7 +153,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginVertical="20dp"
-                    android:adjustViewBounds="true" />
+                    android:adjustViewBounds="true"
+                    android:visibility="@{vm.hasImage ? View.VISIBLE : View.GONE}"
+                    tools:src="@drawable/ic_launcher_circle_base"
+                    tools:visibility="visible" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/no_image_label"
@@ -149,9 +167,11 @@
                     android:text="@string/no_image_available"
                     android:textColor="?colorAccentSecondary"
                     android:textSize="@dimen/medium_text_size"
-                    app:autoSizeTextType="uniform" />
+                    android:visibility="@{vm.hasImage ? View.GONE : View.VISIBLE}"
+                    app:autoSizeTextType="uniform"
+                    tools:visibility="visible" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
 </layout>
