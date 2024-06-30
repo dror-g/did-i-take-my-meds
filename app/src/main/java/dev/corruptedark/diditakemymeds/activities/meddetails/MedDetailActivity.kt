@@ -27,36 +27,40 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.*
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.siravorona.utils.activityresult.ActivityResultManager
 import com.siravorona.utils.activityresult.takePicture
-import dev.corruptedark.diditakemymeds.util.ActionReceiver
-import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
-import dev.corruptedark.diditakemymeds.data.models.DoseRecord
-import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.BR
 import com.siravorona.utils.base.BaseBoundInteractableVmActivity
+import dev.corruptedark.diditakemymeds.BR
+import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.activities.DoseDetailActivity
 import dev.corruptedark.diditakemymeds.activities.EditMedActivity
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
-import dev.corruptedark.diditakemymeds.data.models.Medication
-import dev.corruptedark.diditakemymeds.data.models.ProofImage
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.proofImageDao
+import dev.corruptedark.diditakemymeds.data.models.DoseRecord
+import dev.corruptedark.diditakemymeds.data.models.Medication
+import dev.corruptedark.diditakemymeds.data.models.ProofImage
+import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ActivityMedDetailBinding
+import dev.corruptedark.diditakemymeds.util.ActionReceiver
+import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.util.medicationDoseString
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import java.io.File
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.Executors
-import kotlin.jvm.Throws
-import kotlinx.coroutines.launch
 
 class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBinding, MedDetailViewModel, MedDetailViewModel.Interactor>(
     ActivityMedDetailBinding::class, BR.vm) {
@@ -67,7 +71,6 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     private lateinit var alarmIntent: PendingIntent
     private val context = this
     private val mainScope = MainScope()
-    private var refreshJob: Job? = null
     private var currentPhotoPath: String? = null
 
     private val MAXIMUM_DELAY = 60000L // 1 minute in milliseconds
@@ -79,6 +82,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     private val IMAGE_EXTENSION = ".jpg"
     private var imageFolder: File? = null
     private var takeMed = false
+    private var medicationId = 0L
 
     override val vm: MedDetailViewModel by viewModels()
     override val modelInteractor = object : MedDetailViewModel.Interactor {
@@ -106,10 +110,13 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
             this@MedDetailActivity.cancelMedicationAlarm(medication)
         }
     }
+    private var medicationFlow: Flow<MedicationFull>? = null
 
     // region lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        takeMed = intent.getBooleanExtra(EXTRA_TAKE_MED, false)
+        medicationId = intent.getLongExtra(EXTRA_MEDICATION_ID, -1)
         imageFolder = File(filesDir.path + File.separator + getString(R.string.image_path))
         alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         setSupportActionBar(binding.appbar.toolbar)
@@ -120,40 +127,32 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         }
 
         ViewCompat.setNestedScrollingEnabled(binding.outerScroll, true)
-
-        takeMed = intent.getBooleanExtra(getString(R.string.take_med_key), false)
-
         vm.setupDoseRecordsList(binding.dosesRecycler)
+
+        lifecycleScope.launch {
+            medicationFlow = MedicationDB.getInstance(this@MedDetailActivity)
+                .medicationDao()
+                .observeFullDistinct(medicationId)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                medicationFlow?.collectLatest { medFull ->
+                    medFull.medication.let {
+                        it.updateStartsToFuture()
+                        it.doseRecord.sort()
+                    }
+                    mainScope.launch {
+                        onMedicationChanged(medFull)
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch(lifecycleDispatcher) {
-            refreshFromDatabase()
-            val medication = vm.medication
-            medicationDao(context).updateMedications(medication)
-
-            if (takeMed) {
-                takeMed = false
-                justTookItButtonPressed()
-            }
+            checkMedicationExists()
         }
-        medicationDao(context).getAll().observe(context) {
-            lifecycleScope.launch(lifecycleDispatcher) {
-                refreshFromDatabase()
-            }
-        }
-
-        refreshJob = startRefresherLoop(intent.getLongExtra(getString(R.string.med_id_key), -1))
     }
-
-    override fun onPause() {
-        runBlocking {
-            stopRefresherLoop(refreshJob)
-        }
-        super.onPause()
-    }
-
 
     // endregion
 
@@ -342,23 +341,8 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     // endregion
 
     @Synchronized
-    private fun refreshFromDatabase() {
-        val medId = intent.getLongExtra(getString(R.string.med_id_key), -1L)
-
-        if (medicationDao(this).medicationExists(medId)) {
-            val medFull = medicationDao(context).getFull(medId)
-            medFull.medication.let {
-                it.updateStartsToFuture()
-                it.doseRecord.sort()
-            }
-            mainScope.launch {
-                vm.medicationFull = medFull
-                if (!vm.medication.isAsNeeded()) {
-                    closestDose = vm.medication.calculateClosestDose().timeInMillis
-                }
-            }
-        }
-        else {
+    private fun checkMedicationExists() {
+        if (!medicationDao(this).medicationExists(medicationId)) {
             mainScope.launch {
                 onBackPressed()
             }
@@ -410,15 +394,16 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
 
 
     private suspend fun openEditMedication(aMedication: Medication) {
-        val result = EditMedActivity.startForResult(this, aMedication)
-        val medFull = medicationDao(context).getFull(result.first)
-        val medication = medFull.medication
+       EditMedActivity.startForResult(this, aMedication)
+    }
+
+    private fun onMedicationChanged(medicationFull: MedicationFull) {
         mainScope.launch {
-            vm.medicationFull = medFull
-            if (!medication.isAsNeeded()) {
-                closestDose = medication.calculateClosestDose().timeInMillis
+            vm.medicationFull = medicationFull
+            if (!medicationFull.medication.isAsNeeded()) {
+                closestDose = medicationFull.medication.calculateClosestDose().timeInMillis
             }
-            scheduleAlarm(medication)
+            scheduleAlarm(medicationFull.medication)
         }
     }
 
@@ -443,42 +428,6 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         }
     }
 
-
-    // region refresher loop
-    private fun startRefresherLoop(medId: Long): Job {
-        return lifecycleScope.launch(lifecycleDispatcher) {
-            while (medicationDao(context).medicationExists(medId)) {
-                val medication = medicationDao(context).get(medId)
-                val transitionDelay = medication.closestDoseTransitionTime() - System.currentTimeMillis()
-                val delayDuration =
-                    when {
-                        transitionDelay < MINIMUM_DELAY -> {
-                            MINIMUM_DELAY
-                        }
-                        transitionDelay in MINIMUM_DELAY until MAXIMUM_DELAY -> {
-                            transitionDelay
-                        }
-                        else -> {
-                            MAXIMUM_DELAY
-                        }
-                    }
-
-                delay(delayDuration)
-                refreshFromDatabase()
-            }
-        }
-
-    }
-
-    private suspend fun stopRefresherLoop(refresher: Job?) {
-        runCatching {
-            refresher?.cancelAndJoin()
-        }.onFailure { throwable ->
-            throwable.printStackTrace()
-        }
-    }
-    // endregion
-
     private fun saveImageProof(pictureTaken: Boolean) {
         val medication = vm.medication
         if (pictureTaken) {
@@ -499,12 +448,6 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         }
     }
 
-
-    private fun updateFields(medication: Medication) {
-        if (!medication.isAsNeeded()) {
-            closestDose = medication.calculateClosestDose().timeInMillis
-        }
-    }
 
     private fun scheduleAlarm(medication: Medication) {
         alarmIntent = AlarmIntentManager.buildNotificationAlarm(context, medication)
@@ -529,6 +472,17 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         } else {
             //Cancel alarm
             alarmManager?.cancel(alarmIntent)
+        }
+    }
+    companion object {
+        private const val EXTRA_MEDICATION_ID = "med_id"
+        private const val EXTRA_TAKE_MED = "take_med"
+        fun start(launcherActivity: ComponentActivity, medicationId: Long, takeMed: Boolean) {
+            val intent = Intent(launcherActivity, MedDetailActivity::class.java).apply {
+                putExtra(EXTRA_MEDICATION_ID, medicationId)
+                putExtra(EXTRA_TAKE_MED, takeMed)
+            }
+            launcherActivity.startActivity(intent)
         }
     }
 }

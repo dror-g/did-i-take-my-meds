@@ -157,10 +157,7 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
     }
 
     private fun openMedDetailActivity(medId: Long, takeMed: Boolean) {
-        val intent = Intent(this, MedDetailActivity::class.java)
-        intent.putExtra(getString(R.string.med_id_key), medId)
-        intent.putExtra(getString(R.string.take_med_key), takeMed)
-        startActivity(intent)
+        MedDetailActivity.start(this, medId, takeMed)
     }
 
     override fun onResume() {
