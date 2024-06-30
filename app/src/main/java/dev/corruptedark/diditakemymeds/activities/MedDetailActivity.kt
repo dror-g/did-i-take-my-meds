@@ -24,7 +24,6 @@ import android.app.PendingIntent
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -39,6 +38,8 @@ import androidx.core.content.FileProvider
 import androidx.core.view.*
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.siravorona.utils.activityresult.ActivityResultManager
+import com.siravorona.utils.activityresult.takePicture
 import dev.corruptedark.diditakemymeds.util.ActionReceiver
 import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord
@@ -191,25 +192,6 @@ class MedDetailActivity : BaseBoundActivity<ActivityMedDetailBinding>(ActivityMe
                 }
             }
         }
-
-    private val photoResultStarter = registerForActivityResult(ActivityResultContracts.TakePicture()) { pictureTaken ->
-        if (pictureTaken) {
-            val dose = createDose()
-            val proofImage = ProofImage(medication!!.id, dose.doseTime, currentPhotoPath!!)
-            saveDose(dose)
-            lifecycleScope.launch (lifecycleDispatcher) {
-                proofImageDao(context).insertAll(proofImage)
-                mainScope.launch {
-                    Toast.makeText(context, getString(R.string.dose_and_proof_saved), Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-        else {
-            mainScope.launch {
-                Toast.makeText(context, getString(R.string.failed_to_get_proof), Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
 
     private var alarmManager: AlarmManager? = null
     private lateinit var alarmIntent: PendingIntent
@@ -656,27 +638,22 @@ class MedDetailActivity : BaseBoundActivity<ActivityMedDetailBinding>(ActivityMe
         }
     }
 
-    private fun startTakePictureIntent(medId: Long, doseTime: Long) {
+    private fun takeImageProof(medId: Long, doseTime: Long) {
         lifecycleScope.launch(lifecycleDispatcher) {
-            Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-                takePictureIntent.resolveActivity(packageManager)?.also {
-
-                    val photoFile: File? = withContext(Dispatchers.IO) {
-                        runCatching {
-                            createImageFile(medId, doseTime)
-                        }
-                    }.getOrNull()
-
-                    photoFile?.also { file ->
-                        val photoURI: Uri = FileProvider.getUriForFile(
-                            context,
-                            getString(R.string.file_provider),
-                            file
-                        )
-                        photoResultStarter.launch(photoURI)
-                    }
-                }
+            if (Intent(MediaStore.ACTION_IMAGE_CAPTURE).resolveActivity(packageManager) == null) {
+                return@launch // can't take photos
             }
+            val photoFile = withContext(Dispatchers.IO) {
+                runCatching { createImageFile(medId, doseTime) }
+            }.getOrNull() ?: return@launch // couldn't create file to hold the image
+
+            val photoURI = FileProvider.getUriForFile(
+                context,
+                getString(R.string.file_provider),
+                photoFile
+            )
+            val picTaken = ActivityResultManager.getInstance().takePicture(photoURI)
+            saveImageProof(picTaken)
         }
     }
 
@@ -733,7 +710,7 @@ class MedDetailActivity : BaseBoundActivity<ActivityMedDetailBinding>(ActivityMe
             }
             else {
                 if (medication!!.requirePhotoProof) {
-                    startTakePictureIntent(medication!!.id, System.currentTimeMillis())
+                    takeImageProof(medication!!.id, System.currentTimeMillis())
                 } else {
                     saveDose(createDose())
                 }
@@ -781,6 +758,25 @@ class MedDetailActivity : BaseBoundActivity<ActivityMedDetailBinding>(ActivityMe
             refresher?.cancelAndJoin()
         }.onFailure { throwable ->
             throwable.printStackTrace()
+        }
+    }
+
+    private fun saveImageProof(pictureTaken: Boolean) {
+        if (pictureTaken) {
+            val dose = createDose()
+            val proofImage = ProofImage(medication!!.id, dose.doseTime, currentPhotoPath!!)
+            saveDose(dose)
+            lifecycleScope.launch (lifecycleDispatcher) {
+                proofImageDao(context).insertAll(proofImage)
+                mainScope.launch {
+                    Toast.makeText(context, getString(R.string.dose_and_proof_saved), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        else {
+            mainScope.launch {
+                Toast.makeText(context, getString(R.string.failed_to_get_proof), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

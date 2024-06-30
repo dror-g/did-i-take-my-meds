@@ -5,12 +5,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import com.siravorona.utils.activityresult.ActivityResultManager
 import com.siravorona.utils.bindableproperty.BindableManager
 
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
         BindableManager.loadBR(BR::class.java)
+        ActivityResultManager.init(this)
         createNotificationChannel()
     }
 

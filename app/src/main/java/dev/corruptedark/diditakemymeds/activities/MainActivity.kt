@@ -31,6 +31,9 @@ import androidx.appcompat.content.res.AppCompatResources
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
+import com.siravorona.utils.activityresult.ActivityResultManager
+import com.siravorona.utils.activityresult.createDocument
+import com.siravorona.utils.activityresult.getContent
 import com.siravorona.utils.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.listadapters.MedListAdapter
@@ -45,9 +48,7 @@ import dev.corruptedark.diditakemymeds.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.Comparator
-//import kotlinx.coroutines.*
 import java.util.concurrent.Executors
-
 
 class MainActivity : BaseBoundActivity<ActivityMainBinding>(
     ActivityMainBinding::class
@@ -72,34 +73,6 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
 
     private val tempDir by lazy { File(filesDir.path + File.separator + getString(R.string.temp_dir)) }
     private val imageDir by lazy { File(filesDir.path + File.separator + getString(R.string.image_path)) }
-
-
-    private val activityResultStarter =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            result.resultCode
-        }
-
-    private val restoreResultStarter =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode != RESULT_OK) return@registerForActivityResult
-            val restoreUri = result.data?.data ?: return@registerForActivityResult
-            restoreJob = lifecycleScope.launch(lifecycleDispatcher) {
-                doRestore(this@MainActivity, restoreUri, tempDir, imageDir)
-            }
-        }
-
-    private val backUpResultStarter =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode != RESULT_OK) return@registerForActivityResult
-            val backupUri =  result.data?.data ?: return@registerForActivityResult
-            if (backupUri.path != null) {
-                backupJob = lifecycleScope.launch(lifecycleDispatcher) {
-                    doBackup(context, backupUri, tempDir, imageDir)
-                }
-            }
-        }
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -187,7 +160,7 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
         val intent = Intent(this, MedDetailActivity::class.java)
         intent.putExtra(getString(R.string.med_id_key), medId)
         intent.putExtra(getString(R.string.take_med_key), takeMed)
-        activityResultStarter.launch(intent)
+        startActivity(intent)
     }
 
     override fun onResume() {
@@ -291,35 +264,32 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
         }
 
         val intent = Intent(this, AboutActivity::class.java)
-        activityResultStarter.launch(intent)
+        startActivity(intent)
     }
 
     private fun openAddMedActivity() {
         val intent = Intent(this, AddMedActivity::class.java)
-        activityResultStarter.launch(intent)
+        startActivity(intent)
     }
 
     private fun restoreDatabase() {
         lifecycleScope.launch (lifecycleDispatcher){
+            val restoreUri = ActivityResultManager.getInstance().getContent(MIME_TYPES) ?: return@launch
             stopRefresherLoop(refreshJob)
+            restoreJob = lifecycleScope.launch(lifecycleDispatcher) {
+                doRestore(this@MainActivity, restoreUri, tempDir, imageDir)
+            }
         }
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = Intent.normalizeMimeType(MIME_TYPES)
-
-        restoreResultStarter.launch(intent)
     }
 
-    private fun backUpDatabase() {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = Intent.normalizeMimeType(MIME_TYPES)
-        intent.putExtra(
-            Intent.EXTRA_TITLE,
-            MedicationDB.DATABASE_NAME + ZipFileManager.ZIP_FILE_EXTENSION
-        )
 
-        backUpResultStarter.launch(intent)
+    private fun backUpDatabase() {
+        // Intent.normalizeMimeType(MIME_TYPES), intent.addCategory(Intent.CATEGORY_OPENABLE)
+        lifecycleScope.launch (lifecycleDispatcher){
+            val suggestedName = MedicationDB.DATABASE_NAME + ZipFileManager.ZIP_FILE_EXTENSION
+            val backupUri = ActivityResultManager.getInstance().createDocument(MIME_TYPES, suggestedName) ?: return@launch
+            doBackup(context, backupUri, tempDir, imageDir)
+        }
     }
 
     override fun onPause() {
@@ -387,6 +357,7 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
             MedicationDB.wipeInstance()
 
             if (!tempFolder.exists()) tempFolder.mkdirs()
+            if (!imageFolder.exists()) imageFolder.mkdirs()
 
             tempFolder.listFiles()?.iterator()?.forEach { entry ->
                 entry.deleteRecursively()
