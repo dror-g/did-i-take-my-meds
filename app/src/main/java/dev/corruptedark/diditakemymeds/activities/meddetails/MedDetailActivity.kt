@@ -21,17 +21,21 @@ package dev.corruptedark.diditakemymeds.activities.meddetails
 
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
-import androidx.core.view.*
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -55,12 +59,14 @@ import dev.corruptedark.diditakemymeds.databinding.ActivityMedDetailBinding
 import dev.corruptedark.diditakemymeds.util.ActionReceiver
 import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.util.medicationDoseString
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import java.io.File
-import java.lang.Exception
-import java.util.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Calendar
 import java.util.concurrent.Executors
 
 class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBinding, MedDetailViewModel, MedDetailViewModel.Interactor>(
@@ -69,7 +75,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     private var alarmManager: AlarmManager? = null
-    private lateinit var alarmIntent: PendingIntent
+    private var alarmIntent: PendingIntent? = null
     private val context = this
     private val mainScope = MainScope()
 
@@ -99,7 +105,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         }
 
         override fun cancelMedicationAlarm(medication: Medication) {
-            this@MedDetailActivity.cancelMedicationAlarm(medication)
+            this@MedDetailActivity.cancelExistingMedicationAlarm(medication)
         }
     }
     private var medicationFlow: Flow<MedicationFull>? = null
@@ -182,7 +188,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     private fun deleteMedication(medication: Medication) {
         lifecycleScope.launch(lifecycleDispatcher) {
             val db = MedicationDB.getInstance(context)
-            alarmManager?.cancel(alarmIntent)
+            cancelExistingMedicationAlarm(medication, false)
             withContext(Dispatchers.IO) {
                 val proofImages =
                     db.proofImageDao().getProofImagesByMedId(medication.id)
@@ -217,16 +223,31 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     // endregion
 
     // region alarms
-    private fun cancelMedicationAlarm(medication: Medication) {
-        alarmManager?.cancel(alarmIntent)
-        Toast.makeText(
-            context,
-            getString(R.string.notifications_disabled),
-            Toast.LENGTH_SHORT
-        ).show()
+    private fun updateAlarm(medication: Medication) {
+        if (medication.notify) {
+            cancelExistingMedicationAlarm(medication, false)
+            scheduleNextMedicationAlarm(medication, false)
+        } else {
+            //Cancel alarm
+            cancelExistingMedicationAlarm(medication, false)
+        }
     }
 
-    private fun scheduleNextMedicationAlarm(medication: Medication) {
+    private fun cancelExistingMedicationAlarm(medication: Medication, showToast: Boolean = true) {
+        alarmIntent?.let { alarmManager?.cancel(it) }
+        if (showToast) {
+            Toast.makeText(
+                context,
+                getString(R.string.notifications_disabled),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun scheduleNextMedicationAlarm(medication: Medication, showToast: Boolean = true) {
+        cancelExistingMedicationAlarm(medication, false)
+        val alarmIntent = AlarmIntentManager.buildNotificationAlarm(context, medication)
+        this.alarmIntent = alarmIntent
         AlarmIntentManager.setExact(
             alarmManager,
             alarmIntent,
@@ -234,17 +255,18 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         )
 
         val receiver = ComponentName(context, ActionReceiver::class.java)
-
         context.packageManager.setComponentEnabledSetting(
             receiver,
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
             PackageManager.DONT_KILL_APP
         )
-        Toast.makeText(
-            context,
-            getString(R.string.notifications_enabled),
-            Toast.LENGTH_SHORT
-        ).show()
+        if (showToast) {
+            Toast.makeText(
+                context,
+                getString(R.string.notifications_enabled),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
     // endregion
 
@@ -368,7 +390,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
             if (!medicationFull.medication.isAsNeeded()) {
                 closestDose = medicationFull.medication.calculateClosestDose().timeInMillis
             }
-            scheduleAlarm(medicationFull.medication)
+            updateAlarm(medicationFull.medication)
         }
     }
 
@@ -414,31 +436,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     }
 
 
-    private fun scheduleAlarm(medication: Medication) {
-        alarmIntent = AlarmIntentManager.buildNotificationAlarm(context, medication)
 
-        if (medication.notify) {
-            //Set alarm
-            alarmManager?.cancel(alarmIntent)
-
-            AlarmIntentManager.setExact(
-                alarmManager,
-                alarmIntent,
-                medication.calculateNextDose().timeInMillis
-            )
-
-            val receiver = ComponentName(context, ActionReceiver::class.java)
-
-            context.packageManager.setComponentEnabledSetting(
-                receiver,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP
-            )
-        } else {
-            //Cancel alarm
-            alarmManager?.cancel(alarmIntent)
-        }
-    }
     companion object {
         private const val EXTRA_MEDICATION_ID = "med_id"
         private const val EXTRA_TAKE_MED = "take_med"
