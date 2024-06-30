@@ -41,6 +41,7 @@ import com.siravorona.utils.activityresult.takePicture
 import com.siravorona.utils.base.BaseBoundInteractableVmActivity
 import dev.corruptedark.diditakemymeds.BR
 import dev.corruptedark.diditakemymeds.R
+import dev.corruptedark.diditakemymeds.StorageManager
 import dev.corruptedark.diditakemymeds.activities.DoseDetailActivity
 import dev.corruptedark.diditakemymeds.activities.EditMedActivity
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
@@ -58,7 +59,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import java.io.File
-import java.io.IOException
+import java.lang.Exception
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -72,9 +73,6 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     private val context = this
     private val mainScope = MainScope()
 
-    private val IMAGE_NAME_SEPARATOR = "_"
-    private val IMAGE_EXTENSION = ".jpg"
-    private var imageFolder: File? = null
     private var takeMed = false
     private var medicationId = 0L
 
@@ -111,7 +109,6 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         super.onCreate(savedInstanceState)
         takeMed = intent.getBooleanExtra(EXTRA_TAKE_MED, false)
         medicationId = intent.getLongExtra(EXTRA_MEDICATION_ID, -1)
-        imageFolder = File(filesDir.path + File.separator + getString(R.string.image_path))
         alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         setSupportActionBar(binding.appbar.toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -190,12 +187,12 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
                 val proofImages =
                     db.proofImageDao().getProofImagesByMedId(medication.id)
                 proofImages.forEach { proofImage ->
-
-                    imageFolder?.apply {
-                        proofImage.deleteImageFile(imageFolder!!)
+                    try {
+                      StorageManager.deleteImageFile(this@MedDetailActivity, proofImage)
+                    } catch (e: Exception) {
+                        //
                     }
                     db.proofImageDao().delete(proofImage)
-
                 }
 
                 db.medicationDao().delete(medication)
@@ -321,9 +318,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
             if (proofImageDao(context).proofImageExists(medId, doseTime)) {
                 val proofImage = proofImageDao(context).get(medId, doseTime)
                 if (proofImage != null) {
-                    imageFolder?.apply {
-                        proofImage.deleteImageFile(imageFolder!!)
-                    }
+                    StorageManager.deleteImageFile(this@MedDetailActivity, proofImage)
                     proofImageDao(context).delete(proofImage)
                 }
             }
@@ -343,35 +338,13 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         }
     }
 
-
-
-    @Throws(IOException::class)
-    private fun createImageFile(medId: Long, doseTime: Long): File {
-        val medIdString = medId.toString()
-        val doseTimeString = doseTime.toString()
-        val storageDir = imageFolder
-        if (storageDir != null && !storageDir.exists()) {
-            try {
-                storageDir.mkdir()
-            }
-            catch (exception: SecurityException) {
-                exception.printStackTrace()
-            }
-        }
-        return File.createTempFile(
-            medIdString + IMAGE_NAME_SEPARATOR + doseTimeString,
-            IMAGE_EXTENSION,
-            storageDir
-        )
-    }
-
     private fun takeImageProof(medId: Long, doseTime: Long) {
         lifecycleScope.launch(lifecycleDispatcher) {
             if (Intent(MediaStore.ACTION_IMAGE_CAPTURE).resolveActivity(packageManager) == null) {
                 return@launch // can't take photos
             }
             val photoFile = withContext(Dispatchers.IO) {
-                runCatching { createImageFile(medId, doseTime) }
+                runCatching { StorageManager.createImageFile(context, medId, doseTime) }
             }.getOrNull() ?: return@launch // couldn't create file to hold the image
 
             val photoURI = FileProvider.getUriForFile(
