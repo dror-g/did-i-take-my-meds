@@ -25,5 +25,7 @@
     <attr name="ditmm_colorBackground" format="reference|color"/>
     <attr name="ditmm_colorItemBackground" format="reference|color"/>
     <attr name="ditmm_colorBorder" format="reference|color"/>
+    <attr name="ditmm_colorFilledButtonBackground" format="reference|color"/>
+    <attr name="ditmm_colorFilledButtonText" format="reference|color"/>
     <attr name="ditmm_bar_logo" format="reference"/>
 </resources>

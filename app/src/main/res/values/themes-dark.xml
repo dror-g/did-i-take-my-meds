@@ -35,6 +35,8 @@
         <item name="ditmm_colorBackground">@color/background</item>
         <item name="ditmm_colorItemBackground">@color/item_background</item>
         <item name="ditmm_colorBorder">@color/purple_500</item>
+        <item name="ditmm_colorFilledButtonBackground">@color/purple_700</item>
+        <item name="ditmm_colorFilledButtonText">@color/purple_200</item>
         <item name="colorAccentSecondary">@color/sub_purple</item>
 
         <item name="ditmm_bar_logo">@drawable/bar_logo_dark</item>

@@ -121,7 +121,7 @@
                     tools:text="@string/i_just_took_it"
                     app:justTookIt="@{vm.medication}"
                     android:onClick="@{() -> vm.onJustTookItPressed()}"
-                    style="@style/Widget.Button.Accented.Outlined" />
+                    style="@style/Widget.Button.Accented.Outlined.Filled" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/active_switch"

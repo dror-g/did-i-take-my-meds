@@ -66,8 +66,11 @@
     </style>
 
 
-    <style name="Widget.Button.Accented.Outlined.Filled" >
-        <item name="backgroundTint">?colorPrimary</item>
+    <style name="Widget.Button.Accented.Outlined.Filled">
+        <item name="backgroundTint">?ditmm_colorFilledButtonBackground</item>
+<!--        <item name="colorPrimary">?colorOnPrimarySurface</item>-->
+        <item name="android:textColor">?ditmm_colorFilledButtonText</item>
+        <item name="strokeColor">?ditmm_colorBorder</item>
     </style>
 
     <style name="ScreenHintLabel">
