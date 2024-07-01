@@ -21,52 +21,66 @@ package dev.corruptedark.diditakemymeds.util
 
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.Medication
 
 object AlarmIntentManager {
 
+    fun scheduleNotification(
+        context: Context, medication: Medication,
+        customTimeMillis: Long? = null,
+    ): PendingIntent {
+        val alarmIntent = buildNotificationAlarm(context, medication)
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        setExact(
+            alarmManager, alarmIntent,
+            customTimeMillis ?: medication.calculateNextDose().timeInMillis
+        )
+
+        val receiver = ComponentName(context, ActionReceiver::class.java)
+
+        context.packageManager.setComponentEnabledSetting(
+            receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
+        )
+        return alarmIntent
+    }
+
     fun buildNotificationAlarm(context: Context, medication: Medication): PendingIntent {
         return Intent(context, ActionReceiver::class.java).let { innerIntent ->
             innerIntent.action = ActionReceiver.NOTIFY_ACTION
-            innerIntent.putExtra(
-                context.getString(R.string.med_id_key),
-                medication.id
-            )
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.getBroadcast(
-                    context,
-                    medication.id.toInt(),
-                    innerIntent,
-                    PendingIntent.FLAG_IMMUTABLE
-                )
-            } else {
-                PendingIntent.getBroadcast(
-                    context,
-                    medication.id.toInt(),
-                    innerIntent,
-                    0
-                )
-            }
+            innerIntent.putExtra(context.getString(R.string.med_id_key), medication.id)
+            context.broadcastIntentFromIntent(medication.id.toInt(), innerIntent)
         }
     }
 
-    fun setExact(alarmManager: AlarmManager?, alarmIntent: PendingIntent, timeInMillis: Long) {
+    fun setExact(alarmManager: AlarmManager, alarmIntent: PendingIntent, timeInMillis: Long) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager!!.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                timeInMillis,
-                alarmIntent
-            )
+            try {
+                if (canScheduleExactAlarms(alarmManager)) {
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP, timeInMillis, alarmIntent
+                    )
+                }
+            } catch (e: SecurityException) {
+                //
+            }
         } else {
-            alarmManager!!.set(
-                AlarmManager.RTC_WAKEUP,
-                timeInMillis,
-                alarmIntent
+            alarmManager.set(
+                AlarmManager.RTC_WAKEUP, timeInMillis, alarmIntent
             )
+        }
+    }
+
+    private fun canScheduleExactAlarms(alarmManager: AlarmManager) : Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            alarmManager.canScheduleExactAlarms()
+        } else {
+            true
         }
     }
 }

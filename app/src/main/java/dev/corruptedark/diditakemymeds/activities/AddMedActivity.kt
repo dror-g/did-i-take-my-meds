@@ -512,24 +512,9 @@ class AddMedActivity : BaseBoundActivity<ActivityAddOrEditMedBinding>(ActivityAd
             medicationDao(this).insertAll(medication)
             medication = medicationDao(this).getAllRaw().last()
 
-            alarmIntent = AlarmIntentManager.buildNotificationAlarm(this, medication)
-
             if (notify) {
                 //Set alarm
-
-                AlarmIntentManager.setExact(
-                    alarmManager,
-                    alarmIntent,
-                    medication.calculateNextDose().timeInMillis
-                )
-
-                val receiver = ComponentName(this, ActionReceiver::class.java)
-
-                this.packageManager.setComponentEnabledSetting(
-                    receiver,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP
-                )
+                alarmIntent = AlarmIntentManager.scheduleNotification(this, medication)
             }
 
             mainScope.launch {

@@ -1,11 +1,13 @@
 package dev.corruptedark.diditakemymeds.util
 
+import android.Manifest
 import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
-import android.text.format.DateFormat
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.res.ResourcesCompat
@@ -21,7 +23,6 @@ import java.util.concurrent.Executors
 
 class ActionReceiver : BroadcastReceiver() {
     private var alarmManager: AlarmManager? = null
-    private lateinit var alarmIntent: PendingIntent
     private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     companion object {
@@ -33,7 +34,12 @@ class ActionReceiver : BroadcastReceiver() {
 
         private const val NO_ICON = 0
 
-        fun configureNotification(context: Context, medication: Medication): NotificationCompat.Builder {
+        fun configureNotification(
+            context: Context,
+            medication: Medication,
+            contentText: String? = null,
+            noActions: Boolean = false
+        ): NotificationCompat.Builder {
             val calendar = Calendar.getInstance()
             medicationDao(context).updateMedications(medication)
 
@@ -42,236 +48,242 @@ class ActionReceiver : BroadcastReceiver() {
                 putExtra(context.getString(R.string.med_id_key), medication.id)
             }
 
-            val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.getActivity(context, medication.id.toInt(), actionIntent, PendingIntent.FLAG_IMMUTABLE)
-            } else {
-                PendingIntent.getActivity(context, medication.id.toInt(), actionIntent, 0)
-            }
+            val contentIntent = buildContentIntent(context, medication, actionIntent)
 
             val closestDose = medication.calculateClosestDose()
             val hour = closestDose.schedule.hour
             val minute = closestDose.schedule.minute
             calendar.set(Calendar.HOUR_OF_DAY, hour)
             calendar.set(Calendar.MINUTE, minute)
-            val isSystem24Hour = DateFormat.is24HourFormat(context)
+            val formattedTime = context.formatTime(calendar)
 
-            val formattedTime = if (isSystem24Hour) DateFormat.format(
-                context.getString(R.string.time_24),
-                calendar
-            )
-            else DateFormat.format(context.getString(R.string.time_12), calendar)
+            val notificationBuilder =
+                NotificationCompat.Builder(context, context.getString(R.string.channel_name))
+                    .setSmallIcon(R.drawable.ic_small_notification)
+                    .setColor(
+                        ResourcesCompat.getColor(
+                            context.resources,
+                            R.color.notification_icon_color,
+                            context.theme
+                        )
+                    )
+                    .setContentTitle(medication.name)
+                    .setSubText(formattedTime)
+                    .setContentText(context.getString(R.string.time_for_your_dose))
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setContentIntent(contentIntent)
+                    .setAutoCancel(false)
 
-            //Start building "took med" notification action
-            val tookMedIntent = Intent(context, ActionReceiver::class.java).apply {
-                action = TOOK_MED_ACTION
-                putExtra(context.getString(R.string.med_id_key), medication.id)
+            if (contentText != null) notificationBuilder.setContentText(contentText)
+
+            if (!noActions) {
+                val tookMedPendingIntent = buildActionTookMedIntent(context, medication)
+                val remindPendingIntent = buildActionRemindIntent(context, medication)
+
+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || !medication.requirePhotoProof) {
+                    notificationBuilder.addAction(
+                        NO_ICON,
+                        context.getString(R.string.took_it),
+                        tookMedPendingIntent
+                    )
+                }
+
+                notificationBuilder.addAction(
+                    NO_ICON,
+                    context.getString(R.string.remind_in_15),
+                    remindPendingIntent
+                )
             }
-            val tookMedPendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.getBroadcast(context, medication.id.toInt(), tookMedIntent, PendingIntent.FLAG_IMMUTABLE)
-            } else {
-                PendingIntent.getBroadcast(context, medication.id.toInt(), tookMedIntent, 0)
-            }
-            //End building "took med" notification action
 
-            //Start building "remind" notification action
+            return notificationBuilder
+        }
+
+        //region pending intents
+        private fun buildActionRemindIntent(
+            context: Context,
+            medication: Medication
+        ): PendingIntent {
             val remindIntent = Intent(context, ActionReceiver::class.java).apply {
                 action = REMIND_ACTION
                 putExtra(context.getString(R.string.med_id_key), medication.id)
             }
-            val remindPendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.getBroadcast(context, medication.id.toInt(), remindIntent, PendingIntent.FLAG_IMMUTABLE)
-            } else {
-                PendingIntent.getBroadcast(context, medication.id.toInt(), remindIntent, 0)
+            return context.broadcastIntentFromIntent(medication.id.toInt(), remindIntent)
+        }
+
+        private fun buildActionTookMedIntent(
+            context: Context,
+            medication: Medication
+        ): PendingIntent {
+            val tookMedIntent = Intent(context, ActionReceiver::class.java).apply {
+                action = TOOK_MED_ACTION
+                putExtra(context.getString(R.string.med_id_key), medication.id)
             }
-            //End building "remind" notification action
+            return context.broadcastIntentFromIntent(medication.id.toInt(), tookMedIntent)
+        }
+
+        private fun buildContentIntent(
+            context: Context,
+            medication: Medication,
+            actionIntent: Intent
+        ): PendingIntent {
+            return context.activityIntentFromIntent(medication.id.toInt(), actionIntent)
+        }
+    }
+    // endregion
 
 
-            val notificationBuilder = NotificationCompat.Builder(
+    private fun notify(
+        context: Context, medication: Medication,
+        contentText: String? = null,
+        noActions: Boolean = false,
+    ) {
+        if (ActivityCompat.checkSelfPermission(
                 context,
-                context.getString(R.string.channel_name)
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val notification =
+                configureNotification(
+                    context, medication,
+                    contentText = contentText,
+                    noActions = noActions
+                ).build()
+            val nm = NotificationManagerCompat.from(context.applicationContext)
+            nm.notify(
+                medication.id.toInt(),
+                notification
             )
-                .setSmallIcon(R.drawable.ic_small_notification)
-                .setColor(
-                    ResourcesCompat.getColor(
-                        context.resources,
-                        R.color.notification_icon_color,
-                        context.theme
-                    )
-                )
-                .setContentTitle(medication.name)
-                .setSubText(formattedTime)
-                .setContentText(context.getString(R.string.time_for_your_dose))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(false)
-
-
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || !medication.requirePhotoProof) {
-                notificationBuilder.addAction(NO_ICON, context.getString(R.string.took_it), tookMedPendingIntent)
-            }
-
-            notificationBuilder.addAction(NO_ICON, context.getString(R.string.remind_in_15), remindPendingIntent)
-
-            return notificationBuilder
         }
     }
 
-    private fun createNotificationChannel(context: Context) {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = context.getString(R.string.channel_name)
-            val descriptionText = context.getString(R.string.channel_description)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(name, name, importance).apply {
-                description = descriptionText
-            }
-            // Register the channel with the system
-            val notificationManager: NotificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
+    private suspend fun cancelNotification(context: Context, idToCancel: Int) {
+        val nm = NotificationManagerCompat.from(context.applicationContext)
+        delay(CANCEL_DELAY)
+        nm.cancel(idToCancel)
     }
+
 
     override fun onReceive(context: Context, intent: Intent) {
         alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        createNotificationChannel(context)
+        NotificationsUtil.createNotificationChannel(context)
 
         GlobalScope.launch(dispatcher) {
-            val medications = medicationDao(context).getAllRaw()
-
             when (intent.action) {
                 Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_LOCKED_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
-                    medications.forEach { medication ->
-                        medication.updateStartsToFuture()
-                        if (medication.notify) {
-                            //Create alarm
-                            alarmIntent =
-                                AlarmIntentManager.buildNotificationAlarm(context, medication)
-                            AlarmIntentManager.setExact(
-                                alarmManager,
-                                alarmIntent,
-                                medication.calculateNextDose().timeInMillis
-                            )
-                            if (System.currentTimeMillis() > medication.calculateClosestDose().timeInMillis && !medication.closestDoseAlreadyTaken()) {
-                                val notification = configureNotification(context, medication).build()
-                                with(NotificationManagerCompat.from(context.applicationContext)) {
-                                    notify(
-                                        medication.id.toInt(),
-                                        notification
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    medicationDao(context)
-                        .updateMedications(*medications.toTypedArray())
+                    onStartEverythingAction(context)
                 }
                 NOTIFY_ACTION -> {
                     //Handle alarm
-                    val medication =
-                        medicationDao(context)
-                            .get(intent.getLongExtra(context.getString(R.string.med_id_key), -1))
-
-                    medication.updateStartsToFuture()
-                    alarmIntent = AlarmIntentManager.buildNotificationAlarm(context, medication)
-                    AlarmIntentManager.setExact(
-                        alarmManager,
-                        alarmIntent,
-                        medication.calculateNextDose().timeInMillis
-                    )
-
-                    if (medication.active && !medication.closestDoseAlreadyTaken()) {
-                        val notification = configureNotification(context, medication).build()
-                        with(NotificationManagerCompat.from(context.applicationContext)) {
-                            notify(
-                                medication.id.toInt(),
-                                notification
-                            )
-                        }
-                    }
+                    onNotifyAction(context, intent)
                 }
                 TOOK_MED_ACTION -> {
-
-                    val medId = intent.getLongExtra(context.getString(R.string.med_id_key), -1L)
-
-                    if (medicationDao(context).medicationExists(medId) && medicationDao(context).get(medId).active) {
-                        val medication: Medication =
-                            medicationDao(context).get(medId)
-
-                        if (medication.requirePhotoProof) {
-                            val takeMedIntent = Intent(context, MainActivity::class.java).apply {
-                                flags =
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                putExtra(context.getString(R.string.med_id_key), medication.id)
-                                putExtra(context.getString(R.string.take_med_key), true)
-                            }
-
-                            context.startActivity(takeMedIntent)
-                        }
-                        else {
-                            if (!medication.closestDoseAlreadyTaken() && medication.hasDoseRemaining()) {
-
-                                val takenDose = if(medication.isAsNeeded()) {
-                                    DoseRecord(
-                                        System.currentTimeMillis()
-                                    )
-                                }
-                                else {
-                                    DoseRecord(
-                                        System.currentTimeMillis(),
-                                        medication.calculateClosestDose().timeInMillis
-                                    )
-                                }
-                                medication.addNewTakenDose(takenDose)
-                                medicationDao(context)
-                                    .updateMedications(medication)
-                            }
-
-                            val notification = configureNotification(context, medication)
-                                .setContentText(context.getString(R.string.taken))
-                                .clearActions()
-                                .build()
-
-                            with(NotificationManagerCompat.from(context.applicationContext)) {
-                                notify(
-                                    medication.id.toInt(),
-                                    notification
-                                )
-                                delay(CANCEL_DELAY)
-                                cancel(medication.id.toInt())
-                            }
-                        }
-
-                    }
-                    else {
-                        with(NotificationManagerCompat.from(context.applicationContext)) {
-                            cancel(medId.toInt())
-                        }
-                    }
+                    onTookMedAction(context, intent)
                 }
                 REMIND_ACTION -> {
-                    val medId = intent.getLongExtra(context.getString(R.string.med_id_key), -1L)
-
-                    with(NotificationManagerCompat.from(context.applicationContext)) {
-                        cancel(medId.toInt())
-                    }
-
-                    if (medicationDao(context).medicationExists(medId)) {
-                        val calendar = Calendar.getInstance()
-                        calendar.add(Calendar.MINUTE, REMIND_DELAY)
-                        val medication: Medication =
-                            medicationDao(context).get(medId)
-                        alarmIntent = AlarmIntentManager.buildNotificationAlarm(context, medication)
-                        AlarmIntentManager.setExact(
-                            alarmManager,
-                            alarmIntent,
-                            calendar.timeInMillis
-                        )
-                    }
+                    onRemindAction(context, intent)
                 }
             }
+        }
+    }
+
+    private suspend fun onTookMedAction(
+        context: Context,
+        intent: Intent
+    ) {
+        val medId = intent.getLongExtra(context.getString(R.string.med_id_key), -1L)
+        if (medicationDao(context).medicationExists(medId)
+            && medicationDao(context).get(medId).active
+        ) {
+            val medication: Medication =
+                medicationDao(context).get(medId)
+
+            if (medication.requirePhotoProof) {
+                takePhotoProof(context, medication)
+            } else {
+                if (!medication.closestDoseAlreadyTaken() && medication.hasDoseRemaining()) {
+                    val takenDose = if (medication.isAsNeeded()) {
+                        DoseRecord(System.currentTimeMillis())
+                    } else {
+                        DoseRecord(
+                            System.currentTimeMillis(),
+                            medication.calculateClosestDose().timeInMillis
+                        )
+                    }
+                    medication.addNewTakenDose(takenDose)
+                    medicationDao(context)
+                        .updateMedications(medication)
+                }
+
+                notify(context, medication, context.getString(R.string.taken), true)
+                cancelNotification(context, medication.id.toInt())
+            }
+
+        } else {
+            with(NotificationManagerCompat.from(context.applicationContext)) {
+                cancel(medId.toInt())
+            }
+        }
+    }
+
+    private fun takePhotoProof(
+        context: Context,
+        medication: Medication
+    ) {
+        val takeMedIntent = Intent(context, MainActivity::class.java).apply {
+            flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(context.getString(R.string.med_id_key), medication.id)
+            putExtra(context.getString(R.string.take_med_key), true)
+        }
+
+        context.startActivity(takeMedIntent)
+    }
+
+    private fun onRemindAction(context: Context, intent: Intent) {
+        val medId = intent.getLongExtra(context.getString(R.string.med_id_key), -1L)
+
+        with(NotificationManagerCompat.from(context.applicationContext)) {
+            cancel(medId.toInt())
+        }
+
+        if (medicationDao(context).medicationExists(medId)) {
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.MINUTE, REMIND_DELAY)
+            val medication: Medication =
+                medicationDao(context).get(medId)
+            AlarmIntentManager.scheduleNotification(context, medication, calendar.timeInMillis)
+
+        }
+    }
+
+    private fun onStartEverythingAction(context: Context) {
+        val medications = medicationDao(context).getAllRaw()
+        medications.forEach { medication ->
+            medication.updateStartsToFuture()
+            if (medication.notify) {
+                //Create alarm
+                AlarmIntentManager.scheduleNotification(context, medication)
+                if (System.currentTimeMillis() > medication.calculateClosestDose().timeInMillis && !medication.closestDoseAlreadyTaken()) {
+                    notify(context, medication)
+                }
+            }
+        }
+        medicationDao(context)
+            .updateMedications(*medications.toTypedArray())
+    }
+
+    private fun onNotifyAction(context: Context, intent: Intent) {
+        val medication =
+            medicationDao(context)
+                .get(intent.getLongExtra(context.getString(R.string.med_id_key), -1))
+
+        medication.updateStartsToFuture()
+        AlarmIntentManager.scheduleNotification(context, medication)
+
+        if (medication.active && !medication.closestDoseAlreadyTaken()) {
+            notify(context, medication)
         }
     }
 }

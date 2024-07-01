@@ -237,7 +237,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     }
 
     private fun cancelExistingMedicationAlarm(medication: Medication, showToast: Boolean = true) {
-        alarmIntent?.let { alarmManager?.cancel(it) }
+        alarmIntent?.let { alarmManager?.cancel(it); alarmIntent = null }
         if (showToast) {
             Toast.makeText(
                 context,
@@ -249,26 +249,15 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
 
     private fun scheduleNextMedicationAlarm(medication: Medication, showToast: Boolean = true) {
         cancelExistingMedicationAlarm(medication, false)
-        val alarmIntent = AlarmIntentManager.buildNotificationAlarm(context, medication)
-        this.alarmIntent = alarmIntent
-        AlarmIntentManager.setExact(
-            alarmManager,
-            alarmIntent,
-            medication.calculateNextDose().timeInMillis
-        )
-
-        val receiver = ComponentName(context, ActionReceiver::class.java)
-        context.packageManager.setComponentEnabledSetting(
-            receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
-        )
-        if (showToast) {
-            Toast.makeText(
-                context,
-                getString(R.string.notifications_enabled),
-                Toast.LENGTH_SHORT
-            ).show()
+        this.alarmIntent = AlarmIntentManager.scheduleNotification(context, medication)
+        if (this.alarmIntent != null) {
+            if (showToast) {
+                Toast.makeText(
+                    context,
+                    getString(R.string.notifications_enabled),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
     // endregion

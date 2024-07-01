@@ -45,7 +45,7 @@ import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.medicationTypeDao
 import dev.corruptedark.diditakemymeds.databinding.ActivityMainBinding
-import dev.corruptedark.diditakemymeds.util.getThemeDrawableByAttr
+import com.siravorona.utils.getThemeDrawableByAttr
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.Comparator

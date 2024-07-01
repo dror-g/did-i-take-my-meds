@@ -17,8 +17,8 @@ import dev.corruptedark.diditakemymeds.BR
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.databinding.ItemDoseListBinding
-import dev.corruptedark.diditakemymeds.util.dpToPx
-import dev.corruptedark.diditakemymeds.util.getThemedColorByAttr
+import com.siravorona.utils.dp2Px
+import com.siravorona.utils.getThemedColorByAttr
 
 class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>() {
     interface Interactor {
@@ -126,7 +126,7 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
         val context = recyclerView.context
 
         val dividerColor = context.getThemedColorByAttr(R.attr.ditmm_colorBackground)
-        val decoration = ColorDividerItemDecoration(LinearLayoutManager.VERTICAL, dividerColor, context.dpToPx(5.0f))
+        val decoration = ColorDividerItemDecoration(LinearLayoutManager.VERTICAL, dividerColor, context.dp2Px(5.0f))
         recyclerView.addItemDecoration(decoration)
 
         BindableAdapter(doseRecordItems, BR.item)

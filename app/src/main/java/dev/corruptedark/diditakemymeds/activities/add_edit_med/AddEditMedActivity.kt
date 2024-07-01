@@ -228,24 +228,10 @@ class AddEditMedActivity :
     }
 
     private fun setMedicationAlarm(medication: Medication) {
-        alarmIntent?.let { alarmManager?.cancel(it) }
-        val alarmIntent = AlarmIntentManager.buildNotificationAlarm(this, medication)
-        this.alarmIntent = alarmIntent
+        alarmIntent?.let { alarmManager?.cancel(it); alarmIntent = null}
         if (medication.notify) {
-            //Set alarm
-            AlarmIntentManager.setExact(
-                alarmManager,
-                alarmIntent,
-                medication.calculateNextDose().timeInMillis
-            )
-
-            val receiver = ComponentName(this, ActionReceiver::class.java)
-
-            this.packageManager.setComponentEnabledSetting(
-                receiver,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP
-            )
+            val intent = AlarmIntentManager.scheduleNotification(this, medication)
+            this.alarmIntent = intent
         }
     }
 
