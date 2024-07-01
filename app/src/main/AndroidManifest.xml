@@ -74,6 +74,9 @@
             android:name=".activities.AboutActivity"
             android:label="@string/about" />
         <activity
+            android:name=".activities.add_edit_med.AddEditMedActivity"
+            android:label="@string/edit_medication" />
+        <activity
             android:name=".activities.EditMedActivity"
             android:label="@string/edit_medication" />
         <activity

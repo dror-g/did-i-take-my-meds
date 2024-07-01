@@ -45,8 +45,9 @@ import com.siravorona.utils.base.BaseBoundInteractableVmActivity
 import dev.corruptedark.diditakemymeds.BR
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.StorageManager
-import dev.corruptedark.diditakemymeds.activities.dosedetails.DoseDetailActivity
 import dev.corruptedark.diditakemymeds.activities.EditMedActivity
+import dev.corruptedark.diditakemymeds.activities.add_edit_med.AddEditMedActivity
+import dev.corruptedark.diditakemymeds.activities.dosedetails.DoseDetailActivity
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.proofImageDao
@@ -379,17 +380,16 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
 
 
     private suspend fun openEditMedication(aMedication: Medication) {
-       EditMedActivity.startForResult(this, aMedication)
+      AddEditMedActivity.startForResult(this, aMedication)
     }
 
     private fun onMedicationChanged(medicationFull: MedicationFull) {
-        mainScope.launch {
-            vm.medicationFull = medicationFull
-            if (!medicationFull.medication.isAsNeeded()) {
-                closestDose = medicationFull.medication.calculateClosestDose().timeInMillis
-            }
-            updateAlarm(medicationFull.medication)
+        vm.medicationFull = medicationFull
+        if (!medicationFull.medication.isAsNeeded()) {
+            closestDose = medicationFull.medication.calculateClosestDose().timeInMillis
         }
+        updateAlarm(medicationFull.medication)
+
     }
 
     private fun justTookItButtonPressed() {

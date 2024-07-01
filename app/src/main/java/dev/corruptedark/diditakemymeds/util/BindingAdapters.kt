@@ -5,10 +5,13 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.google.android.material.appbar.MaterialToolbar
 import dev.corruptedark.diditakemymeds.R
+import dev.corruptedark.diditakemymeds.data.models.BirthControlType
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.data.models.DoseUnit
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.MedicationType
+import dev.corruptedark.diditakemymeds.data.models.RepeatSchedule
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 @BindingAdapter("zeroContentInsetStart")
@@ -138,9 +141,7 @@ fun setNextDose(view: TextView, doseRecord: DoseRecord) {
 @BindingAdapter("timeFromMillis")
 fun setTimeFromMillis(view: TextView, millis: Long) {
     val context = view.context
-    val systemIs24Hour = DateFormat.is24HourFormat(context)
-    val timeFormat = if (systemIs24Hour) context.getString(R.string.time_24) else context.getString(R.string.time_12)
-    val text = DateFormat.format(timeFormat, millis)
+    val text = context.formatTime(millis)
     view.text = text
 }
 @BindingAdapter("dateFromMillis")
@@ -148,5 +149,20 @@ fun setDateFromMillis(view: TextView, millis: Long) {
     val context = view.context
     val dateFormat = context.getString(R.string.date_format)
     val text = DateFormat.format(dateFormat, millis)
+    view.text = text
+}
+
+@BindingAdapter("schedule", "blankScheduleText")
+fun setSchedule(view: TextView, schedule: RepeatSchedule, blankScheduleText: String) {
+    val context = view.context
+    val text = if (schedule != RepeatSchedule.BLANK) {
+        val calendar = Calendar.getInstance().apply { schedule.fillCalendar(this) }
+        val formattedTime = context.formatTime(calendar)
+        val formattedDate = context.formatDate(calendar)
+        val activeDays = schedule.daysBetween
+        context.getString(R.string.schedule_format, formattedTime, formattedDate, activeDays, 0, 0, 0)
+    } else {
+        blankScheduleText
+    }
     view.text = text
 }

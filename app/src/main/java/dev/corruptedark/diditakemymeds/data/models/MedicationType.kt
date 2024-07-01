@@ -34,4 +34,8 @@ data class MedicationType(val name: String) {
         contentValues.put(::name.name, name)
         return contentValues
     }
+
+    companion object {
+        val BLANK = MedicationType("")
+    }
 }

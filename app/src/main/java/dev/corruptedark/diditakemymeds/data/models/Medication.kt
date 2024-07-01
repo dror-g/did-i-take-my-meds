@@ -84,46 +84,7 @@ data class Medication(
             timeFormat: String,
             locale: Locale
         ): String {
-            val localizedFormatter = SimpleDateFormat(dateFormat, locale)
-
-            val calendar = Calendar.getInstance()
-            val doseCal: Calendar = Calendar.getInstance()
-            doseCal.timeInMillis = doseTime
-            val today = calendar.clone() as Calendar
-            calendar.add(Calendar.DATE, -1)
-            val yesterday = calendar.clone() as Calendar
-            calendar.add(Calendar.DATE, 2)
-            val tomorrow = calendar.clone() as Calendar
-
-            val dayString: String =
-                if (doseCal.get(Calendar.DATE) == today.get(Calendar.DATE) && doseCal.get(Calendar.MONTH) == today.get(
-                        Calendar.MONTH
-                    ) && doseCal.get(Calendar.YEAR) == today.get(Calendar.YEAR)
-                ) {
-                    todayString
-                } else if (doseCal.get(Calendar.DATE) == yesterday.get(Calendar.DATE) && doseCal.get(
-                        Calendar.MONTH
-                    ) == yesterday.get(Calendar.MONTH) && doseCal.get(Calendar.YEAR) == yesterday.get(
-                        Calendar.YEAR
-                    )
-                ) {
-                    yesterdayString
-                } else if (doseCal.get(Calendar.DATE) == tomorrow.get(Calendar.DATE) && doseCal.get(
-                        Calendar.MONTH
-                    ) == tomorrow.get(Calendar.MONTH) && doseCal.get(Calendar.YEAR) == tomorrow.get(
-                        Calendar.YEAR
-                    )
-                ) {
-                    tomorrowString
-                } else {
-                    localizedFormatter.format(doseCal.timeInMillis) as String
-                }
-
-            val time = DateFormat.format(timeFormat, doseCal)
-
-            val builder: StringBuilder = StringBuilder().append(time).append(" ").append(dayString)
-
-            return builder.toString()
+            return dev.corruptedark.diditakemymeds.util.doseString(yesterdayString, todayString, tomorrowString, doseTime, dateFormat, timeFormat, locale)
         }
 
         fun compareByName(a: Medication, b: Medication): Int {

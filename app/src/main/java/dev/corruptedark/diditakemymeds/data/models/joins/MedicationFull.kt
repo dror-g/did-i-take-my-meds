@@ -14,6 +14,6 @@ data class MedicationFull(
     val doseUnit: DoseUnit
 ) {
     companion object {
-        val BLANK = MedicationFull(Medication.BLANK, MedicationType(""), DoseUnit(""))
+        val BLANK = MedicationFull(Medication.BLANK, MedicationType.BLANK, DoseUnit(""))
     }
 }

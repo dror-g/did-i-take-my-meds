@@ -1,7 +1,11 @@
 package dev.corruptedark.diditakemymeds.util
 
+import android.app.Dialog
 import android.content.Context
+import android.content.res.Resources
+import android.graphics.Rect
 import android.text.format.DateFormat
+import android.view.ViewGroup
 import java.util.Calendar
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
@@ -24,6 +28,13 @@ object DialogUtil {
         CANCELLED, POSITIVE, NEGATIVE, NEUTRAL
     }
 
+    fun setWidthPercent(dialog: Dialog, percentage: Int) {
+        val percent = percentage.toFloat() / 100
+        val dm = Resources.getSystem().displayMetrics
+        val rect = dm.run { Rect(0, 0, widthPixels, heightPixels) }
+        val percentWidth = rect.width() * percent
+        dialog.window?.setLayout(percentWidth.toInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
     suspend fun showMaterialDialogSuspend(
         context: Context,
         lifecycleOwner: LifecycleOwner,

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+    <variable
+        name="item"
+        type="dev.corruptedark.diditakemymeds.activities.add_edit_med.ItemExtraDose" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/extra_times_template"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="10dp"
+        android:weightSum="10">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/schedule_dose_button"
+            android:layout_weight="8.5"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:paddingVertical="15dp"
+            android:textSize="@dimen/medium_text_size"
+            tools:text="@string/schedule_dose"
+            app:schedule="@{item.schedule}"
+            app:blankScheduleText="@{@string/schedule_dose}"
+            style="@style/Widget.Button.Accented.Outlined" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:layout_weight="1.5"
+            android:id="@+id/delete_dose_button"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:src="@drawable/delete"
+            android:background="?ditmm_colorBackground"
+            android:layout_gravity="center" />
+    </LinearLayout>
+</layout>
