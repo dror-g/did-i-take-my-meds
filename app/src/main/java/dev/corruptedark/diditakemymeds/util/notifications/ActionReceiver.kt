@@ -1,4 +1,4 @@
-package dev.corruptedark.diditakemymeds.util
+package dev.corruptedark.diditakemymeds.util.notifications
 
 import android.Manifest
 import android.app.*
@@ -10,19 +10,19 @@ import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.res.ResourcesCompat
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.activities.MainActivity
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.data.models.Medication
+import dev.corruptedark.diditakemymeds.util.activityIntentFromIntent
+import dev.corruptedark.diditakemymeds.util.broadcastIntentFromIntent
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.Executors
 
 
 class ActionReceiver : BroadcastReceiver() {
-    private var alarmManager: AlarmManager? = null
     private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     companion object {
@@ -40,63 +40,35 @@ class ActionReceiver : BroadcastReceiver() {
             contentText: String? = null,
             noActions: Boolean = false
         ): NotificationCompat.Builder {
-            val calendar = Calendar.getInstance()
-            medicationDao(context).updateMedications(medication)
+//            medicationDao(context).updateMedications(medication)
+
+            val builder = NotificationsUtil.medicationNotificationBuilder(context, medication)
 
             val actionIntent = Intent(context, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 putExtra(context.getString(R.string.med_id_key), medication.id)
             }
+            if (contentText != null) builder.setContentText(contentText)
 
             val contentIntent = buildContentIntent(context, medication, actionIntent)
-
-            val closestDose = medication.calculateClosestDose()
-            val hour = closestDose.schedule.hour
-            val minute = closestDose.schedule.minute
-            calendar.set(Calendar.HOUR_OF_DAY, hour)
-            calendar.set(Calendar.MINUTE, minute)
-            val formattedTime = context.formatTime(calendar)
-
-            val notificationBuilder =
-                NotificationCompat.Builder(context, context.getString(R.string.channel_name))
-                    .setSmallIcon(R.drawable.ic_small_notification)
-                    .setColor(
-                        ResourcesCompat.getColor(
-                            context.resources,
-                            R.color.notification_icon_color,
-                            context.theme
-                        )
-                    )
-                    .setContentTitle(medication.name)
-                    .setSubText(formattedTime)
-                    .setContentText(context.getString(R.string.time_for_your_dose))
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setContentIntent(contentIntent)
-                    .setAutoCancel(false)
-
-            if (contentText != null) notificationBuilder.setContentText(contentText)
+            builder.setContentIntent(contentIntent)
 
             if (!noActions) {
                 val tookMedPendingIntent = buildActionTookMedIntent(context, medication)
                 val remindPendingIntent = buildActionRemindIntent(context, medication)
 
-
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || !medication.requirePhotoProof) {
-                    notificationBuilder.addAction(
-                        NO_ICON,
-                        context.getString(R.string.took_it),
-                        tookMedPendingIntent
+                    builder.addAction(
+                        NO_ICON, context.getString(R.string.took_it), tookMedPendingIntent
                     )
                 }
 
-                notificationBuilder.addAction(
-                    NO_ICON,
-                    context.getString(R.string.remind_in_15),
-                    remindPendingIntent
+                builder.addAction(
+                    NO_ICON, context.getString(R.string.remind_in_15), remindPendingIntent
                 )
             }
 
-            return notificationBuilder
+            return builder
         }
 
         //region pending intents
@@ -165,8 +137,6 @@ class ActionReceiver : BroadcastReceiver() {
 
 
     override fun onReceive(context: Context, intent: Intent) {
-        alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
         NotificationsUtil.createNotificationChannel(context)
 
         GlobalScope.launch(dispatcher) {
@@ -253,7 +223,7 @@ class ActionReceiver : BroadcastReceiver() {
             calendar.add(Calendar.MINUTE, REMIND_DELAY)
             val medication: Medication =
                 medicationDao(context).get(medId)
-            AlarmIntentManager.scheduleNotification(context, medication, calendar.timeInMillis)
+            AlarmIntentManager.scheduleMedicationAlarm(context, medication, calendar.timeInMillis)
 
         }
     }
@@ -264,7 +234,7 @@ class ActionReceiver : BroadcastReceiver() {
             medication.updateStartsToFuture()
             if (medication.notify) {
                 //Create alarm
-                AlarmIntentManager.scheduleNotification(context, medication)
+                AlarmIntentManager.scheduleMedicationAlarm(context, medication)
                 if (System.currentTimeMillis() > medication.calculateClosestDose().timeInMillis && !medication.closestDoseAlreadyTaken()) {
                     notify(context, medication)
                 }
@@ -280,7 +250,7 @@ class ActionReceiver : BroadcastReceiver() {
                 .get(intent.getLongExtra(context.getString(R.string.med_id_key), -1))
 
         medication.updateStartsToFuture()
-        AlarmIntentManager.scheduleNotification(context, medication)
+        AlarmIntentManager.scheduleMedicationAlarm(context, medication)
 
         if (medication.active && !medication.closestDoseAlreadyTaken()) {
             notify(context, medication)

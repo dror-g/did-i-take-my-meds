@@ -17,7 +17,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.corruptedark.diditakemymeds.util
+package dev.corruptedark.diditakemymeds.util.notifications
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -28,16 +28,18 @@ import android.content.pm.PackageManager
 import android.os.Build
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.Medication
+import dev.corruptedark.diditakemymeds.util.broadcastIntentFromIntent
 
 object AlarmIntentManager {
 
-    fun scheduleNotification(
+    fun scheduleMedicationAlarm(
         context: Context, medication: Medication,
         customTimeMillis: Long? = null,
     ): PendingIntent {
-        val alarmIntent = buildNotificationAlarm(context, medication)
+        val alarmIntent = buildNotificationAlarmIntent(context, medication)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        setExact(
+        cancelAlarm(alarmManager, alarmIntent)
+        setExactAlarm(
             alarmManager, alarmIntent,
             customTimeMillis ?: medication.calculateNextDose().timeInMillis
         )
@@ -50,7 +52,7 @@ object AlarmIntentManager {
         return alarmIntent
     }
 
-    fun buildNotificationAlarm(context: Context, medication: Medication): PendingIntent {
+    private fun buildNotificationAlarmIntent(context: Context, medication: Medication): PendingIntent {
         return Intent(context, ActionReceiver::class.java).let { innerIntent ->
             innerIntent.action = ActionReceiver.NOTIFY_ACTION
             innerIntent.putExtra(context.getString(R.string.med_id_key), medication.id)
@@ -58,13 +60,27 @@ object AlarmIntentManager {
         }
     }
 
-    fun setExact(alarmManager: AlarmManager, alarmIntent: PendingIntent, timeInMillis: Long) {
+    fun cancelAlarm(context: Context, medication: Medication) {
+        val alarmIntent = buildNotificationAlarmIntent(context, medication)
+        cancelAlarm(context, alarmIntent)
+    }
+
+    fun cancelAlarm(context: Context, alarmIntent: PendingIntent) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        cancelAlarm(alarmManager, alarmIntent)
+    }
+
+    fun cancelAlarm(alarmManager: AlarmManager, alarmIntent: PendingIntent) {
+        alarmManager.cancel(alarmIntent)
+    }
+
+
+    private fun setExactAlarm(alarmManager: AlarmManager, alarmIntent: PendingIntent, timeInMillis: Long) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 if (canScheduleExactAlarms(alarmManager)) {
-                    alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP, timeInMillis, alarmIntent
-                    )
+                    //  alarms set with setAlarmClock appear to persist after process is closed
+                    alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(timeInMillis, alarmIntent), alarmIntent)
                 }
             } catch (e: SecurityException) {
                 //

@@ -19,7 +19,6 @@
 
 package dev.corruptedark.diditakemymeds.activities
 
-import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -28,24 +27,23 @@ import android.view.*
 import android.widget.*
 import androidx.appcompat.content.res.AppCompatResources
 import android.net.Uri
-import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.siravorona.utils.activityresult.ActivityResultManager
 import com.siravorona.utils.activityresult.createDocument
 import com.siravorona.utils.activityresult.getContent
 import com.siravorona.utils.base.BaseBoundActivity
-import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
+import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.listadapters.MedListAdapter
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.BuildConfig
 import dev.corruptedark.diditakemymeds.activities.meddetails.MedDetailActivity
-import dev.corruptedark.diditakemymeds.util.ZipFileManager
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.medicationTypeDao
 import dev.corruptedark.diditakemymeds.databinding.ActivityMainBinding
 import com.siravorona.utils.getThemeDrawableByAttr
+import dev.corruptedark.diditakemymeds.StorageManager
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.Comparator
@@ -116,9 +114,10 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
                     }
             }
 
-            if (BuildConfig.VERSION_CODE > sharedPref.getInt(getString(R.string.last_version_used_key), 0)) {
-                ensureAlarmsScheduled()
-            }
+            // recreate alarms that were wiped when the app process was killed
+            // thanks, Google
+            ensureAlarmsScheduled()
+
             with(sharedPref.edit()) {
                 putInt(getString(R.string.last_version_used_key), BuildConfig.VERSION_CODE)
                 apply()
@@ -136,26 +135,17 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
         medicationDao(context).getAllRaw()
             .forEach { medication ->
                 if (medication.notify) {
-                    lifecycleScope.launch(lifecycleDispatcher) {
-                        //Create alarm
-                        scheduleMedicationAlarm(medication)
-                    }
+//                    lifecycleScope.launch(lifecycleDispatcher) {
+//                        //Create alarm
+//                        scheduleMedicationAlarm(medication)
+//                    }
+                    scheduleMedicationAlarm(medication)
                 }
             }
     }
 
-    private fun scheduleMedicationAlarm(
-        medication: Medication,
-    ) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val alarmIntent = AlarmIntentManager.buildNotificationAlarm(this@MainActivity, medication)
-        alarmManager.cancel(alarmIntent)
-
-        AlarmIntentManager.setExact(
-            alarmManager,
-            alarmIntent,
-            medication.calculateNextDose().timeInMillis
-        )
+    private fun scheduleMedicationAlarm(medication: Medication) {
+        AlarmIntentManager.scheduleMedicationAlarm(this, medication)
     }
 
     private fun openMedDetailActivity(medId: Long, takeMed: Boolean) {
@@ -285,9 +275,9 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
     private fun backUpDatabase() {
         // Intent.normalizeMimeType(MIME_TYPES), intent.addCategory(Intent.CATEGORY_OPENABLE)
         lifecycleScope.launch (lifecycleDispatcher){
-            val suggestedName = MedicationDB.DATABASE_NAME + ZipFileManager.ZIP_FILE_EXTENSION
+            val suggestedName = StorageManager.suggestBackupFileName()
             val backupUri = ActivityResultManager.getInstance().createDocument(MIME_TYPES, suggestedName) ?: return@launch
-            doBackup(context, backupUri, tempDir, imageDir)
+            doBackup(context, backupUri)
         }
     }
 
@@ -342,36 +332,17 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
 
 
     private suspend fun doRestore(context: Context, restoreUri: Uri, tempFolder: File, imageFolder: File) {
-        if (MedicationDB.databaseFileIsValid(applicationContext, restoreUri)) {
-            doRestoreDb(restoreUri)
+        if (MedicationDB.databaseFileIsValid(context, restoreUri)) {
+            doRestoreDb(context, restoreUri)
         } else {
-            doCleanupDb(restoreUri, tempFolder, imageFolder, context)
+            tryRestoreDb(restoreUri, context)
         }
     }
 
-    private suspend fun doBackup(context: Context, backupUri: Uri, tempFolder: File, imageFolder: File) {
+    private suspend fun doBackup(context: Context, backupUri: Uri) {
         stopRefresherLoop(refreshJob)
         runCatching {
-            MedicationDB.getInstance(context).close()
-            MedicationDB.wipeInstance()
-
-            if (!tempFolder.exists()) tempFolder.mkdirs()
-            if (!imageFolder.exists()) imageFolder.mkdirs()
-
-            tempFolder.listFiles()?.iterator()?.forEach { entry ->
-                entry.deleteRecursively()
-            }
-
-            val databaseFile = getDatabasePath(MedicationDB.DATABASE_NAME)
-            databaseFile.copyTo(File(tempFolder.path + File.separator + databaseFile.name))
-
-            imageFolder.copyRecursively(File(tempFolder.path + File.separator + imageFolder.name), true)
-
-            contentResolver.openOutputStream(backupUri)?.use { outputStream ->
-                ZipFileManager.streamFolderToZip(tempFolder, outputStream)
-            }
-
-            tempFolder.deleteRecursively()
+            StorageManager.backup(context, backupUri)
         }.onFailure { exception ->
             exception.printStackTrace()
             ensureRefresherLoop()
@@ -386,28 +357,22 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
         }
     }
 
-    private suspend fun doRestoreDb(restoreUri: Uri) {
+    private suspend fun doRestoreDb(context: Context, restoreUri: Uri) {
         stopRefresherLoop(refreshJob)
-        MedicationDB.getInstance(applicationContext).close()
-        MedicationDB.wipeInstance()
 
         withContext(Dispatchers.IO) {
             runCatching {
-                contentResolver.openInputStream(restoreUri)?.use { inputStream ->
-                    applicationContext.getDatabasePath(MedicationDB.DATABASE_NAME).outputStream().use { outputStream ->
-                        inputStream.copyTo(outputStream)
-                    }
-                }
+                StorageManager.restore(context, restoreUri)
             }.onSuccess {
                 ensureRefresherLoop()
                 mainScope.launch {
-                    Toast.makeText(applicationContext, getString(R.string.database_restored), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.database_restored), Toast.LENGTH_SHORT).show()
                 }
             }.onFailure { exception ->
                 exception.printStackTrace()
                 ensureRefresherLoop()
                 mainScope.launch {
-                    Toast.makeText(applicationContext, getString(R.string.database_is_invalid), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.database_is_invalid), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -417,51 +382,14 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
         }
     }
 
-    private suspend fun doCleanupDb(
+    private suspend fun tryRestoreDb(
         restoreUri: Uri,
-        tempFolder: File,
-        imageFolder: File,
         context: Context
     ) {
+        stopRefresherLoop(refreshJob)
         withContext(Dispatchers.IO) {
-            tempFolder.deleteRecursively()
             runCatching {
-                contentResolver.openInputStream(restoreUri)?.use { inputStream ->
-                    ZipFileManager.streamZipToFolder(
-                        inputStream,
-                        tempFolder
-                    )
-                }
-
-                val tempFiles = tempFolder.listFiles()
-
-                val databaseFile =
-                    tempFiles?.find { file -> file.name == MedicationDB.DATABASE_NAME }
-
-                databaseFile?.inputStream()?.use { databaseStream ->
-                    if (MedicationDB.databaseFileIsValid(context, databaseFile.toUri())) {
-                        stopRefresherLoop(refreshJob)
-                        MedicationDB.getInstance(applicationContext).close()
-                        MedicationDB.wipeInstance()
-                        context.getDatabasePath(MedicationDB.DATABASE_NAME).outputStream()
-                            .use { outStream ->
-                                databaseStream.copyTo(outStream)
-                            }
-                    }
-                }
-
-                imageFolder.listFiles()?.forEach { file ->
-                    if (file.exists()) file.deleteRecursively()
-                }
-
-                val tempImageFolder =
-                    tempFiles?.find { file -> file.isDirectory && file.name == imageFolder.name }
-
-                tempImageFolder?.copyRecursively(imageFolder)
-
-                if (tempFolder.exists()) {
-                    tempFolder.deleteRecursively()
-                }
+                StorageManager.tryRestoreDb(context, restoreUri)
             }.onFailure { exception ->
                 exception.printStackTrace()
                 ensureRefresherLoop()

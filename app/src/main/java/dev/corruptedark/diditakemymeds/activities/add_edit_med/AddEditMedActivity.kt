@@ -20,10 +20,6 @@
 package dev.corruptedark.diditakemymeds.activities.add_edit_med
 
 import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -34,12 +30,10 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.siravorona.utils.activityresult.ActivityResultManager
 import com.siravorona.utils.activityresult.getActivityResult
-import dev.corruptedark.diditakemymeds.util.ActionReceiver
-import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
+import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.BR
 import com.siravorona.utils.base.BaseBoundInteractableVmActivity
-import dev.corruptedark.diditakemymeds.activities.EditMedActivity
 import dev.corruptedark.diditakemymeds.data.models.RepeatSchedule
 import dev.corruptedark.diditakemymeds.data.models.DoseUnit
 import dev.corruptedark.diditakemymeds.data.models.Medication
@@ -79,15 +73,12 @@ class AddEditMedActivity :
     }
 
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-    private var alarmManager: AlarmManager? = null
-    private var alarmIntent: PendingIntent? = null
     private val mainScope = MainScope()
     private var medication: MedicationFull? = null
 
     @SuppressLint("CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        alarmManager = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         vm.showExtraDoseButton = false
         vm.setupExtraDosesList(binding.shedulesList)
 
@@ -228,10 +219,10 @@ class AddEditMedActivity :
     }
 
     private fun setMedicationAlarm(medication: Medication) {
-        alarmIntent?.let { alarmManager?.cancel(it); alarmIntent = null}
         if (medication.notify) {
-            val intent = AlarmIntentManager.scheduleNotification(this, medication)
-            this.alarmIntent = intent
+           AlarmIntentManager.scheduleMedicationAlarm(this, medication)
+        } else {
+            AlarmIntentManager.cancelAlarm(this, medication)
         }
     }
 

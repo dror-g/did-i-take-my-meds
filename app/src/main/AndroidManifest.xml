@@ -97,7 +97,7 @@
         </activity>
 
         <receiver
-            android:name=".util.ActionReceiver"
+            android:name=".util.notifications.ActionReceiver"
             android:enabled="false"
             android:exported="true">
             <intent-filter>

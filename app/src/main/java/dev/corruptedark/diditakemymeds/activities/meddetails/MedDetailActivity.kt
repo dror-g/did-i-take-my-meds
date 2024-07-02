@@ -19,12 +19,8 @@
 
 package dev.corruptedark.diditakemymeds.activities.meddetails
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
@@ -45,7 +41,6 @@ import com.siravorona.utils.base.BaseBoundInteractableVmActivity
 import dev.corruptedark.diditakemymeds.BR
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.StorageManager
-import dev.corruptedark.diditakemymeds.activities.EditMedActivity
 import dev.corruptedark.diditakemymeds.activities.add_edit_med.AddEditMedActivity
 import dev.corruptedark.diditakemymeds.activities.dosedetails.DoseDetailActivity
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
@@ -56,8 +51,7 @@ import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.ProofImage
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ActivityMedDetailBinding
-import dev.corruptedark.diditakemymeds.util.ActionReceiver
-import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
+import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.util.DialogUtil
 import dev.corruptedark.diditakemymeds.util.medicationDoseString
 import kotlinx.coroutines.Dispatchers
@@ -75,8 +69,6 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     private var closestDose: Long = -1L
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-    private var alarmManager: AlarmManager? = null
-    private var alarmIntent: PendingIntent? = null
     private val context = this
     private val mainScope = MainScope()
 
@@ -116,7 +108,6 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         super.onCreate(savedInstanceState)
         takeMed = intent.getBooleanExtra(EXTRA_TAKE_MED, false)
         medicationId = intent.getLongExtra(EXTRA_MEDICATION_ID, -1)
-        alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         setSupportActionBar(binding.appbar.toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -228,7 +219,6 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     // region alarms
     private fun updateAlarm(medication: Medication) {
         if (medication.notify) {
-            cancelExistingMedicationAlarm(medication, false)
             scheduleNextMedicationAlarm(medication, false)
         } else {
             //Cancel alarm
@@ -237,7 +227,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
     }
 
     private fun cancelExistingMedicationAlarm(medication: Medication, showToast: Boolean = true) {
-        alarmIntent?.let { alarmManager?.cancel(it); alarmIntent = null }
+        AlarmIntentManager.cancelAlarm(this, medication)
         if (showToast) {
             Toast.makeText(
                 context,
@@ -249,15 +239,13 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
 
     private fun scheduleNextMedicationAlarm(medication: Medication, showToast: Boolean = true) {
         cancelExistingMedicationAlarm(medication, false)
-        this.alarmIntent = AlarmIntentManager.scheduleNotification(context, medication)
-        if (this.alarmIntent != null) {
-            if (showToast) {
-                Toast.makeText(
-                    context,
-                    getString(R.string.notifications_enabled),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        AlarmIntentManager.scheduleMedicationAlarm(context, medication)
+        if (showToast) {
+            Toast.makeText(
+                context,
+                getString(R.string.notifications_enabled),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
     // endregion

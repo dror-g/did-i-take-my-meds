@@ -1,13 +1,9 @@
 package dev.corruptedark.diditakemymeds
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.os.Build
 import com.siravorona.utils.activityresult.ActivityResultManager
 import com.siravorona.utils.bindableproperty.BindableManager
-import dev.corruptedark.diditakemymeds.util.NotificationsUtil
+import dev.corruptedark.diditakemymeds.util.notifications.NotificationsUtil
 
 class App : Application() {
     override fun onCreate() {

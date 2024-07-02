@@ -83,7 +83,6 @@ class EditMedActivity : BaseBoundActivity<ActivityAddOrEditMedBinding>(ActivityA
     private var requirePhotoProof = true
     private var takeWithFood = false
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-    private var alarmManager: AlarmManager? = null
     lateinit var medication: Medication
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,7 +90,6 @@ class EditMedActivity : BaseBoundActivity<ActivityAddOrEditMedBinding>(ActivityA
 
         isSystem24Hour = DateFormat.is24HourFormat(context)
         clockFormat = if (isSystem24Hour) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
-        alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         scheduleButtonsRows = ArrayList()
 
         setSupportActionBar(binding.appbar.toolbar)

@@ -28,7 +28,7 @@ import android.os.Build
 import android.widget.RemoteViews
 import java.util.concurrent.TimeUnit
 import androidx.lifecycle.Observer
-import dev.corruptedark.diditakemymeds.util.ActionReceiver
+import dev.corruptedark.diditakemymeds.util.notifications.ActionReceiver
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.db.medicationDao

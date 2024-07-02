@@ -20,10 +20,6 @@
 package dev.corruptedark.diditakemymeds.activities
 
 import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.ComponentName
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.format.DateFormat
@@ -34,8 +30,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.timepicker.TimeFormat
 import androidx.lifecycle.lifecycleScope
-import dev.corruptedark.diditakemymeds.util.ActionReceiver
-import dev.corruptedark.diditakemymeds.util.AlarmIntentManager
+import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.listadapters.DoseUnitListAdapter
 import dev.corruptedark.diditakemymeds.listadapters.MedTypeListAdapter
 import dev.corruptedark.diditakemymeds.R
@@ -84,15 +79,13 @@ class AddMedActivity : BaseBoundActivity<ActivityAddOrEditMedBinding>(ActivityAd
     private var requirePhotoProof = true
     private var takeWithFood = false
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-    private var alarmManager: AlarmManager? = null
-    private lateinit var alarmIntent: PendingIntent
+
     private val mainScope = MainScope()
     private val context = this
 
     @SuppressLint("CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        alarmManager = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         binding.extraDoseButton.visibility = View.GONE
 
         setSupportActionBar(binding.appbar.toolbar)
@@ -514,7 +507,7 @@ class AddMedActivity : BaseBoundActivity<ActivityAddOrEditMedBinding>(ActivityAd
 
             if (notify) {
                 //Set alarm
-                alarmIntent = AlarmIntentManager.scheduleNotification(this, medication)
+                AlarmIntentManager.scheduleMedicationAlarm(this, medication)
             }
 
             mainScope.launch {
