@@ -53,16 +53,15 @@ data class Medication(
     var doseUnitId: Long = DEFAULT_ID,
     var amountPerDose: Double = UNDEFINED_AMOUNT,
     var remainingDoses: Int = UNDEFINED_REMAINING,
-    var takeWithFood: Boolean = false
+    var takeWithFood: Boolean = false,
+    @ColumnInfo(name = "dose_record")
+    var doseRecord: ArrayList<DoseRecord> = ArrayList(),
+    var moreDosesPerDay: ArrayList<RepeatSchedule> = ArrayList()
 ) {
 
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-
-    @ColumnInfo(name = "dose_record")
-    var doseRecord: ArrayList<DoseRecord> = ArrayList()
-    var moreDosesPerDay: ArrayList<RepeatSchedule> = ArrayList()
 
     companion object {
 

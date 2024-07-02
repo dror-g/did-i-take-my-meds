@@ -133,14 +133,16 @@ class DoseDetailActivity :
 
     private fun doUpdateDose(doseRecord: DoseRecord, newTimeTakenMills: Long) {
         val medId = this.medId
-        deleteProofImage(medId, doseRecord.doseTime)
-        val medication = medicationDao(this).get(medId)
-        medication.removeTakenDose(doseRecord, false)
-        val newRecord = DoseRecord(newTimeTakenMills, doseRecord.closestDose)
-        medication.addNewTakenDose(newRecord)
-        medicationDao(this).updateMedications(medication)
-        mainScope.launch {
-            vm.doseRecord = newRecord
+        lifecycleScope.launch(lifecycleDispatcher) {
+            deleteProofImage(medId, doseRecord.doseTime)
+            val medication = medicationDao(this@DoseDetailActivity).get(medId)
+            medication.removeTakenDose(doseRecord, false)
+            val newRecord = DoseRecord(newTimeTakenMills, doseRecord.closestDose)
+            medication.addNewTakenDose(newRecord)
+            medicationDao(this@DoseDetailActivity).updateMedications(medication)
+            mainScope.launch {
+                vm.doseRecord = newRecord
+            }
         }
     }
 
