@@ -34,7 +34,6 @@ import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.BR
 import com.siravorona.utils.base.BaseBoundInteractableVmActivity
-import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 import dev.corruptedark.diditakemymeds.data.models.RepeatSchedule
 import dev.corruptedark.diditakemymeds.data.models.DoseUnit
 import dev.corruptedark.diditakemymeds.data.models.Medication
@@ -82,7 +81,6 @@ class AddEditMedActivity :
     @SuppressLint("CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        vm.showExtraDoseButton = false
         vm.setupExtraDosesList(binding.shedulesList)
 
         setSupportActionBar(binding.appbar.toolbar)
@@ -98,6 +96,8 @@ class AddEditMedActivity :
             // invalid params passed
             finish()
         }
+        val title = if (isNewMed) getString(R.string.new_medication) else getString(R.string.edit_medication)
+        supportActionBar?.title = title
 
         lifecycleScope.launch(lifecycleDispatcher) {
             val medicationFull = fetchMedication(medicationId)
@@ -204,7 +204,7 @@ class AddEditMedActivity :
             weeksBetween = vm.schedule.weeksBetween,
             monthsBetween = vm.schedule.monthsBetween,
             yearsBetween = vm.schedule.yearsBetween,
-            notify = vm.notify,
+            notify = vm.shouldNotify(),
             requirePhotoProof = vm.requirePhotoProof,
             typeId = typeId,
             rxNumber = vm.rxNumber,

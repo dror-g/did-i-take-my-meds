@@ -1,7 +1,6 @@
 package dev.corruptedark.diditakemymeds.activities.add_edit_med
 
 import android.widget.AutoCompleteTextView
-import android.widget.EditText
 import androidx.databinding.Bindable
 import androidx.recyclerview.widget.RecyclerView
 import com.siravorona.utils.base.InteractableViewModel
@@ -70,14 +69,14 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
 
     @get:Bindable
     var schedule by bindableProperty(RepeatSchedule.BLANK) {_, newValue ->
-        showExtraDoseButton = (newValue != RepeatSchedule.BLANK)
+        canAddExtraDose = (newValue != RepeatSchedule.BLANK)
     }
 
     @get:Bindable
-    var asNeeded by bindableProperty(true) {_, newValue -> onAsNeededChanged(newValue)}
+    var asNeeded by bindableProperty(true)
 
     @get:Bindable
-    var notify by bindableProperty(true) {_, newValue -> onNotifyChanged(newValue)}
+    var notify by bindableProperty(true)
 
     @get:Bindable
     var requirePhotoProof by bindableProperty(true)
@@ -86,16 +85,23 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
     var takeWithFood by bindableProperty(false)
 
     @get:Bindable
-    var showExtraDoseButton by bindableProperty(false)
+    var canAddExtraDose by bindableProperty(false)
 
-    @get:Bindable
-    var showNotificationSwitch by bindableProperty(false)
+    @get:Bindable("asNeeded")
+    val showNotificationSwitch : Boolean
+        get() { return !asNeeded }
 
     @get:Bindable
     var showRequireProofSwitch by bindableProperty(false)
 
-    @get:Bindable
-    var showRepeatScheduleButton by bindableProperty(false)
+    @get:Bindable("asNeeded")
+    val showSchedulingUI: Boolean
+        get() { return !asNeeded }
+
+    @get:Bindable("showSchedulingUI", "canAddExtraDose")
+    val showExtraDoseButton : Boolean
+        get() { return showSchedulingUI && canAddExtraDose }
+
 
     private var extraDoseItems = observableListOf<ItemExtraDose>()
 
@@ -110,22 +116,9 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
         pharmacy = medication.pharmacy
         description = medication.description
         asNeeded = medication.isAsNeeded()
-
-        if (asNeeded) {
-            notify = false
-            showNotificationSwitch = false
-            showRepeatScheduleButton = false
-            showExtraDoseButton = false
-            schedule = RepeatSchedule.BLANK
-            clearExtraDoseItems()
-        } else {
-            notify = medication.notify
-            showNotificationSwitch = true
-            showRepeatScheduleButton = true
-            showExtraDoseButton = true
-            schedule = RepeatSchedule.fromMedication(medication)
-            setExtraDoses(medication.moreDosesPerDay)
-        }
+        notify = medication.notify
+        schedule = RepeatSchedule.fromMedication(medication)
+        setExtraDoses(medication.moreDosesPerDay)
 
         medTypeString = medType.name
         doseUnitString = doseUnit.unit
@@ -155,7 +148,7 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
     }
 
     fun setupExtraDosesList(recyclerView: RecyclerView) {
-        BindableAdapter(extraDoseItems,BR.item)
+        BindableAdapter(extraDoseItems, BR.item)
             .map<ItemExtraDose, ExtraDoseTemplate2Binding>(R.layout.extra_dose_template2) {
                 onBind { holder ->
                     holder.binding.deleteDoseButton.setOnClickListener {
@@ -166,24 +159,28 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
                     holder.binding.scheduleDoseButton.setOnClickListener {
                         val item = holder.binding.item ?: return@setOnClickListener
                         val index = holder.bindingAdapterPosition
-                        launchVmScope({
-                            val result = interactor?.rescheduleDose(index, item.schedule)
-                            if (result != null) {
-                                extraDoseItems.removeAt(index)
-                                val schedule = result.first
-                                val bcType = result.second
-                                if (bcType != BirthControlType.NO) {
-                                    val newSchedule = schedule.asBirthControl(bcType)
-                                    extraDoseItems.add(index, ItemExtraDose(newSchedule))
-                                    addBirthControlDoses(newSchedule, bcType)
-                                } else {
-                                    extraDoseItems.add(index, ItemExtraDose(schedule))
-                                }
-                            }
-                        })
+                        onScheduleDoseTapped(index, item.schedule)
                     }
                 }
             }.into(recyclerView)
+    }
+
+    private fun onScheduleDoseTapped(index: Int, existingSchedule: RepeatSchedule) {
+        launchVmScope({
+            val result = interactor?.rescheduleDose(index, existingSchedule)
+            if (result != null) {
+                extraDoseItems.removeAt(index)
+                val schedule = result.first
+                val bcType = result.second
+                if (bcType != BirthControlType.NO) {
+                    val newSchedule = schedule.asBirthControl(bcType)
+                    extraDoseItems.add(index, ItemExtraDose(newSchedule))
+                    addBirthControlDoses(newSchedule, bcType)
+                } else {
+                    extraDoseItems.add(index, ItemExtraDose(schedule))
+                }
+            }
+        })
     }
 
     fun clearExtraDoseItems() {
@@ -201,22 +198,8 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
         extraDoseItems.add(ItemExtraDose(schedule))
     }
 
-
-    private fun onNotifyChanged(newValue: Boolean) {
-
-    }
-
-    private fun onAsNeededChanged(asNeeded: Boolean) {
-        if (asNeeded) {
-            notify = false
-            clearExtraDoseItems()
-            schedule = RepeatSchedule.BLANK
-            showNotificationSwitch = false
-            showRepeatScheduleButton = false
-        } else {
-            showNotificationSwitch = true
-            showRepeatScheduleButton = true
-        }
+    fun shouldNotify(): Boolean {
+        return notify && !asNeeded
     }
 
     fun onRepeatScheduleTapped() {

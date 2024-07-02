@@ -98,23 +98,22 @@
                     android:paddingVertical="15dp"
                     android:textSize="@dimen/medium_text_size"
                     tools:text="@string/schedule_dose"
+                    tools:visibility="visible"
+                    android:visibility="@{vm.showSchedulingUI ? View.VISIBLE : View.GONE}"
                     app:schedule="@{vm.schedule}"
                     app:blankScheduleText="@{@string/schedule_dose}"
                     android:onClick="@{() -> vm.onRepeatScheduleTapped()}"
                     style="@style/Widget.Button.Accented.Outlined" />
 
-<!--                <androidx.appcompat.widget.LinearLayoutCompat-->
-<!--                    android:id="@+id/schedule_buttons_layout"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:orientation="vertical" />-->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/shedules_list"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/extra_dose_template2"
-                    tools:itemCount="2"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:visibility="@{vm.showSchedulingUI ? View.VISIBLE : View.GONE}"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="2"
+                    tools:listitem="@layout/extra_dose_template2"
+                    tools:visibility="visible" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/extra_dose_button"

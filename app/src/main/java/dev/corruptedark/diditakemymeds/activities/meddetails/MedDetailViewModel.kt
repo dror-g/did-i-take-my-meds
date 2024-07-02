@@ -31,8 +31,11 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
     }
 
     private val doseRecordItems = observableListOf<DoseRecordItem>()
+
     @get:Bindable
-    var medicationFull: MedicationFull by bindableProperty(MedicationFull.BLANK) { oldValue, newValue ->
+    var medicationFull: MedicationFull by bindableProperty(
+        MedicationFull.BLANK
+    ) { oldValue, newValue ->
         doseRecordItems.clear()
         val records = newValue.medication.doseRecord
         doseRecordItems.addAll(records.map { DoseRecordItem(it) })
@@ -105,6 +108,7 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
     }
 
     fun onNotifyCheckedChanged(switch: CompoundButton, checked: Boolean) {
+        if (medication.notify == checked) return
         medication.notify = checked
         interactor?.saveMedication(medication)
         if (checked) {
@@ -115,7 +119,7 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
     }
 
     fun onJustTookItPressed() {
-      interactor?.justTookItPressed(medication)
+        interactor?.justTookItPressed(medication)
     }
 
     fun notifyMedicationPropertyChange() {
@@ -126,16 +130,18 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
         val context = recyclerView.context
 
         val dividerColor = context.getThemedColorByAttr(R.attr.ditmm_colorBackground)
-        val decoration = ColorDividerItemDecoration(LinearLayoutManager.VERTICAL, dividerColor, context.dp2Px(5.0f))
+        val decoration = ColorDividerItemDecoration(
+            LinearLayoutManager.VERTICAL, dividerColor, context.dp2Px(5.0f)
+        )
         recyclerView.addItemDecoration(decoration)
 
         BindableAdapter(doseRecordItems, BR.item)
             .map<DoseRecordItem, ItemDoseListBinding>(R.layout.item_dose_list) {
-               onLongClick {
-                   val record = it.binding.item?.doseRecord ?: return@onLongClick false
-                   interactor?.promptDeleteDoseRecord(medication, record)
-                   true
-               }
+                onLongClick {
+                    val record = it.binding.item?.doseRecord ?: return@onLongClick false
+                    interactor?.promptDeleteDoseRecord(medication, record)
+                    true
+                }
                 onClick {
                     val record = it.binding.item?.doseRecord ?: return@onClick
                     interactor?.openDoseDetail(medication, record)
