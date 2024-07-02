@@ -120,14 +120,14 @@ class SimpleSingleMedWidget : AppWidgetProvider() {
         refresher = startRefresherLoop(context)
 
         mainScope.launch {
-            medicationDao(context).getAll().observeForever(databaseObserver!!)
+            medicationDao(context).getAllLiveData().observeForever(databaseObserver!!)
         }
     }
 
     override fun onDisabled(context: Context) {
         // Enter relevant functionality for when the last widget is disabled
         databaseObserver?.apply {
-            medicationDao(context).getAll().removeObserver(this)
+            medicationDao(context).getAllLiveData().removeObserver(this)
         }
 
         runBlocking {

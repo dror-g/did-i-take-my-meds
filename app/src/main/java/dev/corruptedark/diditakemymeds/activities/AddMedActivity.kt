@@ -275,7 +275,7 @@ class AddMedActivity : BaseBoundActivity<ActivityAddOrEditMedBinding>(ActivityAd
             schedulePickerCaller = null
         }
 
-        medicationDao(applicationContext).getAll()
+        medicationDao(applicationContext).getAllLiveData()
             .observe(this, {})
     }
 

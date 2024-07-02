@@ -26,7 +26,6 @@ import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 
 @Dao
@@ -55,16 +54,16 @@ interface MedicationDao {
     suspend fun observeFullDistinct(medId: Long) = observeFull(medId).distinctUntilChanged().filterNotNull()
 
     @Query("SELECT * FROM $MED_TABLE")
-    fun getAll(): LiveData<MutableList<Medication>>
-
+    fun getAllLiveData(): LiveData<MutableList<Medication>>
 
     @Transaction
     @Query("SELECT * FROM $MED_TABLE")
-    fun getAllFull(): LiveData<MutableList<MedicationFull>>
+    fun observeAllFull(): Flow<List<MedicationFull>>
+
+    suspend fun observeAllFullDistinct() = observeAllFull().distinctUntilChanged()
 
     @Query("SELECT * FROM $MED_TABLE")
     fun getAllRaw(): MutableList<Medication>
-
 
     @Transaction
     @Query("SELECT * FROM $MED_TABLE")

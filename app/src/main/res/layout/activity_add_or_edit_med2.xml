@@ -65,7 +65,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         tools:text="Finalgon"
-                        android:text="@{vm.name}"
+                        android:text="@={vm.name}"
                         android:textSize="@dimen/small_text_size" />
 
                 </com.google.android.material.textfield.TextInputLayout>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?><!--Did I Take My Meds? is a FOSS app to keep track of medications
+    Did I Take My Meds? is designed to help prevent a user from skipping doses and/or overdosing
+    Copyright (C) 2021  Noah Stanford <noahstandingford@gmail.com>
+
+    Did I Take My Meds? is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Did I Take My Meds? is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see https://www.gnu.org/licenses.-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="dev.corruptedark.diditakemymeds.activities.main.ItemMedication" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?ditmm_colorBackground"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp"
+        app:medicationActive="@{item.medication}">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/name_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{item.name}"
+            android:textColor="?colorAccent"
+            android:textSize="@dimen/large_text_size"
+            tools:text="@string/sample_medicine" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/type_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/medium_text_size"
+            app:medicationType="@{item.type}"
+            tools:text="@string/sample_type_label" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/time_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:textColor="?colorAccentSecondary"
+                android:textSize="@dimen/medium_text_size"
+                app:medicationTakenTime="@{item.medication}"
+                tools:text="@string/midnight" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/taken_label"
+                autoSizeTextType="uniform"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:textColor="?colorAccentSecondary"
+                android:textSize="@dimen/medium_text_size"
+                app:medicationTakenStatus="@{item.medication}"
+                tools:text="@string/not_taken" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </LinearLayout>
+</layout>

@@ -11,7 +11,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.activities.MainActivity
+import dev.corruptedark.diditakemymeds.activities.main.MainActivity
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.data.models.Medication

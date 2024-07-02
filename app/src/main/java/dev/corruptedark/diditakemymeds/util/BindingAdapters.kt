@@ -1,11 +1,11 @@
 package dev.corruptedark.diditakemymeds.util
 
 import android.text.format.DateFormat
+import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.google.android.material.appbar.MaterialToolbar
 import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.data.models.BirthControlType
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.data.models.DoseUnit
 import dev.corruptedark.diditakemymeds.data.models.Medication
@@ -165,4 +165,46 @@ fun setSchedule(view: TextView, schedule: RepeatSchedule?, blankScheduleText: St
         blankScheduleText
     }
     view.text = text
+}
+
+@BindingAdapter("medicationTakenTime")
+fun setTakenTime(view: TextView, medication: Medication) {
+    val context = view.context
+    val text = if (medication.active) {
+        if (medication.isAsNeeded()) {
+            context.getString(R.string.taken_as_needed)
+        } else {
+            val closestDoseMillis = medication .calculateClosestDose().timeInMillis
+            context.formatTime(closestDoseMillis)
+        }
+    } else {
+        context.getString(R.string.inactive)
+    }
+    view.text = text
+}
+
+@BindingAdapter("medicationTakenStatus")
+fun setTakenStatus(view: TextView, medication: Medication) {
+    val context = view.context
+    if (medication.active && !medication.isAsNeeded()) {
+        val text = if (medication.closestDoseAlreadyTaken()) {
+            context.getString(R.string.taken)
+        } else {
+            context.getString(R.string.not_taken)
+        }
+        view.text = text
+        view.visibility = View.VISIBLE
+    } else {
+        view.text = ""
+        view.visibility = View.GONE
+    }
+}
+
+@BindingAdapter("medicationActive")
+fun setMedicationActive(view: View, medication: Medication) {
+    if (medication.active) {
+        view.alpha = 1.0f
+    } else {
+        view.alpha = 0.7f;
+    }
 }
