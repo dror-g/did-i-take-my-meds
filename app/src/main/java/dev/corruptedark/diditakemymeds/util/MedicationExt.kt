@@ -9,6 +9,7 @@ import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 fun doseString(
     yesterdayString: String,
@@ -57,11 +58,21 @@ fun medicationDoseString(context: Context, timeInMillis: Long): String {
         locale
     )
 }
+
 fun Medication.nextDoseString(context: Context): String {
     return medicationDoseString(context, calculateNextDose().timeInMillis)
 }
+
 fun Medication.closestDoseString(context: Context): String {
     return medicationDoseString(context, calculateClosestDose().timeInMillis)
+}
+
+fun Medication.timeSinceLastDoseString(context: Context): String {
+    val timeSinceTakenDose = timeSinceLastTakenDose()
+    val days = TimeUnit.MILLISECONDS.toDays(timeSinceTakenDose)
+    val hours = TimeUnit.MILLISECONDS.toHours(timeSinceTakenDose) % 24
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(timeSinceTakenDose) % 60
+    return context.getString(R.string.time_since_dose_template, days, hours, minutes)
 }
 
 fun Long.canBeRealId() = (this != 0L && this != -1L)

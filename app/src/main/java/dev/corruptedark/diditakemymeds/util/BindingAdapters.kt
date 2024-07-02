@@ -81,12 +81,7 @@ fun setClosestDose(view: TextView, medication: Medication) {
 
 @BindingAdapter("sinceLastDose")
 fun setSinceLastDose(view: TextView, medication: Medication) {
-    val timeSinceTakenDose = medication.timeSinceLastTakenDose()
-    val days = TimeUnit.MILLISECONDS.toDays(timeSinceTakenDose)
-    val hours = TimeUnit.MILLISECONDS.toHours(timeSinceTakenDose) % 24
-    val minutes = TimeUnit.MILLISECONDS.toMinutes(timeSinceTakenDose) % 60
-
-    val text = view.context.getString(R.string.time_since_dose_template, days, hours, minutes)
+    val text = medication.timeSinceLastDoseString(view.context)
     view.text = text
 
 }

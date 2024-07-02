@@ -23,30 +23,40 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.AdapterView
+import androidx.activity.viewModels
 import dev.corruptedark.diditakemymeds.databinding.SimpleSingleMedWidgetConfigureBinding
 import androidx.lifecycle.lifecycleScope
 import dev.corruptedark.diditakemymeds.R
-import com.siravorona.utils.base.BaseBoundActivity
+import dev.corruptedark.diditakemymeds.BR
+import com.siravorona.utils.base.BaseBoundInteractableVmActivity
 import dev.corruptedark.diditakemymeds.data.models.Medication
-import dev.corruptedark.diditakemymeds.listadapters.MedListAdapter
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
-import dev.corruptedark.diditakemymeds.data.db.medicationTypeDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 
 /**
- * The configuration screen for the [SimpleSingleMedWidget] AppWidget.
+ * The configuration screen for the [SimpleSingleMedWidgetDark] AppWidget.
  */
-class SimpleSingleMedWidgetConfigureActivity : BaseBoundActivity<SimpleSingleMedWidgetConfigureBinding>(SimpleSingleMedWidgetConfigureBinding::class) {
+class SimpleSingleMedWidgetConfigureActivity :
+    BaseBoundInteractableVmActivity<SimpleSingleMedWidgetConfigureBinding, ConfigureWidgetViewModel, ConfigureWidgetViewModel.Interactor>(
+        SimpleSingleMedWidgetConfigureBinding::class, BR.vm) {
     val context = this
     val mainScope = MainScope()
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
-    public override fun onCreate(icicle: Bundle?) {
-        super.onCreate(icicle)
+    override val vm : ConfigureWidgetViewModel by viewModels()
+
+    override val modelInteractor = object : ConfigureWidgetViewModel.Interactor {
+        override fun onMedicationTapped(medication: Medication) {
+            this@SimpleSingleMedWidgetConfigureActivity.onMedicationTapped(medication)
+        }
+    }
+
+
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if the user presses the back button.
@@ -54,32 +64,12 @@ class SimpleSingleMedWidgetConfigureActivity : BaseBoundActivity<SimpleSingleMed
 
         setSupportActionBar(binding.appbar.toolbar)
         supportActionBar?.title = getString(R.string.choose_a_medication)
-
+        vm.initRecycler(binding.medListView)
 
         lifecycleScope.launch(Dispatchers.Default) {
-            val medListAdapter = MedListAdapter(
-                context,
-                medicationDao(context).getAllRaw(),
-                medicationTypeDao(context).getAllRaw()
-            )
-
-            mainScope.launch(Dispatchers.Main) {
-                binding.medListView.adapter = medListAdapter
-                binding.medListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-                    val medId = medListAdapter.getItem(position).id
-
-                    saveMedIdPref(context, appWidgetId, medId)
-
-                    // It is the responsibility of the configuration activity to update the app widget
-                    val appWidgetManager = AppWidgetManager.getInstance(context)
-                    updateAppWidget(context, appWidgetManager, appWidgetId)
-
-                    // Make sure we pass back the original appWidgetId
-                    val resultValue = Intent()
-                    resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    setResult(RESULT_OK, resultValue)
-                    finish()
-                }
+            val medications = medicationDao(context).getAllRawFull()
+            mainScope.launch {
+                vm.setMedications(medications)
             }
         }
 
@@ -100,27 +90,20 @@ class SimpleSingleMedWidgetConfigureActivity : BaseBoundActivity<SimpleSingleMed
         }
     }
 
-}
+    private fun onMedicationTapped(medication: Medication) {
+        val medId = medication.id
+        saveMedIdPref(context, appWidgetId, medId)
+        val layoutId = getLayoutPref(context, appWidgetId)
 
-private const val PREFS_NAME = "dev.corruptedark.diditakemymeds.SimpleSingleMedWidget"
-private const val PREF_PREFIX_KEY = "appwidget_"
+        // It is the responsibility of the configuration activity to update the app widget
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        updateAppWidget(context, appWidgetManager, appWidgetId, layoutId)
 
-internal fun saveMedIdPref(context: Context, appWidgetId: Int, medId: Long) {
-    val prefs = context.getSharedPreferences(PREFS_NAME, 0).edit()
-    prefs.putLong(PREF_PREFIX_KEY + appWidgetId + context.applicationContext.getString(R.string.med_id_key), medId)
-    prefs.apply()
-}
+        // Make sure we pass back the original appWidgetId
+        val resultValue = Intent()
+        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+        setResult(RESULT_OK, resultValue)
+        finish()
+    }
 
-internal fun loadMedIdPref(context: Context, appWidgetId: Int): Long {
-    val prefs = context.getSharedPreferences(PREFS_NAME, 0)
-    return prefs.getLong(
-        PREF_PREFIX_KEY + appWidgetId + context.applicationContext.getString(R.string.med_id_key),
-        Medication.INVALID_MED_ID
-    )
-}
-
-internal fun deleteMedIdPref(context: Context, appWidgetId: Int) {
-    val prefs = context.getSharedPreferences(PREFS_NAME, 0).edit()
-    prefs.remove(PREF_PREFIX_KEY + appWidgetId + context.applicationContext.getString(R.string.med_id_key))
-    prefs.apply()
 }

@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.DidITakeMyMeds.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault">
-        <item name="appWidgetRadius">8dp</item>
-        <item name="appWidgetPadding">4dp</item>
-        <item name="appWidgetInnerRadius">4dp</item>
-    </style>
-
-    <style name="Theme.DidITakeMyMeds.AppWidgetContainer" parent="Theme.DidITakeMyMeds.AppWidgetContainerParent" />
 
     <style name="Theme.TextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="colorControlActivated">?colorAccent</item>

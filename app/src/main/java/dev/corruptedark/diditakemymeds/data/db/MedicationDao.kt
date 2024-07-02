@@ -67,7 +67,7 @@ interface MedicationDao {
 
     @Transaction
     @Query("SELECT * FROM $MED_TABLE")
-    fun getAllRawFull(): MutableList<MedicationFull>
+    fun getAllRawFull(): List<MedicationFull>
 
     @Query("SELECT EXISTS(SELECT * FROM $MED_TABLE WHERE id = :medId)")
     fun medicationExists(medId: Long): Boolean

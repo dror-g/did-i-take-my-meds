@@ -48,7 +48,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DidITakeMyMeds.Light">
         <receiver
-            android:name=".widgets.SimpleSingleMedWidget"
+            android:name=".widgets.SimpleSingleMedWidgetDark"
+            android:label="Dark Widget"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -56,7 +57,19 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/simple_single_med_widget_info" />
+                android:resource="@xml/simple_single_med_widget_info_dark" />
+        </receiver>
+        <receiver
+            android:name=".widgets.SimpleSingleMedWidgetLight"
+            android:label="Light Widget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/simple_single_med_widget_info_light" />
         </receiver>
 
         <activity

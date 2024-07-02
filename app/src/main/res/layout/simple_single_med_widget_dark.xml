@@ -45,7 +45,7 @@
         android:gravity="center_horizontal"
         android:text="@string/time_since_dose_sample"/>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/just_took_it_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

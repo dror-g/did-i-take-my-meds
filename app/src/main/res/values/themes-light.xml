@@ -57,5 +57,11 @@
         <item name="colorAccent">@color/purple_700</item>
     </style>
 
+    <style name="Theme.DidITakeMyMeds.AppWidgetContainerParent.Light" parent="@style/Theme.DidITakeMyMeds.Light">
+        <item name="appWidgetRadius">8dp</item>
+        <item name="appWidgetPadding">4dp</item>
+        <item name="appWidgetInnerRadius">4dp</item>
+    </style>
 
+    <style name="Theme.DidITakeMyMeds.AppWidgetContainer.Light" parent="Theme.DidITakeMyMeds.AppWidgetContainerParent.Light" />
 </resources>

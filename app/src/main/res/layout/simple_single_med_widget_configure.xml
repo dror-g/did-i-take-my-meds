@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--Did I Take My Meds? is a FOSS app to keep track of medications
+<?xml version="1.0" encoding="utf-8"?><!--Did I Take My Meds? is a FOSS app to keep track of medications
     Did I Take My Meds? is designed to help prevent a user from skipping doses and/or overdosing
     Copyright (C) 2021  Noah Stanford <noahstandingford@gmail.com>
 
@@ -15,10 +14,14 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see https://www.gnu.org/licenses.-->
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
+        <variable
+            name="vm"
+            type="dev.corruptedark.diditakemymeds.widgets.ConfigureWidgetViewModel" />
     </data>
 
     <LinearLayout
@@ -32,12 +35,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/med_list_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="?ditmm_colorBackground"
-            android:dividerHeight="10dp" />
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </LinearLayout>
 </layout>

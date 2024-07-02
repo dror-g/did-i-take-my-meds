@@ -19,31 +19,28 @@
 
 package dev.corruptedark.diditakemymeds.widgets
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.widget.RemoteViews
-import java.util.concurrent.TimeUnit
 import androidx.lifecycle.Observer
 import dev.corruptedark.diditakemymeds.util.notifications.ActionReceiver
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
+import dev.corruptedark.diditakemymeds.util.broadcastIntentFromIntent
+import dev.corruptedark.diditakemymeds.util.timeSinceLastDoseString
 import kotlinx.coroutines.*
 
 /**
  * Implementation of App Widget functionality.
  * App Widget Configuration implemented in [SimpleSingleMedWidgetConfigureActivity]
  */
-class SimpleSingleMedWidget : AppWidgetProvider() {
+abstract class SimpleSingleMedWidgetBase(protected val layoutId: Int) : AppWidgetProvider() {
 
     companion object {
         private var appWidgetIds: IntArray? = null
-        val DAY_TO_HOURS = 24
-        val HOUR_TO_MINUTES = 60
         private val MAXIMUM_DELAY = 60000L // 1 minute in milliseconds
         private val MINIMUM_DELAY = 1000L // 1 second in milliseconds
         val mainScope = MainScope()
@@ -60,7 +57,7 @@ class SimpleSingleMedWidget : AppWidgetProvider() {
 
         // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
+            updateAppWidget(context, appWidgetManager, appWidgetId, layoutId)
         }
     }
 
@@ -68,6 +65,7 @@ class SimpleSingleMedWidget : AppWidgetProvider() {
         // When the user deletes the widget, delete the preference associated with it.
         for (appWidgetId in appWidgetIds) {
             deleteMedIdPref(context, appWidgetId)
+            deleteLayoutPref(context, appWidgetId)
         }
     }
 
@@ -78,16 +76,19 @@ class SimpleSingleMedWidget : AppWidgetProvider() {
                 val medication = medicationDao(context).getAllRaw()
                     .sortedWith(Medication::compareByClosestDoseTransition).first()
 
-                val transitionDelay = medication.closestDoseTransitionTime() - System.currentTimeMillis()
+                val transitionDelay =
+                    medication.closestDoseTransitionTime() - System.currentTimeMillis()
 
                 val delayDuration =
                     when {
                         transitionDelay < MINIMUM_DELAY -> {
                             MINIMUM_DELAY
                         }
+
                         transitionDelay in MINIMUM_DELAY until MAXIMUM_DELAY -> {
                             transitionDelay
                         }
+
                         else -> {
                             MAXIMUM_DELAY
                         }
@@ -111,7 +112,7 @@ class SimpleSingleMedWidget : AppWidgetProvider() {
 
     override fun onEnabled(context: Context) {
         // Enter relevant functionality for when the first widget is created
-        databaseObserver = Observer<MutableList<Medication>> {
+        databaseObserver = Observer {
             appWidgetIds?.apply {
                 onUpdate(context, AppWidgetManager.getInstance(context), this)
             }
@@ -139,56 +140,37 @@ class SimpleSingleMedWidget : AppWidgetProvider() {
 internal fun updateAppWidget(
     context: Context,
     appWidgetManager: AppWidgetManager,
-    appWidgetId: Int
+    appWidgetId: Int,
+    layoutId: Int
 ) {
     val medId = loadMedIdPref(context, appWidgetId)
 
     // Construct the RemoteViews object
-    val views = RemoteViews(context.packageName, R.layout.simple_single_med_widget)
+    val views = RemoteViews(context.packageName, layoutId)
 
     GlobalScope.launch(Dispatchers.IO) {
         val medication: Medication? = if (medId != Medication.INVALID_MED_ID) {
             medicationDao(context).get(medId)
-        }
-        else {
+        } else {
             null
         }
 
         medication?.apply {
             val name = medication.name
-            val timeSinceTakenDose = medication.timeSinceLastTakenDose()
-            val days = TimeUnit.MILLISECONDS.toDays(timeSinceTakenDose)
-            val hours =
-                TimeUnit.MILLISECONDS.toHours(timeSinceTakenDose) % SimpleSingleMedWidget.DAY_TO_HOURS
-            val minutes =
-                TimeUnit.MILLISECONDS.toMinutes(timeSinceTakenDose) % SimpleSingleMedWidget.HOUR_TO_MINUTES
-
-            val timeSinceText = context.applicationContext.getString(
-                R.string.time_since_dose_template,
-                days,
-                hours,
-                minutes
-            )
+            val timeSinceText = medication.timeSinceLastDoseString(context)
 
             val tookMedIntent = Intent(context, ActionReceiver::class.java).apply {
                 action = ActionReceiver.TOOK_MED_ACTION
                 putExtra(context.getString(R.string.med_id_key), medication.id)
             }
-            val tookMedPendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.getBroadcast(context, medication.id.toInt(), tookMedIntent, PendingIntent.FLAG_IMMUTABLE)
-            } else {
-                PendingIntent.getBroadcast(context, medication.id.toInt(), tookMedIntent, 0)
-            }
-            val justTookItString = context.applicationContext.getString(R.string.i_just_took_it)
-            val tookAlreadyString = context.applicationContext.getString(R.string.took_this_already)
+            val tookMedPendingIntent = context.broadcastIntentFromIntent(medication.id.toInt(), tookMedIntent)
             val buttonText = if (medication.closestDoseAlreadyTaken()) {
-                tookAlreadyString.uppercase()
-            }
-            else {
-                justTookItString.uppercase()
+                context.getString(R.string.took_this_already)
+            } else {
+                context.getString(R.string.i_just_took_it)
             }
 
-            SimpleSingleMedWidget.mainScope.launch {
+            SimpleSingleMedWidgetBase.mainScope.launch {
                 views.setTextViewText(R.id.name_label, name)
                 views.setTextViewText(
                     R.id.time_since_dose_label,
