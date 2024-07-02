@@ -57,7 +57,8 @@ abstract class SimpleSingleMedWidgetBase(protected val layoutId: Int) : AppWidge
 
         // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId, layoutId)
+            saveLayoutPref(context, appWidgetId, layoutId)
+            updateAppWidget(context, appWidgetManager, appWidgetId)
         }
     }
 
@@ -133,55 +134,6 @@ abstract class SimpleSingleMedWidgetBase(protected val layoutId: Int) : AppWidge
 
         runBlocking {
             stopRefresherLoop(refresher)
-        }
-    }
-}
-
-internal fun updateAppWidget(
-    context: Context,
-    appWidgetManager: AppWidgetManager,
-    appWidgetId: Int,
-    layoutId: Int
-) {
-    val medId = loadMedIdPref(context, appWidgetId)
-
-    // Construct the RemoteViews object
-    val views = RemoteViews(context.packageName, layoutId)
-
-    GlobalScope.launch(Dispatchers.IO) {
-        val medication: Medication? = if (medId != Medication.INVALID_MED_ID) {
-            medicationDao(context).get(medId)
-        } else {
-            null
-        }
-
-        medication?.apply {
-            val name = medication.name
-            val timeSinceText = medication.timeSinceLastDoseString(context)
-
-            val tookMedIntent = Intent(context, ActionReceiver::class.java).apply {
-                action = ActionReceiver.TOOK_MED_ACTION
-                putExtra(context.getString(R.string.med_id_key), medication.id)
-            }
-            val tookMedPendingIntent = context.broadcastIntentFromIntent(medication.id.toInt(), tookMedIntent)
-            val buttonText = if (medication.closestDoseAlreadyTaken()) {
-                context.getString(R.string.took_this_already)
-            } else {
-                context.getString(R.string.i_just_took_it)
-            }
-
-            SimpleSingleMedWidgetBase.mainScope.launch {
-                views.setTextViewText(R.id.name_label, name)
-                views.setTextViewText(
-                    R.id.time_since_dose_label,
-                    timeSinceText
-                )
-                views.setOnClickPendingIntent(R.id.just_took_it_button, tookMedPendingIntent)
-                views.setTextViewText(R.id.just_took_it_button, buttonText)
-
-                // Instruct the widget manager to update the widget
-                appWidgetManager.updateAppWidget(appWidgetId, views)
-            }
         }
     }
 }

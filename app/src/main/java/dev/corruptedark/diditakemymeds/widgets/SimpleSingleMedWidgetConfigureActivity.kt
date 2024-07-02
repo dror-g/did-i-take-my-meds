@@ -93,11 +93,10 @@ class SimpleSingleMedWidgetConfigureActivity :
     private fun onMedicationTapped(medication: Medication) {
         val medId = medication.id
         saveMedIdPref(context, appWidgetId, medId)
-        val layoutId = getLayoutPref(context, appWidgetId)
 
         // It is the responsibility of the configuration activity to update the app widget
         val appWidgetManager = AppWidgetManager.getInstance(context)
-        updateAppWidget(context, appWidgetManager, appWidgetId, layoutId)
+        updateAppWidget(context, appWidgetManager, appWidgetId)
 
         // Make sure we pass back the original appWidgetId
         val resultValue = Intent()
