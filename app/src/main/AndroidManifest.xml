@@ -77,14 +77,8 @@
             android:name=".activities.add_edit_med.AddEditMedActivity"
             android:label="@string/edit_medication" />
         <activity
-            android:name=".activities.EditMedActivity"
-            android:label="@string/edit_medication" />
-        <activity
             android:name=".activities.meddetails.MedDetailActivity"
             android:label="@string/medication_details" />
-        <activity
-            android:name=".activities.AddMedActivity"
-            android:label="@string/new_medication" />
         <activity
             android:name=".activities.main.MainActivity"
             android:exported="true"
