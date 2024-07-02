@@ -153,9 +153,9 @@ fun setDateFromMillis(view: TextView, millis: Long) {
 }
 
 @BindingAdapter("schedule", "blankScheduleText")
-fun setSchedule(view: TextView, schedule: RepeatSchedule, blankScheduleText: String) {
+fun setSchedule(view: TextView, schedule: RepeatSchedule?, blankScheduleText: String) {
     val context = view.context
-    val text = if (schedule != RepeatSchedule.BLANK) {
+    val text = if (schedule != null && schedule != RepeatSchedule.BLANK) {
         val calendar = Calendar.getInstance().apply { schedule.fillCalendar(this) }
         val formattedTime = context.formatTime(calendar)
         val formattedDate = context.formatDate(calendar)

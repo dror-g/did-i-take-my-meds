@@ -357,7 +357,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
 
 
     private suspend fun openEditMedication(aMedication: Medication) {
-      AddEditMedActivity.startForResult(this, aMedication)
+        AddEditMedActivity.editMedication(this, aMedication)
     }
 
     private fun onMedicationChanged(medicationFull: MedicationFull) {

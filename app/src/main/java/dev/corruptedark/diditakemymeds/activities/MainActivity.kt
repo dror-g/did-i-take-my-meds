@@ -44,6 +44,7 @@ import dev.corruptedark.diditakemymeds.data.db.medicationTypeDao
 import dev.corruptedark.diditakemymeds.databinding.ActivityMainBinding
 import com.siravorona.utils.getThemeDrawableByAttr
 import dev.corruptedark.diditakemymeds.StorageManager
+import dev.corruptedark.diditakemymeds.activities.add_edit_med.AddEditMedActivity
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.Comparator
@@ -257,8 +258,9 @@ class MainActivity : BaseBoundActivity<ActivityMainBinding>(
     }
 
     private fun openAddMedActivity() {
-        val intent = Intent(this, AddMedActivity::class.java)
-        startActivity(intent)
+        lifecycleScope.launch {
+            AddEditMedActivity.addMedication(this@MainActivity)
+        }
     }
 
     private fun restoreDatabase() {

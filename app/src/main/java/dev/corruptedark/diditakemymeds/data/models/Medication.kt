@@ -34,16 +34,16 @@ import kotlin.math.sign
 @Entity(tableName = MedicationDB.MED_TABLE)
 data class Medication(
     var name: String,
-    var hour: Int,
-    var minute: Int,
+    var hour: Int = RepeatSchedule.BLANK.hour,
+    var minute: Int = RepeatSchedule.BLANK.minute,
     var description: String,
-    var startDay: Int,
-    var startMonth: Int,
-    var startYear: Int,
-    var daysBetween: Int = 1,
-    var weeksBetween: Int = 0,
-    var monthsBetween: Int = 0,
-    var yearsBetween: Int = 0,
+    var startDay: Int = RepeatSchedule.BLANK.startDay,
+    var startMonth: Int = RepeatSchedule.BLANK.startMonth,
+    var startYear: Int = RepeatSchedule.BLANK.startYear,
+    var daysBetween: Int = RepeatSchedule.BLANK.daysBetween,
+    var weeksBetween: Int = RepeatSchedule.BLANK.weeksBetween,
+    var monthsBetween: Int = RepeatSchedule.BLANK.monthsBetween,
+    var yearsBetween: Int = RepeatSchedule.BLANK.yearsBetween,
     var notify: Boolean = true,
     var requirePhotoProof: Boolean = true,
     var active: Boolean = true,
@@ -73,7 +73,7 @@ data class Medication(
         const val UNDEFINED_AMOUNT = -99.0
         const val UNDEFINED_REMAINING = -99
 
-        val BLANK = Medication("", 0, 0, "", 0, 0, 0)
+        val BLANK = Medication(name ="", description = "")
 
         fun doseString(
             yesterdayString: String,

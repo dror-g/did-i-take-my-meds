@@ -34,6 +34,7 @@ import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.BR
 import com.siravorona.utils.base.BaseBoundInteractableVmActivity
+import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 import dev.corruptedark.diditakemymeds.data.models.RepeatSchedule
 import dev.corruptedark.diditakemymeds.data.models.DoseUnit
 import dev.corruptedark.diditakemymeds.data.models.Medication
@@ -45,6 +46,7 @@ import dev.corruptedark.diditakemymeds.data.models.BirthControlType
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ActivityAddOrEditMed2Binding
 import dev.corruptedark.diditakemymeds.dialogs.RepeatScheduleDialog2
+import dev.corruptedark.diditakemymeds.util.canBeRealId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -74,7 +76,8 @@ class AddEditMedActivity :
 
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val mainScope = MainScope()
-    private var medication: MedicationFull? = null
+    private var medication = MedicationFull.BLANK
+    private var isNewMed = true
 
     @SuppressLint("CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,7 +92,12 @@ class AddEditMedActivity :
             onBackPressed()
         }
 
-        val medicationId = intent.getLongExtra(EXTRA_MEDICATION_ID, -1L)
+        val medicationId = intent.getLongExtra(EXTRA_MEDICATION_ID, Medication.INVALID_MED_ID)
+        this.isNewMed = intent.getBooleanExtra(EXTRA_IS_NEW_MED, false)
+        if (!isNewMed && !medicationId.canBeRealId()) {
+            // invalid params passed
+            finish()
+        }
 
         lifecycleScope.launch(lifecycleDispatcher) {
             val medicationFull = fetchMedication(medicationId)
@@ -108,7 +116,7 @@ class AddEditMedActivity :
     }
 
     private fun fetchMedication(medicationId: Long): MedicationFull {
-        return if (medicationId != -1L) {
+        return if (medicationId.canBeRealId()) {
             medicationDao(this).getFull(medicationId).also {
                 it.medication.updateStartsToFuture()
             }
@@ -131,8 +139,9 @@ class AddEditMedActivity :
                 true
             }
             R.id.cancel -> {
-                Toast.makeText(this, getString(R.string.cancelled), Toast.LENGTH_SHORT).show()
-                setResult(RESULT_CANCELED)
+                val msgId = if (isNewMed) R.string.cancelled else R.string.edit_cancelled
+                Toast.makeText(this, msgId, Toast.LENGTH_SHORT).show()
+                setResult(false, medication.medication.id)
                 finish()
                 true
             }
@@ -206,8 +215,8 @@ class AddEditMedActivity :
             takeWithFood = vm.takeWithFood
         )
         medication.moreDosesPerDay = ArrayList(vm.getExtraSchedules())
-        val id = this.medication?.medication?.id
-        if (id != null && id != 0L) {
+        val id = this.medication.medication.id
+        if (id.canBeRealId()) {
             medication.id = id
             medication.updateStartsToFuture()
             medicationDao(this).updateMedications(medication)
@@ -229,9 +238,14 @@ class AddEditMedActivity :
     private fun onSaveButtonTapped() {
         val updatedMedication = saveMedication()
         if (updatedMedication !=null) {
-            setResult(RESULT_OK, Intent().apply { putExtra(EXTRA_MEDICATION_ID, updatedMedication.id) })
+            setResult(true, updatedMedication.id)
             finish()
         }
+    }
+
+    private fun setResult(success: Boolean, medicationId: Long) {
+        val code = if (success) RESULT_OK else RESULT_CANCELED
+        setResult(code, Intent().apply { putExtra(EXTRA_MEDICATION_ID, medicationId) })
     }
 
     private fun saveMedication(): Medication? {
@@ -280,12 +294,25 @@ class AddEditMedActivity :
 
     companion object {
         private const val EXTRA_MEDICATION_ID = "EXTRA_MEDICATION_ID"
-        suspend fun startForResult(launcherActivity: ComponentActivity, medication: Medication): Pair<Long, Boolean> {
+        private const val EXTRA_IS_NEW_MED = "EXTRA_IS_NEW_MED"
+        suspend fun editMedication(launcherActivity: ComponentActivity, medication: Medication): Pair<Long, Boolean> {
+            return startForResult(launcherActivity, medication.id, false)
+        }
+
+        suspend fun addMedication(launcherActivity: ComponentActivity): Pair<Long, Boolean> {
+            return startForResult(launcherActivity, Medication.INVALID_MED_ID, true)
+        }
+
+        private suspend fun startForResult(launcherActivity: ComponentActivity, medicationId: Long, isNew: Boolean): Pair<Long, Boolean> {
             val intent = Intent(launcherActivity, AddEditMedActivity::class.java).apply {
-                putExtra(EXTRA_MEDICATION_ID, medication.id)
+                putExtra(EXTRA_MEDICATION_ID, medicationId)
+                putExtra(EXTRA_IS_NEW_MED, isNew)
             }
             val result = ActivityResultManager.getInstance().getActivityResult(intent)
-            return medication.id to (result?.resultCode == RESULT_OK)
+                ?: return medicationId to false
+
+            val resultMedicationId = result.data?.getLongExtra(EXTRA_MEDICATION_ID, 0) ?: 0
+            return resultMedicationId to (result.resultCode == RESULT_OK)
         }
     }
 

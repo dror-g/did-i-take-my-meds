@@ -64,3 +64,5 @@ fun Medication.closestDoseString(context: Context): String {
     return medicationDoseString(context, calculateClosestDose().timeInMillis)
 }
 
+fun Long.canBeRealId() = (this != 0L && this != -1L)
+
