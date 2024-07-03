@@ -26,7 +26,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.app.NotificationCompat
 import dev.corruptedark.diditakemymeds.R
+import dev.corruptedark.diditakemymeds.activities.main.MainActivity
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.util.broadcastIntentFromIntent
 
@@ -36,9 +38,9 @@ object AlarmIntentManager {
         context: Context, medication: Medication,
         customTimeMillis: Long? = null,
     ): PendingIntent {
-        val alarmIntent = buildNotificationAlarmIntent(context, medication)
+        val alarmIntent = NotificationsUtil.buildNotificationAlarmIntent(context, medication)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        cancelAlarm(alarmManager, alarmIntent)
+        alarmManager.cancel(alarmIntent)
         setExactAlarm(
             alarmManager, alarmIntent,
             customTimeMillis ?: medication.calculateNextDose().timeInMillis
@@ -52,28 +54,11 @@ object AlarmIntentManager {
         return alarmIntent
     }
 
-    private fun buildNotificationAlarmIntent(context: Context, medication: Medication): PendingIntent {
-        return Intent(context, ActionReceiver::class.java).let { innerIntent ->
-            innerIntent.action = ActionReceiver.NOTIFY_ACTION
-            innerIntent.putExtra(context.getString(R.string.med_id_key), medication.id)
-            context.broadcastIntentFromIntent(medication.id.toInt(), innerIntent)
-        }
-    }
-
     fun cancelAlarm(context: Context, medication: Medication) {
-        val alarmIntent = buildNotificationAlarmIntent(context, medication)
-        cancelAlarm(context, alarmIntent)
-    }
-
-    fun cancelAlarm(context: Context, alarmIntent: PendingIntent) {
+        val alarmIntent = NotificationsUtil.buildNotificationAlarmIntent(context, medication)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        cancelAlarm(alarmManager, alarmIntent)
-    }
-
-    fun cancelAlarm(alarmManager: AlarmManager, alarmIntent: PendingIntent) {
         alarmManager.cancel(alarmIntent)
     }
-
 
     private fun setExactAlarm(alarmManager: AlarmManager, alarmIntent: PendingIntent, timeInMillis: Long) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

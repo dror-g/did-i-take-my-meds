@@ -64,8 +64,9 @@ import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.concurrent.Executors
 
-class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBinding, MedDetailViewModel, MedDetailViewModel.Interactor>(
-    ActivityMedDetailBinding::class, BR.vm) {
+class MedDetailActivity :
+    BaseBoundInteractableVmActivity<ActivityMedDetailBinding, MedDetailViewModel, MedDetailViewModel.Interactor>(
+        ActivityMedDetailBinding::class, BR.vm) {
     private var closestDose: Long = -1L
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
@@ -140,6 +141,10 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         super.onResume()
         lifecycleScope.launch(lifecycleDispatcher) {
             checkMedicationExists()
+            if (takeMed) {
+                takeMed = false
+                justTookItButtonPressed()
+            }
         }
     }
 
@@ -158,12 +163,14 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
                 promptDeleteMedication(vm.medication)
                 true
             }
+
             R.id.edit -> {
                 lifecycleScope.launch(lifecycleDispatcher) {
                     openEditMedication(vm.medication)
                 }
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -184,10 +191,10 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
             cancelExistingMedicationAlarm(medication, false)
             withContext(Dispatchers.IO) {
                 val proofImages =
-                    db.proofImageDao().getProofImagesByMedId(medication.id)
+                        db.proofImageDao().getProofImagesByMedId(medication.id)
                 proofImages.forEach { proofImage ->
                     try {
-                      StorageManager.deleteImageFile(this@MedDetailActivity, proofImage)
+                        StorageManager.deleteImageFile(this@MedDetailActivity, proofImage)
                     } catch (e: Exception) {
                         //
                     }
@@ -199,17 +206,20 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
             finish()
         }
     }
+
     private fun promptDeleteMedication(medication: Medication) {
         lifecycleScope.launch(lifecycleDispatcher) {
-            val action = DialogUtil.showMaterialDialogSuspend(this@MedDetailActivity, this@MedDetailActivity,
+            val action = DialogUtil.showMaterialDialogSuspend(this@MedDetailActivity,
+                this@MedDetailActivity,
                 title = getString(R.string.are_you_sure),
                 message = getString(R.string.medication_delete_warning),
                 positiveButtonText = getString(R.string.confirm)
             )
-            when(action) {
+            when (action) {
                 DialogUtil.Action.POSITIVE -> {
                     deleteMedication(medication)
                 }
+
                 else -> {}
             }
         }
@@ -286,7 +296,8 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
         val dialogBuilder = MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.are_you_sure))
             .setMessage(
-                getString(R.string.dose_record_delete_warning) + "\n\n" + medicationDoseString(context, doseRecord.doseTime)
+                getString(R.string.dose_record_delete_warning) + "\n\n" + medicationDoseString(
+                    context, doseRecord.doseTime)
             )
             .setNegativeButton(getString(R.string.cancel)) { dialog, which ->
                 dialog.dismiss()
@@ -308,6 +319,7 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
 
         dialogBuilder.show()
     }
+
     private fun removeDose(medication: Medication, doseRecord: DoseRecord, realDose: Boolean) {
         lifecycleScope.launch(lifecycleDispatcher) {
             val medId = medication.id
@@ -376,11 +388,10 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
             if (medication.closestDoseAlreadyTaken() && !medication.isAsNeeded()) {
                 Toast.makeText(this, getString(R.string.already_took_dose), Toast.LENGTH_SHORT)
                     .show()
-            }
-            else if (!medication.hasDoseRemaining()) {
-                Toast.makeText(this, getString(R.string.no_remaining_doses_message), Toast.LENGTH_LONG).show()
-            }
-            else {
+            } else if (!medication.hasDoseRemaining()) {
+                Toast.makeText(this, getString(R.string.no_remaining_doses_message),
+                    Toast.LENGTH_LONG).show()
+            } else {
                 if (medication.requirePhotoProof) {
                     takeImageProof(medication.id, System.currentTimeMillis())
                 } else {
@@ -396,16 +407,17 @@ class MedDetailActivity : BaseBoundInteractableVmActivity<ActivityMedDetailBindi
             val dose = createDose(medication)
             val proofImage = ProofImage(medication.id, dose.doseTime, filePath)
             saveDose(dose)
-            lifecycleScope.launch (lifecycleDispatcher) {
+            lifecycleScope.launch(lifecycleDispatcher) {
                 proofImageDao(context).insertAll(proofImage)
                 mainScope.launch {
-                    Toast.makeText(context, getString(R.string.dose_and_proof_saved), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.dose_and_proof_saved),
+                        Toast.LENGTH_SHORT).show()
                 }
             }
-        }
-        else {
+        } else {
             mainScope.launch {
-                Toast.makeText(context, getString(R.string.failed_to_get_proof), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.failed_to_get_proof), Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
