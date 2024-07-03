@@ -27,7 +27,7 @@
             app:zeroNavigationContentInsetStart="@{noNavigationStartInset}"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             android:theme="@style/Theme.Toolbar"
-            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+            app:popupTheme="?actionBarPopupTheme"
             tools:title="some text" />
 
     </com.google.android.material.appbar.AppBarLayout>

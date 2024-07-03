@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--Did I Take My Meds? is a FOSS app to keep track of medications
+<?xml version="1.0" encoding="utf-8"?><!--Did I Take My Meds? is a FOSS app to keep track of medications
     Did I Take My Meds? is designed to help prevent a user from skipping doses and/or overdosing
     Copyright (C) 2021  Noah Stanford <noahstandingford@gmail.com>
 
@@ -16,7 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see https://www.gnu.org/licenses.-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
         android:id="@+id/info"
@@ -30,18 +30,36 @@
         android:icon="@drawable/ic_sort_by_time"
         android:orderInCategory="2"
         android:title="@string/sort"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/theme_light"
+        android:icon="@drawable/ic_theme_light"
+        android:orderInCategory="3"
+        android:title="@string/main_menu_light_theme"
+        tools:showAsAction="always"
+        app:iconTint="?colorOnSurface"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/theme_dark"
+        android:icon="@drawable/ic_theme_dark"
+        android:orderInCategory="4"
+        app:iconTint="?colorOnSurface"
+        android:title="@string/main_menu_dark_theme"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/restore_database"
-        android:orderInCategory="3"
+        android:orderInCategory="5"
         android:title="@string/restore_database"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/back_up_database"
-        android:orderInCategory="4"
+        android:orderInCategory="6"
         android:title="@string/back_up_database"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
+
 
 </menu>

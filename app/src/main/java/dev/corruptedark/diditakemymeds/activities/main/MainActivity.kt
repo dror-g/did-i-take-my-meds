@@ -19,6 +19,7 @@
 
 package dev.corruptedark.diditakemymeds.activities.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -30,9 +31,12 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.core.view.iterator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.jakewharton.processphoenix.ProcessPhoenix
 import com.siravorona.utils.activityresult.ActivityResultManager
 import com.siravorona.utils.activityresult.createDocument
 import com.siravorona.utils.activityresult.getContent
@@ -50,6 +54,7 @@ import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ActivityMainBinding
+import dev.corruptedark.diditakemymeds.settings.AppSettings
 import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -88,6 +93,7 @@ class MainActivity :
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        applyThemeFromPreferences()
         super.onCreate(savedInstanceState)
         setSupportActionBar(binding.appbar.toolbar)
         val logo = getThemeDrawableByAttr(R.attr.ditmm_bar_logo)
@@ -108,19 +114,12 @@ class MainActivity :
         super.onPostCreate(savedInstanceState)
 
         lifecycleScope.launch(lifecycleDispatcher) {
+            sortType = AppSettings.sortBy
 
-            val sharedPref = getPreferences(Context.MODE_PRIVATE)
-            val sortKey = sharedPref.getString(getString(R.string.sort_key), "") ?: ""
-            sortType = SortBy.getByKeyOrDefault(sortKey, SortBy.TIME)
-
-            // recreate alarms that were wiped when the app process was killed
-            // thanks, Google
-            ensureAlarmsScheduled()
-
-            with(sharedPref.edit()) {
-                putInt(getString(R.string.last_version_used_key), BuildConfig.VERSION_CODE)
-                apply()
+            if (BuildConfig.VERSION_CODE > AppSettings.lastVersionUsed) {
+                ensureAlarmsScheduled()
             }
+            AppSettings.lastVersionUsed = BuildConfig.VERSION_CODE
 
             val medId =
                 intent.getLongExtra(getString(R.string.med_id_key), Medication.INVALID_MED_ID)
@@ -148,9 +147,12 @@ class MainActivity :
         MedDetailActivity.start(this, medId, takeMed)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    @SuppressLint("RestrictedApi")
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.menu_main, menu)
+        (menu as? MenuBuilder)?.setOptionalIconsVisible(true)
+        adjustMenuItemsVisibility(menu)
         return true
     }
 
@@ -172,8 +174,39 @@ class MainActivity :
                 backUpDatabase()
                 true
             }
+            R.id.theme_light -> {
+                switchToLightTheme()
+                true
+            }
+            R.id.theme_dark -> {
+                switchToDarkTheme()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun adjustMenuItemsVisibility(menu: Menu) {
+        val isLightTheme = AppSettings.isLightTheme
+        menu.iterator().forEach {menuItem ->
+            val id = menuItem.itemId
+            if (id == R.id.theme_light) {
+                menuItem.isVisible = !isLightTheme
+            }
+            if (id == R.id.theme_dark) {
+                menuItem.isVisible = isLightTheme
+            }
+        }
+    }
+
+    private fun switchToLightTheme() {
+        AppSettings.isLightTheme = true
+        ProcessPhoenix.triggerRebirth(this)
+    }
+
+    private fun switchToDarkTheme() {
+        AppSettings.isLightTheme = false
+        ProcessPhoenix.triggerRebirth(this)
     }
 
     private fun onSortMenuItemTapped(item: MenuItem) {
@@ -198,13 +231,14 @@ class MainActivity :
     }
 
     private fun sortAndNotify(sortType: SortBy, nextSortType: SortBy) {
-        val sharedPref = getPreferences(Context.MODE_PRIVATE)
         this.sortType = nextSortType
-        with(sharedPref.edit()) {
-            putString(getString(R.string.sort_key), sortType.key)
-            apply()
-        }
+        AppSettings.sortBy = sortType
         vm.sortMedications(sortType)
+    }
+
+    private fun applyThemeFromPreferences() {
+        val appTheme = AppSettings.currentTheme
+        setTheme(appTheme)
     }
 
     private fun openAboutActivity() {
