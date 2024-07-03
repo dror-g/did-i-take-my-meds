@@ -68,17 +68,18 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class MainActivity :
-    BaseBoundInteractableVmActivity<ActivityMainBinding, MainViewModel, MainViewModel.Interactor>(
-        ActivityMainBinding::class, BR.vm
-    ) {
+        BaseBoundInteractableVmActivity<ActivityMainBinding, MainViewModel, MainViewModel.Interactor>(
+                ActivityMainBinding::class, BR.vm) {
     private var sortType = SortBy.NAME
     private val MIME_TYPES = "application/*"
 
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val context = this
     private val mainScope = MainScope()
+
     @Volatile
     private var restoreJob: Job? = null
+
     @Volatile
     private var backupJob: Job? = null
 
@@ -121,8 +122,8 @@ class MainActivity :
             }
             AppSettings.lastVersionUsed = BuildConfig.VERSION_CODE
 
-            val medId =
-                intent.getLongExtra(getString(R.string.med_id_key), Medication.INVALID_MED_ID)
+            val medId = intent.getLongExtra(getString(R.string.med_id_key),
+                    Medication.INVALID_MED_ID)
             val takeMed = intent.getBooleanExtra(getString(R.string.take_med_key), false)
             if (medicationDao(context).medicationExists(medId)) {
                 openMedDetailActivity(medId, takeMed)
@@ -131,12 +132,11 @@ class MainActivity :
     }
 
     private fun ensureAlarmsScheduled() {
-        medicationDao(context).getAllRaw()
-            .forEach { medication ->
-                if (medication.notify) {
-                    scheduleMedicationAlarm(medication)
-                }
+        medicationDao(context).getAllRaw().forEach { medication ->
+            if (medication.notify) {
+                scheduleMedicationAlarm(medication)
             }
+        }
     }
 
     private fun scheduleMedicationAlarm(medication: Medication) {
@@ -162,33 +162,39 @@ class MainActivity :
                 openAboutActivity()
                 true
             }
+
             R.id.sortType -> {
                 onSortMenuItemTapped(item)
                 true
             }
+
             R.id.restore_database -> {
                 restoreDatabase()
                 true
             }
+
             R.id.back_up_database -> {
                 backUpDatabase()
                 true
             }
+
             R.id.theme_light -> {
                 switchToLightTheme()
                 true
             }
+
             R.id.theme_dark -> {
                 switchToDarkTheme()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun adjustMenuItemsVisibility(menu: Menu) {
         val isLightTheme = AppSettings.isLightTheme
-        menu.iterator().forEach {menuItem ->
+        menu.iterator().forEach { menuItem ->
             val id = menuItem.itemId
             if (id == R.id.theme_light) {
                 menuItem.isVisible = !isLightTheme
@@ -217,10 +223,12 @@ class MainActivity :
                 nextSort = SortBy.NAME
                 iconId = R.drawable.ic_sort_by_alpha
             }
+
             SortBy.NAME -> {
                 nextSort = SortBy.TYPE
                 iconId = R.drawable.ic_sort_by_type
             }
+
             SortBy.TYPE -> {
                 nextSort = SortBy.TIME
                 iconId = R.drawable.ic_sort_by_time
@@ -254,8 +262,8 @@ class MainActivity :
 
     private fun restoreDatabase() {
         lifecycleScope.launch(lifecycleDispatcher) {
-            val restoreUri =
-                ActivityResultManager.getInstance().getContent(MIME_TYPES) ?: return@launch
+            val restoreUri = ActivityResultManager.getInstance().getContent(MIME_TYPES)
+                    ?: return@launch
             restoreJob = lifecycleScope.launch(lifecycleDispatcher) {
                 doRestore(this@MainActivity, restoreUri)
             }
@@ -267,9 +275,8 @@ class MainActivity :
         // Intent.normalizeMimeType(MIME_TYPES), intent.addCategory(Intent.CATEGORY_OPENABLE)
         lifecycleScope.launch(lifecycleDispatcher) {
             val suggestedName = StorageManager.suggestBackupFileName()
-            val backupUri =
-                ActivityResultManager.getInstance().createDocument(MIME_TYPES, suggestedName)
-                    ?: return@launch
+            val backupUri = ActivityResultManager.getInstance()
+                    .createDocument(MIME_TYPES, suggestedName) ?: return@launch
             doBackup(context, backupUri)
         }
     }
@@ -299,13 +306,13 @@ class MainActivity :
             exception.printStackTrace()
             mainScope.launch {
                 Toast.makeText(context, getString(R.string.back_up_failed), Toast.LENGTH_SHORT)
-                    .show()
+                        .show()
                 launchMedicationsObserve()
             }
         }.onSuccess {
             mainScope.launch {
                 Toast.makeText(context, getString(R.string.back_up_successful), Toast.LENGTH_SHORT)
-                    .show()
+                        .show()
                 launchMedicationsObserve()
             }
         }
@@ -320,18 +327,16 @@ class MainActivity :
             }.onSuccess {
                 mainScope.launch {
                     launchMedicationsObserve {
-                        Toast.makeText(
-                            context, getString(R.string.database_restored), Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(context, getString(R.string.database_restored),
+                                Toast.LENGTH_SHORT).show()
                     }
                 }
             }.onFailure { exception ->
                 exception.printStackTrace()
                 mainScope.launch {
                     launchMedicationsObserve()
-                    Toast.makeText(
-                        context, getString(R.string.database_is_invalid), Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, getString(R.string.database_is_invalid),
+                            Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -341,10 +346,7 @@ class MainActivity :
         }
     }
 
-    private suspend fun tryRestoreDb(
-        restoreUri: Uri,
-        context: Context
-    ) {
+    private suspend fun tryRestoreDb(restoreUri: Uri, context: Context) {
         cancelJob(medicationsFlowJob)
         withContext(Dispatchers.IO) {
             runCatching {
@@ -352,19 +354,15 @@ class MainActivity :
             }.onFailure { exception ->
                 exception.printStackTrace()
                 mainScope.launch {
-                    Toast.makeText(
-                        applicationContext, getString(R.string.database_is_invalid),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(applicationContext, getString(R.string.database_is_invalid),
+                            Toast.LENGTH_SHORT).show()
                     launchMedicationsObserve()
                 }
             }.onSuccess {
                 mainScope.launch {
                     launchMedicationsObserve {
-                        Toast.makeText(
-                            applicationContext, getString(R.string.database_restored),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(applicationContext, getString(R.string.database_restored),
+                                Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -378,15 +376,13 @@ class MainActivity :
             cancelJob(medicationsFlowJob)
         }
         medicationsFlowJob = lifecycleScope.launch {
-            medicationsFlow = MedicationDB.getInstance(this@MainActivity)
-                .medicationDao()
-                .observeAllFullDistinct()
+            medicationsFlow = MedicationDB.getInstance(this@MainActivity).medicationDao()
+                    .observeAllFullDistinct()
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 medicationsFlow?.collectLatest { medications ->
                     mainScope.launch {
                         vm.setMedications(medications, sortType)
-                        binding.listEmptyLabel.visibility =
-                            if (medications.isEmpty()) View.VISIBLE else View.GONE
+                        binding.listEmptyLabel.visibility = if (medications.isEmpty()) View.VISIBLE else View.GONE
                     }
                 }
             }

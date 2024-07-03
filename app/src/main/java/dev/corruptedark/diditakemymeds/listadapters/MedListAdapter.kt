@@ -29,9 +29,12 @@ import com.google.android.material.textview.MaterialTextView
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.MedicationType
-import java.util.*
+import java.util.Calendar
 
-class MedListAdapter(private val context: Context, private val medications: MutableList<Medication>, private val medicationTypes: MutableList<MedicationType>) : BaseAdapter() {
+class MedListAdapter(
+        private val context: Context, private val medications: MutableList<Medication>,
+        private val medicationTypes: MutableList<MedicationType>
+) : BaseAdapter() {
     private val isSystem24Hour = DateFormat.is24HourFormat(context)
     private val calendar = Calendar.getInstance()
 
@@ -53,7 +56,7 @@ class MedListAdapter(private val context: Context, private val medications: Muta
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         var view = convertView
-        if(view == null)
+        if (view == null)
             view = LayoutInflater.from(context).inflate(R.layout.med_list_item, parent, false)
         val nameLabel = view?.findViewById<MaterialTextView>(R.id.name_label)
         nameLabel?.text = medications[position].name
@@ -77,8 +80,8 @@ class MedListAdapter(private val context: Context, private val medications: Muta
             } else {
                 takenLabel?.visibility = View.VISIBLE
                 timeLabel?.text = if (isSystem24Hour) DateFormat.format(
-                    context.getString(R.string.time_24),
-                    calendar
+                        context.getString(R.string.time_24),
+                        calendar
                 )
                 else DateFormat.format(context.getString(R.string.time_12), calendar)
                 if (medications[position].closestDoseAlreadyTaken()) {
@@ -87,13 +90,12 @@ class MedListAdapter(private val context: Context, private val medications: Muta
                     takenLabel?.text = context.getString(R.string.not_taken)
                 }
             }
-        }
-        else {
+        } else {
             takenLabel?.visibility = View.GONE
             timeLabel?.text = context.getString(R.string.inactive)
             view?.alpha = INACTIVE_VIEW_ALPHA
         }
-        
+
         return view!!
     }
 }

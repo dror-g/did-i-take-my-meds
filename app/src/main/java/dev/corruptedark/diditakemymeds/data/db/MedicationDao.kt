@@ -51,7 +51,8 @@ interface MedicationDao {
     @Query("SELECT * FROM $MED_TABLE WHERE id = :medId LIMIT 1")
     fun observeFull(medId: Long): Flow<MedicationFull?>
 
-    suspend fun observeFullDistinct(medId: Long) = observeFull(medId).distinctUntilChanged().filterNotNull()
+    suspend fun observeFullDistinct(medId: Long) = observeFull(medId).distinctUntilChanged()
+            .filterNotNull()
 
     @Query("SELECT * FROM $MED_TABLE")
     fun getAllLiveData(): LiveData<MutableList<Medication>>

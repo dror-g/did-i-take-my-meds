@@ -25,5 +25,6 @@ import dev.corruptedark.diditakemymeds.R
  * Implementation of App Widget functionality.
  * App Widget Configuration implemented in [SimpleSingleMedWidgetConfigureActivity]
  */
-class SimpleSingleMedWidgetLight : SimpleSingleMedWidgetBase(R.layout.simple_single_med_widget_light) {
+class SimpleSingleMedWidgetLight :
+        SimpleSingleMedWidgetBase(R.layout.simple_single_med_widget_light) {
 }

@@ -39,7 +39,7 @@ class Converters {
         @TypeConverter
         @JvmStatic
         fun fromJson(string: String): ArrayList<DoseRecord> {
-            val listType: Type = object: TypeToken<ArrayList<DoseRecord>>() {}.type
+            val listType: Type = object : TypeToken<ArrayList<DoseRecord>>() {}.type
             return gson.fromJson(string, listType)
         }
 
@@ -52,7 +52,7 @@ class Converters {
         @TypeConverter
         @JvmStatic
         fun timeOfDayListFromJson(string: String): ArrayList<RepeatSchedule> {
-            val listType: Type = object: TypeToken<ArrayList<RepeatSchedule>>() {}.type
+            val listType: Type = object : TypeToken<ArrayList<RepeatSchedule>>() {}.type
             return gson.fromJson(string, listType)
         }
     }

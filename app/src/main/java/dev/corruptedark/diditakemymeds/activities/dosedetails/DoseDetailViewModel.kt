@@ -4,9 +4,9 @@ import android.net.Uri
 import androidx.databinding.Bindable
 import com.siravorona.utils.base.InteractableViewModel
 import com.siravorona.utils.bindableproperty.bindableProperty
+import dev.corruptedark.diditakemymeds.BR
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import java.util.Calendar
-import dev.corruptedark.diditakemymeds.BR
 
 class DoseDetailViewModel : InteractableViewModel<DoseDetailViewModel.Interactor>() {
     interface Interactor {
@@ -27,7 +27,9 @@ class DoseDetailViewModel : InteractableViewModel<DoseDetailViewModel.Interactor
 
     @get:Bindable("imageUri")
     val hasImage: Boolean
-        get() {return  imageUri != null}
+        get() {
+            return imageUri != null
+        }
 
     @get:Bindable
     var showEditTakenTime by bindableProperty(false)
@@ -46,12 +48,12 @@ class DoseDetailViewModel : InteractableViewModel<DoseDetailViewModel.Interactor
     }
 
     fun onTimeTapped() {
-        val interactor = interactor?: return
+        val interactor = interactor ?: return
         launchVmScope({
             val initialHour = workingCalendar.get(Calendar.HOUR_OF_DAY)
             val initialMinute = workingCalendar.get(Calendar.MINUTE)
             val (hour, minute) = interactor.requestTime(initialHour, initialMinute)
-                ?: return@launchVmScope
+                    ?: return@launchVmScope
             workingCalendar.set(Calendar.HOUR_OF_DAY, hour)
             workingCalendar.set(Calendar.MINUTE, minute)
             notifyPropertyChanged(BR.workingCalendar)
@@ -61,7 +63,7 @@ class DoseDetailViewModel : InteractableViewModel<DoseDetailViewModel.Interactor
     fun onDateTapped() {
         launchVmScope({
             val (year, month, day) = interactor?.requestDate(workingCalendar.timeInMillis)
-                ?: return@launchVmScope
+                    ?: return@launchVmScope
             workingCalendar.set(Calendar.YEAR, year)
             workingCalendar.set(Calendar.MONTH, month)
             workingCalendar.set(Calendar.DAY_OF_MONTH, day)

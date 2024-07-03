@@ -48,7 +48,8 @@ interface ProofImageDao {
     @Query("SELECT * FROM $IMAGE_TABLE WHERE medId = :medId")
     fun getProofImagesByMedId(medId: Long): MutableList<ProofImage>
 
-    @Query("SELECT EXISTS(SELECT * FROM $IMAGE_TABLE WHERE medId = :medId AND doseTime = :doseTime)")
+    @Query(
+            "SELECT EXISTS(SELECT * FROM $IMAGE_TABLE WHERE medId = :medId AND doseTime = :doseTime)")
     fun proofImageExists(medId: Long, doseTime: Long): Boolean
 
 }

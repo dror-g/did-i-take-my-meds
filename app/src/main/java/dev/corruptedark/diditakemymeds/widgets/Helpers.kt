@@ -21,9 +21,9 @@ private const val PREF_KEY_LAYOUT = "_layout"
 
 
 internal fun updateAppWidget(
-    context: Context,
-    appWidgetManager: AppWidgetManager,
-    appWidgetId: Int,
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
 ) {
     val medId = loadMedIdPref(context, appWidgetId)
     val layoutId = getLayoutPref(context, appWidgetId)
@@ -45,8 +45,9 @@ internal fun updateAppWidget(
                 action = ActionReceiver.TOOK_MED_ACTION
                 putExtra(context.getString(R.string.med_id_key), medication.id)
             }
-            val tookMedPendingIntent =
-                context.broadcastIntentFromIntent(medication.id.toInt(), tookMedIntent)
+            val tookMedPendingIntent = context.broadcastIntentFromIntent(
+                    medication.id.toInt(), tookMedIntent
+            )
             val buttonText = if (medication.closestDoseAlreadyTaken()) {
                 context.getString(R.string.took_this_already)
             } else {
@@ -55,10 +56,7 @@ internal fun updateAppWidget(
 
             SimpleSingleMedWidgetBase.mainScope.launch {
                 views.setTextViewText(R.id.name_label, name)
-                views.setTextViewText(
-                    R.id.time_since_dose_label,
-                    timeSinceText
-                )
+                views.setTextViewText(R.id.time_since_dose_label, timeSinceText)
                 views.setOnClickPendingIntent(R.id.just_took_it_button, tookMedPendingIntent)
                 views.setTextViewText(R.id.just_took_it_button, buttonText)
 
@@ -82,7 +80,7 @@ internal fun deleteLayoutPref(context: Context, appWidgetId: Int) {
 internal fun getLayoutPref(context: Context, appWidgetId: Int): Int {
     val prefName = "$PREF_PREFIX_KEY$appWidgetId$PREF_KEY_LAYOUT"
     return context.getSharedPreferences(PREFS_NAME, 0)
-        .getInt(prefName, R.layout.simple_single_med_widget_dark)
+            .getInt(prefName, R.layout.simple_single_med_widget_dark)
 }
 
 

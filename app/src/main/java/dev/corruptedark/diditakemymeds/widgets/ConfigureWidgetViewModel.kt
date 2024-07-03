@@ -7,7 +7,6 @@ import com.siravorona.utils.lists.observableListOf
 import dev.corruptedark.diditakemymeds.BR
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.activities.main.ItemMedication
-import dev.corruptedark.diditakemymeds.activities.main.SortBy
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.MedListItem2Binding
@@ -21,14 +20,14 @@ class ConfigureWidgetViewModel : InteractableViewModel<ConfigureWidgetViewModel.
 
     fun initRecycler(recyclerView: RecyclerView) {
         BindableAdapter(medicationItems, BR.item)
-            .map<ItemMedication, MedListItem2Binding>(R.layout.med_list_item2) {
-                onClick {
-                    val item = it.binding.item ?: return@onClick
-                    interactor?.onMedicationTapped(item.medication)
-                }
-            }
-            .into(recyclerView)
+                .map<ItemMedication, MedListItem2Binding>(R.layout.med_list_item2) {
+                    onClick {
+                        val item = it.binding.item ?: return@onClick
+                        interactor?.onMedicationTapped(item.medication)
+                    }
+                }.into(recyclerView)
     }
+
     fun setMedications(medications: List<MedicationFull>) {
         medicationItems.clear()
         val newItems = medications.map { ItemMedication(it) }

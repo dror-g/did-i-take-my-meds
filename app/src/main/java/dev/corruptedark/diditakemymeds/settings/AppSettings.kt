@@ -4,15 +4,15 @@ import com.chibatching.kotpref.KotprefModel
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.activities.main.SortBy
 
-object AppSettings : KotprefModel(){
+object AppSettings : KotprefModel() {
     override val kotprefName: String = " AppSettings"
 
     var sortByString by stringPref(AppSettingsLegacy.sortByString)
     var lastVersionUsed by intPref(AppSettingsLegacy.lastVersionUsed)
 
     var currentThemeKey by stringPref(
-        ThemePrefHelper.defaultThemePrefValue,
-        key = R.string.pref_key_app_theme
+            ThemePrefHelper.defaultThemePrefValue,
+            key = R.string.pref_key_app_theme
     )
 
     var sortBy: SortBy

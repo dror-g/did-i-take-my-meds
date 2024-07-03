@@ -23,9 +23,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.BuildConfig
 import com.siravorona.utils.base.BaseBoundActivity
+import dev.corruptedark.diditakemymeds.BuildConfig
+import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.databinding.ActivityAboutBinding
 
 class AboutActivity : BaseBoundActivity<ActivityAboutBinding>(ActivityAboutBinding::class) {
@@ -44,21 +44,19 @@ class AboutActivity : BaseBoundActivity<ActivityAboutBinding>(ActivityAboutBindi
         }
         binding.supportButton.setOnClickListener {
             if (BuildConfig.BUILD_TYPE == getString(R.string.play_release)) {
-                MaterialAlertDialogBuilder(this)
-                    .setTitle(getString(R.string.sorry))
-                    .setMessage(getString(R.string.cannot_donate_explanation))
-                    .setNeutralButton(getString(R.string.okay)) { dialog, which ->
-                        dialog.dismiss()
-                    }
-                    .show()
-            }
-            else {
+                MaterialAlertDialogBuilder(this).setTitle(getString(R.string.sorry))
+                        .setMessage(getString(R.string.cannot_donate_explanation))
+                        .setNeutralButton(getString(R.string.okay)) { dialog, which ->
+                            dialog.dismiss()
+                        }.show()
+            } else {
                 val webpage = Uri.parse(getString(R.string.liberapay_link))
                 val intent = Intent(Intent.ACTION_VIEW, webpage)
                 startActivity(intent)
             }
         }
-        binding.appDescriptionView.text = getString(R.string.app_description, BuildConfig.VERSION_NAME)
+        binding.appDescriptionView.text = getString(R.string.app_description,
+                BuildConfig.VERSION_NAME)
     }
 
 

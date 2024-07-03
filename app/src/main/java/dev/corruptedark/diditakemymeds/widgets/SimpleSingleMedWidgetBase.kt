@@ -22,16 +22,17 @@ package dev.corruptedark.diditakemymeds.widgets
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
-import android.content.Intent
-import android.widget.RemoteViews
 import androidx.lifecycle.Observer
-import dev.corruptedark.diditakemymeds.util.notifications.ActionReceiver
-import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
-import dev.corruptedark.diditakemymeds.util.broadcastIntentFromIntent
-import dev.corruptedark.diditakemymeds.util.timeSinceLastDoseString
-import kotlinx.coroutines.*
+import dev.corruptedark.diditakemymeds.data.models.Medication
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Implementation of App Widget functionality.
@@ -49,9 +50,9 @@ abstract class SimpleSingleMedWidgetBase(protected val layoutId: Int) : AppWidge
     }
 
     override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            appWidgetIds: IntArray
     ) {
         Companion.appWidgetIds = appWidgetIds
 
@@ -75,25 +76,25 @@ abstract class SimpleSingleMedWidgetBase(protected val layoutId: Int) : AppWidge
 
             while (medicationDao(context).getAllRaw().isNotEmpty()) {
                 val medication = medicationDao(context).getAllRaw()
-                    .sortedWith(Medication::compareByClosestDoseTransition).first()
+                        .sortedWith(Medication::compareByClosestDoseTransition).first()
 
                 val transitionDelay =
-                    medication.closestDoseTransitionTime() - System.currentTimeMillis()
+                        medication.closestDoseTransitionTime() - System.currentTimeMillis()
 
                 val delayDuration =
-                    when {
-                        transitionDelay < MINIMUM_DELAY -> {
-                            MINIMUM_DELAY
-                        }
+                        when {
+                            transitionDelay < MINIMUM_DELAY -> {
+                                MINIMUM_DELAY
+                            }
 
-                        transitionDelay in MINIMUM_DELAY until MAXIMUM_DELAY -> {
-                            transitionDelay
-                        }
+                            transitionDelay in MINIMUM_DELAY until MAXIMUM_DELAY -> {
+                                transitionDelay
+                            }
 
-                        else -> {
-                            MAXIMUM_DELAY
+                            else -> {
+                                MAXIMUM_DELAY
+                            }
                         }
-                    }
 
                 delay(delayDuration)
                 appWidgetIds?.apply {

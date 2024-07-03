@@ -12,7 +12,6 @@ import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.MedicationType
 import dev.corruptedark.diditakemymeds.data.models.RepeatSchedule
 import java.util.Calendar
-import java.util.concurrent.TimeUnit
 
 @BindingAdapter("zeroContentInsetStart")
 fun setNoContentInsetStart(view: MaterialToolbar, noContentInsetStart: Boolean) {
@@ -23,8 +22,7 @@ fun setNoContentInsetStart(view: MaterialToolbar, noContentInsetStart: Boolean) 
 
 @BindingAdapter("zeroNavigationContentInsetStart")
 fun setNoNavigationContentInsetStart(
-    view: MaterialToolbar,
-    zeroNavigationContentInsetStart: Boolean
+        view: MaterialToolbar, zeroNavigationContentInsetStart: Boolean
 ) {
     if (zeroNavigationContentInsetStart) {
         view.contentInsetStartWithNavigation = 0
@@ -52,8 +50,9 @@ fun setRxNumber(view: TextView, medication: Medication) {
 fun setDoseInfo(view: TextView, doseUnit: DoseUnit, amountPerDose: Double) {
     val doseValueString = amountPerDose.toBigDecimal().stripTrailingZeros().toPlainString()
     val doseUnitString = doseUnit.unit
-    val text =
-        view.context.getString(R.string.dose_amount_label_format, doseValueString, doseUnitString)
+    val text = view.context.getString(R.string.dose_amount_label_format,
+            doseValueString,
+            doseUnitString)
     view.text = text
 }
 
@@ -139,6 +138,7 @@ fun setTimeFromMillis(view: TextView, millis: Long) {
     val text = context.formatTime(millis)
     view.text = text
 }
+
 @BindingAdapter("dateFromMillis")
 fun setDateFromMillis(view: TextView, millis: Long) {
     val context = view.context
@@ -155,7 +155,13 @@ fun setSchedule(view: TextView, schedule: RepeatSchedule?, blankScheduleText: St
         val formattedTime = context.formatTime(calendar)
         val formattedDate = context.formatDate(calendar)
         val activeDays = schedule.daysBetween
-        context.getString(R.string.schedule_format, formattedTime, formattedDate, activeDays, 0, 0, 0)
+        context.getString(R.string.schedule_format,
+                formattedTime,
+                formattedDate,
+                activeDays,
+                0,
+                0,
+                0)
     } else {
         blankScheduleText
     }
@@ -169,7 +175,7 @@ fun setTakenTime(view: TextView, medication: Medication) {
         if (medication.isAsNeeded()) {
             context.getString(R.string.taken_as_needed)
         } else {
-            val closestDoseMillis = medication .calculateClosestDose().timeInMillis
+            val closestDoseMillis = medication.calculateClosestDose().timeInMillis
             context.formatTime(closestDoseMillis)
         }
     } else {

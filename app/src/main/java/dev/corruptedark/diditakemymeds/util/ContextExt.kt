@@ -16,6 +16,7 @@ fun Context.formatDate(millis: Long): String {
     val text = DateFormat.format(timeFormat, millis)
     return text.toString()
 }
+
 fun Context.formatTime(calendar: Calendar): String {
     val timeFormat = getTimeFormat()
     val text = DateFormat.format(timeFormat, calendar)

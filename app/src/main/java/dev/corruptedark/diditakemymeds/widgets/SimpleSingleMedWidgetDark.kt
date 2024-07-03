@@ -25,5 +25,6 @@ import dev.corruptedark.diditakemymeds.R
  * Implementation of App Widget functionality.
  * App Widget Configuration implemented in [SimpleSingleMedWidgetConfigureActivity]
  */
-class SimpleSingleMedWidgetDark : SimpleSingleMedWidgetBase(R.layout.simple_single_med_widget_dark) {
+class SimpleSingleMedWidgetDark :
+        SimpleSingleMedWidgetBase(R.layout.simple_single_med_widget_dark) {
 }

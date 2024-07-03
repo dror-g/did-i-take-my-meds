@@ -20,17 +20,16 @@
 package dev.corruptedark.diditakemymeds.widgets
 
 import android.appwidget.AppWidgetManager
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import dev.corruptedark.diditakemymeds.databinding.SimpleSingleMedWidgetConfigureBinding
 import androidx.lifecycle.lifecycleScope
-import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.BR
 import com.siravorona.utils.base.BaseBoundInteractableVmActivity
-import dev.corruptedark.diditakemymeds.data.models.Medication
+import dev.corruptedark.diditakemymeds.BR
+import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
+import dev.corruptedark.diditakemymeds.data.models.Medication
+import dev.corruptedark.diditakemymeds.databinding.SimpleSingleMedWidgetConfigureBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -40,13 +39,13 @@ import kotlinx.coroutines.launch
  * The configuration screen for the [SimpleSingleMedWidgetDark] AppWidget.
  */
 class SimpleSingleMedWidgetConfigureActivity :
-    BaseBoundInteractableVmActivity<SimpleSingleMedWidgetConfigureBinding, ConfigureWidgetViewModel, ConfigureWidgetViewModel.Interactor>(
-        SimpleSingleMedWidgetConfigureBinding::class, BR.vm) {
+        BaseBoundInteractableVmActivity<SimpleSingleMedWidgetConfigureBinding, ConfigureWidgetViewModel, ConfigureWidgetViewModel.Interactor>(
+                SimpleSingleMedWidgetConfigureBinding::class, BR.vm) {
     val context = this
     val mainScope = MainScope()
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
-    override val vm : ConfigureWidgetViewModel by viewModels()
+    override val vm: ConfigureWidgetViewModel by viewModels()
 
     override val modelInteractor = object : ConfigureWidgetViewModel.Interactor {
         override fun onMedicationTapped(medication: Medication) {
@@ -79,7 +78,7 @@ class SimpleSingleMedWidgetConfigureActivity :
         val extras = intent.extras
         if (extras != null) {
             appWidgetId = extras.getInt(
-                AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID
+                    AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID
             )
         }
 

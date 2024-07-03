@@ -42,7 +42,8 @@ import com.google.android.material.timepicker.TimeFormat
 import dev.corruptedark.diditakemymeds.R
 import it.sephiroth.android.library.numberpicker.NumberPicker
 import it.sephiroth.android.library.numberpicker.doOnProgressChanged
-import java.util.*
+import java.util.Calendar
+import java.util.TimeZone
 
 
 class RepeatScheduleDialog : DialogFragment() {
@@ -61,7 +62,9 @@ class RepeatScheduleDialog : DialogFragment() {
     private var confirmButton: MaterialButton? = null
     private var confirmListener: View.OnClickListener? = null
     private var dismissListener: DialogInterface.OnDismissListener? = null
-    private @Volatile var pickerIsOpen = false
+
+    private @Volatile
+    var pickerIsOpen = false
     var hour = -1
     var minute = -1
     var startDay = -1
@@ -80,8 +83,8 @@ class RepeatScheduleDialog : DialogFragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_repeat_schedule_dialog, container, false)
@@ -102,8 +105,7 @@ class RepeatScheduleDialog : DialogFragment() {
                 birthControlGroup.visibility = View.VISIBLE
                 timeBetweenPickers.visibility = View.GONE
                 birthControlSchedule = birthControlGroup.checkedRadioButtonId
-            }
-            else {
+            } else {
                 birthControlGroup.visibility = View.GONE
                 timeBetweenPickers.visibility = View.VISIBLE
                 birthControlSchedule = null
@@ -122,8 +124,9 @@ class RepeatScheduleDialog : DialogFragment() {
             calendar.set(Calendar.DAY_OF_MONTH, startDay)
             calendar.set(Calendar.MONTH, startMonth)
             calendar.set(Calendar.YEAR, startYear)
-            val formattedTime = if (isSystem24Hour) DateFormat.format(getString(R.string.time_24), calendar)
-                else DateFormat.format(getString(R.string.time_12), calendar)
+            val formattedTime = if (isSystem24Hour) DateFormat.format(getString(R.string.time_24),
+                    calendar)
+            else DateFormat.format(getString(R.string.time_12), calendar)
             timePickerButton.text = formattedTime
             startDateButton.text = DateFormat.format(getString(R.string.date_format), calendar)
             daysBetweenPicker.progress = daysBetween
@@ -186,12 +189,12 @@ class RepeatScheduleDialog : DialogFragment() {
 
         @JvmStatic
         fun newInstance(context: Context) =
-            RepeatScheduleDialog().apply {
-                callingContext = context
-                arguments = Bundle().apply {
+                RepeatScheduleDialog().apply {
+                    callingContext = context
+                    arguments = Bundle().apply {
 
+                    }
                 }
-            }
     }
 
     fun addDismissListener(listener: DialogInterface.OnDismissListener) {
@@ -216,9 +219,7 @@ class RepeatScheduleDialog : DialogFragment() {
             if (hour >= 0 && minute >= 0) {
                 initialHour = hour
                 initialMinute = minute
-            }
-            else
-            {
+            } else {
                 initialHour = calendar.get(Calendar.HOUR_OF_DAY)
                 initialMinute = calendar.get(Calendar.MINUTE)
             }
@@ -226,17 +227,18 @@ class RepeatScheduleDialog : DialogFragment() {
             val isSystem24Hour = DateFormat.is24HourFormat(callingContext)
             val clockFormat = if (isSystem24Hour) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
             val timePicker = MaterialTimePicker.Builder()
-                .setTimeFormat(clockFormat)
-                .setHour(initialHour)
-                .setMinute(initialMinute)
-                .setTitleText(getString(R.string.select_a_time))
-                .build()
+                    .setTimeFormat(clockFormat)
+                    .setHour(initialHour)
+                    .setMinute(initialMinute)
+                    .setTitleText(getString(R.string.select_a_time))
+                    .build()
             timePicker.addOnPositiveButtonClickListener {
                 hour = timePicker.hour
                 minute = timePicker.minute
                 calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
                 calendar.set(Calendar.MINUTE, timePicker.minute)
-                val formattedTime = if (isSystem24Hour) DateFormat.format(getString(R.string.time_24), calendar)
+                val formattedTime = if (isSystem24Hour) DateFormat.format(
+                        getString(R.string.time_24), calendar)
                 else DateFormat.format(getString(R.string.time_12), calendar)
                 (view as TextView).text = formattedTime
             }
@@ -244,7 +246,7 @@ class RepeatScheduleDialog : DialogFragment() {
                 pickerIsOpen = false
             }
             timePicker.show((callingContext as AppCompatActivity).supportFragmentManager, getString(
-                R.string.time_picker_tag
+                    R.string.time_picker_tag
             ))
         }
     }
@@ -263,23 +265,24 @@ class RepeatScheduleDialog : DialogFragment() {
             } else {
                 MaterialDatePicker.todayInUtcMilliseconds()
             }
-            
+
             val datePicker = MaterialDatePicker.Builder.datePicker()
-                .setSelection(initialSelection)
-                .setTitleText(getString(R.string.select_a_start_date))
-                .build()
+                    .setSelection(initialSelection)
+                    .setTitleText(getString(R.string.select_a_start_date))
+                    .build()
             datePicker.addOnPositiveButtonClickListener {
                 calendar.timeInMillis = datePicker.selection!!
                 startDay = calendar.get(Calendar.DATE)
                 startMonth = calendar.get(Calendar.MONTH)
                 startYear = calendar.get(Calendar.YEAR)
-                (view as TextView).text = DateFormat.format(getString(R.string.date_format), calendar)
+                (view as TextView).text = DateFormat.format(getString(R.string.date_format),
+                        calendar)
             }
             datePicker.addOnDismissListener {
                 pickerIsOpen = false
             }
             datePicker.show((callingContext as AppCompatActivity).supportFragmentManager, getString(
-                R.string.date_picker_tag
+                    R.string.date_picker_tag
             ))
         }
     }

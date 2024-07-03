@@ -25,7 +25,8 @@ import kotlinx.parcelize.Parcelize
 import kotlin.math.sign
 
 @Parcelize
-data class DoseRecord(val doseTime: Long, val closestDose: Long = NONE): Comparable<DoseRecord>, Parcelable {
+data class DoseRecord(val doseTime: Long, val closestDose: Long = NONE) : Comparable<DoseRecord>,
+        Parcelable {
 
     companion object {
         const val NONE = -1L
@@ -34,10 +35,8 @@ data class DoseRecord(val doseTime: Long, val closestDose: Long = NONE): Compara
     }
 
     override fun compareTo(other: DoseRecord): Int {
-        return if (closestDose == other.closestDose)
-            (other.doseTime - doseTime).sign
-        else
-            (other.closestDose - closestDose).sign
+        return if (closestDose == other.closestDose) (other.doseTime - doseTime).sign
+        else (other.closestDose - closestDose).sign
     }
 
     fun isAsNeeded(): Boolean {

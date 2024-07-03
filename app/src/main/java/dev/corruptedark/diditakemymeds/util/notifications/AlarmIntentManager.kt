@@ -23,34 +23,28 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.core.app.NotificationCompat
-import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.activities.main.MainActivity
 import dev.corruptedark.diditakemymeds.data.models.Medication
-import dev.corruptedark.diditakemymeds.util.broadcastIntentFromIntent
 
 object AlarmIntentManager {
 
     fun scheduleMedicationAlarm(
-        context: Context, medication: Medication,
-        customTimeMillis: Long? = null,
+            context: Context, medication: Medication,
+            customTimeMillis: Long? = null,
     ): PendingIntent {
         val alarmIntent = NotificationsUtil.buildNotificationAlarmIntent(context, medication)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(alarmIntent)
-        setExactAlarm(
-            alarmManager, alarmIntent,
-            customTimeMillis ?: medication.calculateNextDose().timeInMillis
-        )
+        setExactAlarm(alarmManager,
+                alarmIntent,
+                customTimeMillis ?: medication.calculateNextDose().timeInMillis)
 
         val receiver = ComponentName(context, ActionReceiver::class.java)
 
-        context.packageManager.setComponentEnabledSetting(
-            receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
-        )
+        context.packageManager.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP)
         return alarmIntent
     }
 
@@ -60,24 +54,25 @@ object AlarmIntentManager {
         alarmManager.cancel(alarmIntent)
     }
 
-    private fun setExactAlarm(alarmManager: AlarmManager, alarmIntent: PendingIntent, timeInMillis: Long) {
+    private fun setExactAlarm(
+            alarmManager: AlarmManager, alarmIntent: PendingIntent, timeInMillis: Long
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 if (canScheduleExactAlarms(alarmManager)) {
                     //  alarms set with setAlarmClock appear to persist after process is closed
-                    alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(timeInMillis, alarmIntent), alarmIntent)
+                    alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(timeInMillis,
+                            alarmIntent), alarmIntent)
                 }
             } catch (e: SecurityException) {
                 //
             }
         } else {
-            alarmManager.set(
-                AlarmManager.RTC_WAKEUP, timeInMillis, alarmIntent
-            )
+            alarmManager.set(AlarmManager.RTC_WAKEUP, timeInMillis, alarmIntent)
         }
     }
 
-    private fun canScheduleExactAlarms(alarmManager: AlarmManager) : Boolean {
+    private fun canScheduleExactAlarms(alarmManager: AlarmManager): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             alarmManager.canScheduleExactAlarms()
         } else {

@@ -30,34 +30,31 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.siravorona.utils.activityresult.ActivityResultManager
 import com.siravorona.utils.activityresult.getActivityResult
-import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
-import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.BR
 import com.siravorona.utils.base.BaseBoundInteractableVmActivity
-import dev.corruptedark.diditakemymeds.data.models.RepeatSchedule
-import dev.corruptedark.diditakemymeds.data.models.DoseUnit
-import dev.corruptedark.diditakemymeds.data.models.Medication
-import dev.corruptedark.diditakemymeds.data.models.MedicationType
+import dev.corruptedark.diditakemymeds.BR
+import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.db.doseUnitDao
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.medicationTypeDao
 import dev.corruptedark.diditakemymeds.data.models.BirthControlType
+import dev.corruptedark.diditakemymeds.data.models.DoseUnit
+import dev.corruptedark.diditakemymeds.data.models.Medication
+import dev.corruptedark.diditakemymeds.data.models.MedicationType
+import dev.corruptedark.diditakemymeds.data.models.RepeatSchedule
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ActivityAddOrEditMed2Binding
 import dev.corruptedark.diditakemymeds.dialogs.RepeatScheduleDialog2
 import dev.corruptedark.diditakemymeds.util.canBeRealId
+import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.Executors
-import kotlin.collections.ArrayList
 
 class AddEditMedActivity :
-    BaseBoundInteractableVmActivity<ActivityAddOrEditMed2Binding, MedViewModel, MedViewModel.Interactor>(
-        ActivityAddOrEditMed2Binding::class,
-        BR.vm
-    ) {
+        BaseBoundInteractableVmActivity<ActivityAddOrEditMed2Binding, MedViewModel, MedViewModel.Interactor>(
+                ActivityAddOrEditMed2Binding::class, BR.vm) {
     override val vm: MedViewModel by viewModels()
     override val modelInteractor = object : MedViewModel.Interactor {
 
@@ -66,8 +63,8 @@ class AddEditMedActivity :
         }
 
         override suspend fun rescheduleDose(
-            index: Int,
-            schedule: RepeatSchedule
+                index: Int,
+                schedule: RepeatSchedule
         ): Pair<RepeatSchedule, BirthControlType>? {
             return this@AddEditMedActivity.requestSchedule(schedule)
         }
@@ -96,7 +93,8 @@ class AddEditMedActivity :
             // invalid params passed
             finish()
         }
-        val title = if (isNewMed) getString(R.string.new_medication) else getString(R.string.edit_medication)
+        val title = if (isNewMed) getString(R.string.new_medication) else getString(
+                R.string.edit_medication)
         supportActionBar?.title = title
 
         lifecycleScope.launch(lifecycleDispatcher) {
@@ -106,8 +104,8 @@ class AddEditMedActivity :
             this@AddEditMedActivity.medication = medicationFull
 
             mainScope.launch {
-                vm.showRequireProofSwitch =
-                    packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+                vm.showRequireProofSwitch = packageManager.hasSystemFeature(
+                        PackageManager.FEATURE_CAMERA_ANY)
                 vm.setupMedicationTypeInput(binding.medTypeInput, medTypes)
                 vm.setupDoseUnitInput(binding.doseUnitInput, doseUnits)
                 vm.fillFromMedication(medicationFull)
@@ -138,6 +136,7 @@ class AddEditMedActivity :
                 }
                 true
             }
+
             R.id.cancel -> {
                 val msgId = if (isNewMed) R.string.cancelled else R.string.edit_cancelled
                 Toast.makeText(this, msgId, Toast.LENGTH_SHORT).show()
@@ -145,6 +144,7 @@ class AddEditMedActivity :
                 finish()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -192,28 +192,15 @@ class AddEditMedActivity :
         val typeId = getOrCreateMedType(vm.medTypeString)
         val doseUnitId = getOrCreateDoseUnit(vm.doseUnitString)
 
-        var medication = Medication(
-            name = vm.name,
-            hour = vm.schedule.hour,
-            minute = vm.schedule.minute,
-            description = vm.description,
-            startDay = vm.schedule.startDay,
-            startMonth = vm.schedule.startMonth,
-            startYear = vm.schedule.startYear,
-            daysBetween = vm.schedule.daysBetween,
-            weeksBetween = vm.schedule.weeksBetween,
-            monthsBetween = vm.schedule.monthsBetween,
-            yearsBetween = vm.schedule.yearsBetween,
-            notify = vm.shouldNotify(),
-            requirePhotoProof = vm.requirePhotoProof,
-            typeId = typeId,
-            rxNumber = vm.rxNumber,
-            pharmacy = vm.pharmacy,
-            amountPerDose = vm.amountPerDose,
-            doseUnitId = doseUnitId,
-            remainingDoses = vm.remainingDoses,
-            takeWithFood = vm.takeWithFood
-        )
+        var medication = Medication(name = vm.name, hour = vm.schedule.hour,
+                minute = vm.schedule.minute, description = vm.description,
+                startDay = vm.schedule.startDay, startMonth = vm.schedule.startMonth,
+                startYear = vm.schedule.startYear, daysBetween = vm.schedule.daysBetween,
+                weeksBetween = vm.schedule.weeksBetween, monthsBetween = vm.schedule.monthsBetween,
+                yearsBetween = vm.schedule.yearsBetween, notify = vm.shouldNotify(),
+                requirePhotoProof = vm.requirePhotoProof, typeId = typeId, rxNumber = vm.rxNumber,
+                pharmacy = vm.pharmacy, amountPerDose = vm.amountPerDose, doseUnitId = doseUnitId,
+                remainingDoses = vm.remainingDoses, takeWithFood = vm.takeWithFood)
         medication.moreDosesPerDay = ArrayList(vm.getExtraSchedules())
         val id = this.medication.medication.id
         if (id.canBeRealId()) {
@@ -229,7 +216,7 @@ class AddEditMedActivity :
 
     private fun setMedicationAlarm(medication: Medication) {
         if (medication.notify) {
-           AlarmIntentManager.scheduleMedicationAlarm(this, medication)
+            AlarmIntentManager.scheduleMedicationAlarm(this, medication)
         } else {
             AlarmIntentManager.cancelAlarm(this, medication)
         }
@@ -237,7 +224,7 @@ class AddEditMedActivity :
 
     private fun onSaveButtonTapped() {
         val updatedMedication = saveMedication()
-        if (updatedMedication !=null) {
+        if (updatedMedication != null) {
             setResult(true, updatedMedication.id)
             finish()
         }
@@ -261,7 +248,8 @@ class AddEditMedActivity :
         setMedicationAlarm(medication)
 
         mainScope.launch {
-            Toast.makeText(this@AddEditMedActivity, getString(R.string.med_saved), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@AddEditMedActivity, getString(R.string.med_saved),
+                    Toast.LENGTH_SHORT).show()
         }
         return medication
 
@@ -271,23 +259,19 @@ class AddEditMedActivity :
         return requestSchedule(vm.schedule)
     }
 
-    private suspend fun requestSchedule(initial: RepeatSchedule): Pair<RepeatSchedule, BirthControlType>? {
-        val result = RepeatScheduleDialog2.requestSchedule(
-            supportFragmentManager,
-            this@AddEditMedActivity,
-            initial
-        )
+    private suspend fun requestSchedule(
+            initial: RepeatSchedule
+    ): Pair<RepeatSchedule, BirthControlType>? {
+        val result = RepeatScheduleDialog2.requestSchedule(supportFragmentManager,
+                this@AddEditMedActivity, initial)
         val newSchedule = result?.first ?: return null
         val birthControlType = result.second
 
         return if (newSchedule.isValid(birthControlType != BirthControlType.NO)) {
             newSchedule to birthControlType
         } else {
-            Toast.makeText(
-                this@AddEditMedActivity,
-                getString(R.string.fill_out_schedule),
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this@AddEditMedActivity, getString(R.string.fill_out_schedule),
+                    Toast.LENGTH_SHORT).show()
             null
         }
     }
@@ -295,7 +279,10 @@ class AddEditMedActivity :
     companion object {
         private const val EXTRA_MEDICATION_ID = "EXTRA_MEDICATION_ID"
         private const val EXTRA_IS_NEW_MED = "EXTRA_IS_NEW_MED"
-        suspend fun editMedication(launcherActivity: ComponentActivity, medication: Medication): Pair<Long, Boolean> {
+        suspend fun editMedication(
+                launcherActivity: ComponentActivity,
+                medication: Medication
+        ): Pair<Long, Boolean> {
             return startForResult(launcherActivity, medication.id, false)
         }
 
@@ -303,13 +290,16 @@ class AddEditMedActivity :
             return startForResult(launcherActivity, Medication.INVALID_MED_ID, true)
         }
 
-        private suspend fun startForResult(launcherActivity: ComponentActivity, medicationId: Long, isNew: Boolean): Pair<Long, Boolean> {
+        private suspend fun startForResult(
+                launcherActivity: ComponentActivity, medicationId: Long,
+                isNew: Boolean
+        ): Pair<Long, Boolean> {
             val intent = Intent(launcherActivity, AddEditMedActivity::class.java).apply {
                 putExtra(EXTRA_MEDICATION_ID, medicationId)
                 putExtra(EXTRA_IS_NEW_MED, isNew)
             }
             val result = ActivityResultManager.getInstance().getActivityResult(intent)
-                ?: return medicationId to false
+                    ?: return medicationId to false
 
             val resultMedicationId = result.data?.getLongExtra(EXTRA_MEDICATION_ID, 0) ?: 0
             return resultMedicationId to (result.resultCode == RESULT_OK)

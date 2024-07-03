@@ -26,7 +26,8 @@ import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 
 @Entity(tableName = MedicationDB.MED_TYPE_TABLE)
 data class MedicationType(val name: String) {
-    @PrimaryKey(autoGenerate = true) var id: Long = 0
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
 
     fun toContentValues(): ContentValues {
         val contentValues = ContentValues()

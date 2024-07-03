@@ -21,44 +21,31 @@ package dev.corruptedark.diditakemymeds.activities.dosedetails
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.view.View
 import androidx.activity.viewModels
-import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
-import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.BR
 import com.siravorona.utils.base.BaseBoundInteractableVmActivity
 import com.siravorona.utils.parcelable
+import dev.corruptedark.diditakemymeds.BR
+import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.StorageManager
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.db.proofImageDao
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.data.models.Medication
-import dev.corruptedark.diditakemymeds.data.models.ProofImage
 import dev.corruptedark.diditakemymeds.databinding.ActivityDoseDetailBinding
 import dev.corruptedark.diditakemymeds.util.DialogUtil
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import java.io.File
-import java.util.Calendar
-import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.Executors
 
 class DoseDetailActivity :
-    BaseBoundInteractableVmActivity<ActivityDoseDetailBinding, DoseDetailViewModel, DoseDetailViewModel.Interactor>(
-        ActivityDoseDetailBinding::class, BR.vm
-    ) {
+        BaseBoundInteractableVmActivity<ActivityDoseDetailBinding, DoseDetailViewModel, DoseDetailViewModel.Interactor>(
+                ActivityDoseDetailBinding::class, BR.vm) {
 
     private var medId = Medication.INVALID_MED_ID
 
@@ -122,11 +109,11 @@ class DoseDetailActivity :
 
     private suspend fun promptConfirmTimeChanges(): Boolean {
         val action = DialogUtil.showMaterialDialogSuspend(
-            this, this,
-            getString(R.string.are_you_sure),
-            getString(R.string.dose_update_warning),
-            getString(R.string.confirm),
-            getString(R.string.cancel),
+                this, this,
+                getString(R.string.are_you_sure),
+                getString(R.string.dose_update_warning),
+                getString(R.string.confirm),
+                getString(R.string.cancel),
         )
         return action == DialogUtil.Action.POSITIVE
     }
@@ -153,24 +140,15 @@ class DoseDetailActivity :
     }
 
     private suspend fun requestTimeOfDay(initialHour: Int, initialMinute: Int): Pair<Int, Int>? {
-        val config = DialogUtil.TimePickerConfig(
-            getString(R.string.select_a_time),
-            initialHour,
-            initialMinute,
-            DateFormat.is24HourFormat(this)
-        )
-        return DialogUtil.showMaterialTimePickerSuspend(
-            this.supportFragmentManager,
-            this, config, getString(R.string.time_picker_tag)
-        )
+        val config = DialogUtil.TimePickerConfig(getString(R.string.select_a_time), initialHour,
+                initialMinute, DateFormat.is24HourFormat(this))
+        return DialogUtil.showMaterialTimePickerSuspend(this.supportFragmentManager, this, config,
+                getString(R.string.time_picker_tag))
     }
 
     private suspend fun requestDate(initialSelection: Long): Triple<Int, Int, Int>? {
-        val config = DialogUtil.DatePickerConfigB(
-            getString(R.string.select_a_start_date),
-            TimeZone.getTimeZone(getString(R.string.utc)),
-            initialSelection
-        )
+        val config = DialogUtil.DatePickerConfigB(getString(R.string.select_a_start_date),
+                TimeZone.getTimeZone(getString(R.string.utc)), initialSelection)
         return DialogUtil.showMaterialDatePickerSuspend(supportFragmentManager, this, config)
     }
 

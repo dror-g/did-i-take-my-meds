@@ -3,12 +3,10 @@ package dev.corruptedark.diditakemymeds
 import android.content.Context
 import android.net.Uri
 import android.text.format.DateFormat
-import android.widget.Toast
 import androidx.core.net.toUri
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB
 import dev.corruptedark.diditakemymeds.data.models.ProofImage
 import dev.corruptedark.diditakemymeds.util.ZipFileManager
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.util.Date
@@ -102,23 +100,19 @@ object StorageManager {
         tempFolder.deleteRecursively()
 
         context.contentResolver.openInputStream(restoreUri)?.use { inputStream ->
-            ZipFileManager.streamZipToFolder(
-                inputStream,
-                tempFolder
-            )
+            ZipFileManager.streamZipToFolder(inputStream, tempFolder)
         }
 
         val tempFiles = tempFolder.listFiles()
 
-        val databaseFile =
-            tempFiles?.find { file -> file.name == MedicationDB.DATABASE_NAME }
+        val databaseFile = tempFiles?.find { file -> file.name == MedicationDB.DATABASE_NAME }
 
         databaseFile?.inputStream()?.use { databaseStream ->
             if (MedicationDB.databaseFileIsValid(context, databaseFile.toUri())) {
                 context.getDatabasePath(MedicationDB.DATABASE_NAME).outputStream()
-                    .use { outStream ->
-                        databaseStream.copyTo(outStream)
-                    }
+                        .use { outStream ->
+                            databaseStream.copyTo(outStream)
+                        }
             }
         }
 
@@ -126,8 +120,7 @@ object StorageManager {
             if (file.exists()) file.deleteRecursively()
         }
 
-        val tempImageFolder =
-            tempFiles?.find { file -> file.isDirectory && file.name == imageFolder.name }
+        val tempImageFolder = tempFiles?.find { file -> file.isDirectory && file.name == imageFolder.name }
 
         tempImageFolder?.copyRecursively(imageFolder)
 

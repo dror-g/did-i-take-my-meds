@@ -4,9 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Rect
-import android.text.format.DateFormat
 import android.view.ViewGroup
-import java.util.Calendar
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -14,12 +12,11 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import dev.corruptedark.diditakemymeds.R
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import java.time.Year
+import java.util.Calendar
 import java.util.TimeZone
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -35,45 +32,40 @@ object DialogUtil {
         val percentWidth = rect.width() * percent
         dialog.window?.setLayout(percentWidth.toInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
     }
+
     suspend fun showMaterialDialogSuspend(
-        context: Context,
-        lifecycleOwner: LifecycleOwner,
-        title: String,
-        message: String,
-        positiveButtonText: String,
-        negativeButtonText: String? = null,
-        neutralButtonString: String? = null,
-        dialogCancelable: Boolean = false
+            context: Context,
+            lifecycleOwner: LifecycleOwner,
+            title: String,
+            message: String,
+            positiveButtonText: String,
+            negativeButtonText: String? = null,
+            neutralButtonString: String? = null,
+            dialogCancelable: Boolean = false
     ): Action {
         return try {
             withContext(lifecycleOwner.lifecycleScope.coroutineContext) {
                 suspendCancellableCoroutine { continuation ->
-                    val dialog = MaterialAlertDialogBuilder(context)
-                        .setTitle(title)
-                        .setMessage(message)
-                        .setPositiveButton(positiveButtonText) { _, _ ->
-                            continuation.resume(Action.POSITIVE, null)
-                        }.apply {
-                            if (negativeButtonText != null) {
-                                setNegativeButton(negativeButtonText) { _, _ ->
-                                    continuation.resume(Action.NEGATIVE, null)
+                    val dialog = MaterialAlertDialogBuilder(context).setTitle(title)
+                            .setMessage(message).setPositiveButton(positiveButtonText) { _, _ ->
+                                continuation.resume(Action.POSITIVE, null)
+                            }.apply {
+                                if (negativeButtonText != null) {
+                                    setNegativeButton(negativeButtonText) { _, _ ->
+                                        continuation.resume(Action.NEGATIVE, null)
+                                    }
                                 }
-                            }
-                        }
-                        .apply {
-                            if (neutralButtonString != null) {
-                                setNeutralButton(neutralButtonString) { _, _ ->
-                                    continuation.resume(Action.NEUTRAL, null)
+                            }.apply {
+                                if (neutralButtonString != null) {
+                                    setNeutralButton(neutralButtonString) { _, _ ->
+                                        continuation.resume(Action.NEUTRAL, null)
+                                    }
                                 }
-                            }
-                        }
-                        .setOnDismissListener {
-                            if (continuation.isActive) {
-                                continuation.resume(Action.CANCELLED, null)
-                            }
-                        }
-                        .setCancelable(dialogCancelable)
-                        .show()
+                            }.setOnDismissListener {
+                                if (continuation.isActive) {
+                                    continuation.resume(Action.CANCELLED, null)
+                                }
+                            }.setCancelable(dialogCancelable).show()
 
                     continuation.invokeOnCancellation { dialog.dismiss() }
                 }
@@ -89,31 +81,34 @@ object DialogUtil {
 
 
     suspend fun showMaterialDatePickerSuspend(
-        fragmentManager: FragmentManager,
-        lifecycleOwner: LifecycleOwner,
-        config: DatePickerConfigB,
-        tag: String? = null,
-        dialogCancelable: Boolean = false
+            fragmentManager: FragmentManager,
+            lifecycleOwner: LifecycleOwner,
+            config: DatePickerConfigB,
+            tag: String? = null,
+            dialogCancelable: Boolean = false
     ): Triple<Int, Int, Int>? {
-        val datePicker = MaterialDatePicker.Builder.datePicker()
-            .setSelection(config.millis)
-            .setTitleText(config.title)
-            .build()
-        return  showMaterialDatePickerSuspend(fragmentManager, lifecycleOwner, datePicker, config.timeZone, tag, dialogCancelable)
+        val datePicker = MaterialDatePicker.Builder.datePicker().setSelection(config.millis)
+                .setTitleText(config.title).build()
+        return showMaterialDatePickerSuspend(fragmentManager,
+                lifecycleOwner,
+                datePicker,
+                config.timeZone,
+                tag,
+                dialogCancelable)
     }
 
     suspend fun showMaterialDatePickerSuspend(
-        fragmentManager: FragmentManager,
-        lifecycleOwner: LifecycleOwner,
-        datePicker: MaterialDatePicker<Long>,
-        timeZone: TimeZone,
-        tag: String? = null,
-        dialogCancelable: Boolean = false
+            fragmentManager: FragmentManager,
+            lifecycleOwner: LifecycleOwner,
+            datePicker: MaterialDatePicker<Long>,
+            timeZone: TimeZone,
+            tag: String? = null,
+            dialogCancelable: Boolean = false
     ): Triple<Int, Int, Int>? {
         return try {
             withContext(lifecycleOwner.lifecycleScope.coroutineContext) {
                 suspendCancellableCoroutine { continuation ->
-                    datePicker.addOnPositiveButtonClickListener {millis ->
+                    datePicker.addOnPositiveButtonClickListener { millis ->
                         val calendar = Calendar.getInstance(timeZone)
                         calendar.timeInMillis = millis
                         val year = calendar.get(Calendar.YEAR)
@@ -143,20 +138,21 @@ object DialogUtil {
         }
     }
 
-    data class TimePickerConfig(val title: String, val hour: Int, val minute: Int, val is24H: Boolean) {
-    }
+    data class TimePickerConfig(
+            val title: String, val hour: Int, val minute: Int, val is24H: Boolean
+    ) {}
 
     suspend fun showMaterialTimePickerSuspend(
-        fragmentManager: FragmentManager,
-        lifecycleOwner: LifecycleOwner,
-        config: TimePickerConfig,
-        tag: String? = null,
-        dialogCancelable: Boolean = false
+            fragmentManager: FragmentManager,
+            lifecycleOwner: LifecycleOwner,
+            config: TimePickerConfig,
+            tag: String? = null,
+            dialogCancelable: Boolean = false
     ): Pair<Int, Int>? {
         val initialHour: Int
         val initialMinute: Int
 
-        if ( config.hour >= 0 && config.minute >= 0) {
+        if (config.hour >= 0 && config.minute >= 0) {
             initialHour = config.hour
             initialMinute = config.minute
         } else {
@@ -166,21 +162,21 @@ object DialogUtil {
         }
 
         val clockFormat = if (config.is24H) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
-        val timePicker = MaterialTimePicker.Builder()
-            .setTimeFormat(clockFormat)
-            .setHour(initialHour)
-            .setMinute(initialMinute)
-            .setTitleText(config.title)
-            .build()
-        return showMaterialTimePickerSuspend(fragmentManager, lifecycleOwner, timePicker, tag, dialogCancelable)
+        val timePicker = MaterialTimePicker.Builder().setTimeFormat(clockFormat)
+                .setHour(initialHour).setMinute(initialMinute).setTitleText(config.title).build()
+        return showMaterialTimePickerSuspend(fragmentManager,
+                lifecycleOwner,
+                timePicker,
+                tag,
+                dialogCancelable)
     }
 
     suspend fun showMaterialTimePickerSuspend(
-        fragmentManager: FragmentManager,
-        lifecycleOwner: LifecycleOwner,
-        timePicker: MaterialTimePicker,
-        tag: String? = null,
-        dialogCancelable: Boolean = false
+            fragmentManager: FragmentManager,
+            lifecycleOwner: LifecycleOwner,
+            timePicker: MaterialTimePicker,
+            tag: String? = null,
+            dialogCancelable: Boolean = false
     ): Pair<Int, Int>? {
         return try {
             withContext(lifecycleOwner.lifecycleScope.coroutineContext) {

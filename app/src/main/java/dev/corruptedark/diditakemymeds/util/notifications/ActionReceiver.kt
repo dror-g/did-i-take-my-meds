@@ -3,7 +3,6 @@ package dev.corruptedark.diditakemymeds.util.notifications
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.core.app.NotificationManagerCompat
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.activities.main.MainActivity
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
@@ -38,13 +37,16 @@ class ActionReceiver : BroadcastReceiver() {
                 Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_LOCKED_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
                     onStartEverythingAction(context)
                 }
+
                 NOTIFY_ACTION -> {
                     //Handle alarm
                     onNotifyAction(context, intent)
                 }
+
                 TOOK_MED_ACTION -> {
                     onTookMedAction(context, intent)
                 }
+
                 REMIND_ACTION -> {
                     onRemindAction(context, intent)
                 }
@@ -53,8 +55,7 @@ class ActionReceiver : BroadcastReceiver() {
     }
 
     private suspend fun onTookMedAction(
-        context: Context,
-        intent: Intent
+            context: Context, intent: Intent
     ) {
         val medId = intent.getLongExtra(context.getString(R.string.med_id_key), -1L)
         if (!medicationDao(context).medicationExists(medId)) {
@@ -77,31 +78,22 @@ class ActionReceiver : BroadcastReceiver() {
             val takenDose = if (medication.isAsNeeded()) {
                 DoseRecord(System.currentTimeMillis())
             } else {
-                DoseRecord(
-                    System.currentTimeMillis(),
-                    medication.calculateClosestDose().timeInMillis
-                )
+                DoseRecord(System.currentTimeMillis(),
+                        medication.calculateClosestDose().timeInMillis)
             }
             medication.addNewTakenDose(takenDose)
-            medicationDao(context)
-                .updateMedications(medication)
+            medicationDao(context).updateMedications(medication)
         }
 
         NotificationsUtil.notify(context, medication, context.getString(R.string.taken), true)
-        NotificationsUtil.cancelNotificationWithDelay(
-            context,
-            medication.id.toInt(),
-            CANCEL_DELAY
-        )
+        NotificationsUtil.cancelNotificationWithDelay(context, medication.id.toInt(), CANCEL_DELAY)
     }
 
     private fun takePhotoProof(
-        context: Context,
-        medication: Medication
+            context: Context, medication: Medication
     ) {
         val takeMedIntent = Intent(context, MainActivity::class.java).apply {
-            flags =
-                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra(context.getString(R.string.med_id_key), medication.id)
             putExtra(context.getString(R.string.take_med_key), true)
         }
@@ -117,13 +109,8 @@ class ActionReceiver : BroadcastReceiver() {
         if (medicationDao(context).medicationExists(medId)) {
             val calendar = Calendar.getInstance()
             calendar.add(Calendar.MINUTE, REMIND_DELAY)
-            val medication: Medication =
-                medicationDao(context).get(medId)
-            AlarmIntentManager.scheduleMedicationAlarm(
-                context,
-                medication,
-                calendar.timeInMillis
-            )
+            val medication: Medication = medicationDao(context).get(medId)
+            AlarmIntentManager.scheduleMedicationAlarm(context, medication, calendar.timeInMillis)
 
         }
     }
@@ -140,14 +127,12 @@ class ActionReceiver : BroadcastReceiver() {
                 }
             }
         }
-        medicationDao(context)
-            .updateMedications(*medications.toTypedArray())
+        medicationDao(context).updateMedications(*medications.toTypedArray())
     }
 
     private fun onNotifyAction(context: Context, intent: Intent) {
-        val medication =
-            medicationDao(context)
-                .get(intent.getLongExtra(context.getString(R.string.med_id_key), -1))
+        val medication = medicationDao(context).get(intent.getLongExtra(context.getString(R.string.med_id_key),
+                -1))
 
         medication.updateStartsToFuture()
         AlarmIntentManager.scheduleMedicationAlarm(context, medication)

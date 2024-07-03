@@ -36,34 +36,25 @@ object NotificationsUtil {
                 description = descriptionText
             }
             // Register the channel with the system
-            val notificationManager: NotificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
 
         }
     }
 
     fun notify(
-        context: Context, medication: Medication,
-        contentText: String? = null,
-        noActions: Boolean = false,
+            context: Context, medication: Medication,
+            contentText: String? = null,
+            noActions: Boolean = false,
     ) {
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            val notification =
-                configureMedicationNotification(
-                    context, medication,
+        if (ActivityCompat.checkSelfPermission(context,
+                        Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            val notification = configureMedicationNotification(context,
+                    medication,
                     contentText = contentText,
-                    noActions = noActions
-                ).build()
+                    noActions = noActions).build()
             val nm = NotificationManagerCompat.from(context)
-            nm.notify(
-                medication.id.toInt(),
-                notification
-            )
+            nm.notify(medication.id.toInt(), notification)
         }
     }
 
@@ -79,8 +70,8 @@ object NotificationsUtil {
     }
 
     private fun medicationNotificationBuilder(
-        context: Context,
-        medication: Medication,
+            context: Context,
+            medication: Medication,
     ): NotificationCompat.Builder {
         val calendar = Calendar.getInstance()
         val closestDose = medication.calculateClosestDose()
@@ -91,26 +82,19 @@ object NotificationsUtil {
         val formattedTime = context.formatTime(calendar)
 
         return NotificationCompat.Builder(context, context.getString(R.string.channel_name))
-            .setSmallIcon(R.drawable.ic_small_notification)
-            .setColor(
-                ResourcesCompat.getColor(
-                    context.resources,
-                    R.color.notification_icon_color,
-                    context.theme
-                )
-            )
-            .setContentTitle(medication.name)
-            .setSubText(formattedTime)
-            .setContentText(context.getString(R.string.time_for_your_dose))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setAutoCancel(false)
+                .setSmallIcon(R.drawable.ic_small_notification).setColor(ResourcesCompat.getColor(
+                        context.resources,
+                        R.color.notification_icon_color,
+                        context.theme)).setContentTitle(medication.name).setSubText(formattedTime)
+                .setContentText(context.getString(R.string.time_for_your_dose))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT).setAutoCancel(false)
     }
 
     fun configureMedicationNotification(
-        context: Context,
-        medication: Medication,
-        contentText: String? = null,
-        noActions: Boolean = false
+            context: Context,
+            medication: Medication,
+            contentText: String? = null,
+            noActions: Boolean = false
     ): NotificationCompat.Builder {
 
         val builder = medicationNotificationBuilder(context, medication)
@@ -129,14 +113,14 @@ object NotificationsUtil {
             val remindPendingIntent = buildActionRemindIntent(context, medication)
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || !medication.requirePhotoProof) {
-                builder.addAction(
-                    NO_ICON, context.getString(R.string.took_it), tookMedPendingIntent
-                )
+                builder.addAction(NO_ICON,
+                        context.getString(R.string.took_it),
+                        tookMedPendingIntent)
             }
 
-            builder.addAction(
-                NO_ICON, context.getString(R.string.remind_in_15), remindPendingIntent
-            )
+            builder.addAction(NO_ICON,
+                    context.getString(R.string.remind_in_15),
+                    remindPendingIntent)
         }
 
         return builder
@@ -151,10 +135,7 @@ object NotificationsUtil {
         }
     }
 
-    private fun buildActionRemindIntent(
-        context: Context,
-        medication: Medication
-    ): PendingIntent {
+    private fun buildActionRemindIntent(context: Context, medication: Medication): PendingIntent {
         val remindIntent = Intent(context, ActionReceiver::class.java).apply {
             action = ActionReceiver.REMIND_ACTION
             putExtra(context.getString(R.string.med_id_key), medication.id)
@@ -162,10 +143,7 @@ object NotificationsUtil {
         return context.broadcastIntentFromIntent(medication.id.toInt(), remindIntent)
     }
 
-    private fun buildActionTookMedIntent(
-        context: Context,
-        medication: Medication
-    ): PendingIntent {
+    private fun buildActionTookMedIntent(context: Context, medication: Medication): PendingIntent {
         val tookMedIntent = Intent(context, ActionReceiver::class.java).apply {
             action = ActionReceiver.TOOK_MED_ACTION
             putExtra(context.getString(R.string.med_id_key), medication.id)
@@ -174,9 +152,7 @@ object NotificationsUtil {
     }
 
     private fun buildContentIntent(
-        context: Context,
-        medication: Medication,
-        actionIntent: Intent
+            context: Context, medication: Medication, actionIntent: Intent
     ): PendingIntent {
         return context.activityIntentFromIntent(medication.id.toInt(), actionIntent)
     }

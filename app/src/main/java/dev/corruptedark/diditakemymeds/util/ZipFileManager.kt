@@ -19,7 +19,9 @@
 
 package dev.corruptedark.diditakemymeds.util
 
-import java.io.*
+import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -34,7 +36,7 @@ object ZipFileManager {
 
     private fun zipRecursively(outStream: ZipOutputStream, inFile: File, parentDir: String) {
         val buffer = ByteArray(BUFFER_SIZE)
-        
+
         inFile.listFiles()?.forEach { file ->
             if (file.isDirectory) {
                 val entry = ZipEntry(file.name + File.separator)
@@ -44,11 +46,10 @@ object ZipFileManager {
                 outStream.putNextEntry(entry)
 
                 zipRecursively(outStream, file, file.name)
-            }
-            else {
+            } else {
                 if (!file.name.contains(ZIP_FILE_EXTENSION)) {
                     file.inputStream().use { inputStream ->
-                        inputStream.buffered(BUFFER_SIZE). use { bufferedStream ->
+                        inputStream.buffered(BUFFER_SIZE).use { bufferedStream ->
                             val path = parentDir + File.separator + file.name
                             val entry = ZipEntry(path)
                             entry.time = file.lastModified()
@@ -65,8 +66,7 @@ object ZipFileManager {
                             outStream.closeEntry()
                         }
                     }
-                }
-                else {
+                } else {
                     outStream.closeEntry()
                 }
             }
@@ -97,8 +97,7 @@ object ZipFileManager {
                     if (!file.exists()) {
                         file.mkdirs()
                     }
-                }
-                else {
+                } else {
                     val file = File(folder.path + File.separator + entry.name)
                     val bufferedStream = file.outputStream().buffered(BUFFER_SIZE)
 

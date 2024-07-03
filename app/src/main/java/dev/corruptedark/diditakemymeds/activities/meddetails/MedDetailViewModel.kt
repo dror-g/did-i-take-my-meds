@@ -2,23 +2,23 @@ package dev.corruptedark.diditakemymeds.activities.meddetails
 
 import android.widget.CompoundButton
 import androidx.databinding.Bindable
-import androidx.recyclerview.widget.ColorDividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.siravorona.utils.base.InteractableViewModel
 import com.siravorona.utils.bindableproperty.bindableProperty
+import com.siravorona.utils.dp2Px
+import com.siravorona.utils.getThemedColorByAttr
 import com.siravorona.utils.listadapters.BindableAdapter
 import com.siravorona.utils.lists.observableListOf
+import dev.corruptedark.diditakemymeds.BR
+import dev.corruptedark.diditakemymeds.R
+import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.data.models.DoseUnit
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.MedicationType
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
-import dev.corruptedark.diditakemymeds.BR
-import dev.corruptedark.diditakemymeds.R
-import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.databinding.ItemDoseListBinding
-import com.siravorona.utils.dp2Px
-import com.siravorona.utils.getThemedColorByAttr
+import dev.corruptedark.diditakemymeds.util.views.ColorDividerItemDecoration
 
 class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>() {
     interface Interactor {
@@ -34,8 +34,7 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
 
     @get:Bindable
     var medicationFull: MedicationFull by bindableProperty(
-        MedicationFull.BLANK
-    ) { oldValue, newValue ->
+            MedicationFull.BLANK) { oldValue, newValue ->
         doseRecordItems.clear()
         val records = newValue.medication.doseRecord
         doseRecordItems.addAll(records.map { DoseRecordItem(it) })
@@ -130,24 +129,23 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
         val context = recyclerView.context
 
         val dividerColor = context.getThemedColorByAttr(R.attr.ditmm_colorBackground)
-        val decoration = ColorDividerItemDecoration(
-            LinearLayoutManager.VERTICAL, dividerColor, context.dp2Px(5.0f)
-        )
+        val decoration = ColorDividerItemDecoration(LinearLayoutManager.VERTICAL, dividerColor,
+                context.dp2Px(5.0f))
         recyclerView.addItemDecoration(decoration)
 
-        BindableAdapter(doseRecordItems, BR.item)
-            .map<DoseRecordItem, ItemDoseListBinding>(R.layout.item_dose_list) {
-                onLongClick {
-                    val record = it.binding.item?.doseRecord ?: return@onLongClick false
-                    interactor?.promptDeleteDoseRecord(medication, record)
-                    true
-                }
-                onClick {
-                    val record = it.binding.item?.doseRecord ?: return@onClick
-                    interactor?.openDoseDetail(medication, record)
-                }
+        BindableAdapter(doseRecordItems, BR.item).map<DoseRecordItem, ItemDoseListBinding>(
+                R.layout.item_dose_list) {
+            onLongClick {
+                val record = it.binding.item?.doseRecord ?: return@onLongClick false
+                interactor?.promptDeleteDoseRecord(medication, record)
+                true
             }
+            onClick {
+                val record = it.binding.item?.doseRecord ?: return@onClick
+                interactor?.openDoseDetail(medication, record)
+            }
+        }
 
-            .into(recyclerView)
+                .into(recyclerView)
     }
 }

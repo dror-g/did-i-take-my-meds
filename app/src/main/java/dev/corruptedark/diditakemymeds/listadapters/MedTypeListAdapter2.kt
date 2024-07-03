@@ -31,9 +31,10 @@ import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.MedicationType
 import java.util.*
 
-class MedTypeListAdapter2(private val context: Context, types: List<MedicationType>) : BaseAdapter(), Filterable {
+class MedTypeListAdapter2(private val context: Context, types: List<MedicationType>) :
+        BaseAdapter(), Filterable {
     private val medicationTypes = types.toMutableList()
-    val filteredTypes = mutableListOf<MedicationType>().also { it.addAll(medicationTypes)}
+    val filteredTypes = mutableListOf<MedicationType>().also { it.addAll(medicationTypes) }
 
     override fun getCount(): Int {
         return filteredTypes.size
@@ -48,7 +49,8 @@ class MedTypeListAdapter2(private val context: Context, types: List<MedicationTy
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.med_type_list_item, parent, false)
+        val view = convertView ?: LayoutInflater.from(context)
+                .inflate(R.layout.med_type_list_item, parent, false)
 
         val nameLabel = view?.findViewById<MaterialTextView>(R.id.type_name_label)
         nameLabel?.text = getItem(position).name
