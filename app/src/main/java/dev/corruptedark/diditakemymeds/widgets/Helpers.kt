@@ -33,7 +33,7 @@ internal fun updateAppWidget(
 
     GlobalScope.launch(Dispatchers.IO) {
         val medication: Medication? = if (medId != Medication.INVALID_MED_ID) {
-            medicationDao(context).get(medId)
+            medicationDao(context).getById(medId)
         } else {
             null
         }

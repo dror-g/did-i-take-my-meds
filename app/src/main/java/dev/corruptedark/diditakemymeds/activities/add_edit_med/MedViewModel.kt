@@ -119,19 +119,20 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
         val medType = medicationFull.medicationType
         val doseUnit = medicationFull.doseUnit
 
-        takeWithFood = medication.takeWithFood
         name = medication.name
+        description = medication.description
         rxNumber = medication.rxNumber
         pharmacy = medication.pharmacy
-        description = medication.description
-        asNeeded = medication.isAsNeeded()
-        notify = medication.notify
-        schedule = RepeatSchedule.fromMedication(medication)
-        setExtraDoses(medication.moreDosesPerDay)
-
         medTypeString = medType.name
         doseUnitString = doseUnit.unit
+        amountPerDose = medication.amountPerDose
+        remainingDoses = medication.remainingDoses
+        schedule = RepeatSchedule.fromMedication(medication)
+        setExtraDoses(medication.moreDosesPerDay)
+        asNeeded = medication.isAsNeeded()
+        notify = medication.notify
         requirePhotoProof = medication.requirePhotoProof
+        takeWithFood = medication.takeWithFood
     }
 
     fun setupMedicationTypeInput(input: AutoCompleteTextView, types: List<MedicationType>) {

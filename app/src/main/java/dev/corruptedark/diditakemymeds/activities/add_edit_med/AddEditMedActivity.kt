@@ -115,7 +115,7 @@ class AddEditMedActivity :
 
     private fun fetchMedication(medicationId: Long): MedicationFull {
         return if (medicationId.canBeRealId()) {
-            medicationDao(this).getFull(medicationId).also {
+            medicationDao(this).getByIdFull(medicationId).also {
                 it.medication.updateStartsToFuture()
             }
         } else MedicationFull.BLANK
@@ -192,26 +192,45 @@ class AddEditMedActivity :
         val typeId = getOrCreateMedType(vm.medTypeString)
         val doseUnitId = getOrCreateDoseUnit(vm.doseUnitString)
 
-        var medication = Medication(name = vm.name, hour = vm.schedule.hour,
-                minute = vm.schedule.minute, description = vm.description,
-                startDay = vm.schedule.startDay, startMonth = vm.schedule.startMonth,
-                startYear = vm.schedule.startYear, daysBetween = vm.schedule.daysBetween,
-                weeksBetween = vm.schedule.weeksBetween, monthsBetween = vm.schedule.monthsBetween,
-                yearsBetween = vm.schedule.yearsBetween, notify = vm.shouldNotify(),
-                requirePhotoProof = vm.requirePhotoProof, typeId = typeId, rxNumber = vm.rxNumber,
-                pharmacy = vm.pharmacy, amountPerDose = vm.amountPerDose, doseUnitId = doseUnitId,
-                remainingDoses = vm.remainingDoses, takeWithFood = vm.takeWithFood)
-        medication.moreDosesPerDay = ArrayList(vm.getExtraSchedules())
-        val id = this.medication.medication.id
-        if (id.canBeRealId()) {
-            medication.id = id
+        val medication = this.medication.medication.copy(
+                name = vm.name,
+                hour = vm.schedule.hour,
+                minute = vm.schedule.minute,
+                description = vm.description,
+                startDay = vm.schedule.startDay,
+                startMonth = vm.schedule.startMonth,
+                startYear = vm.schedule.startYear,
+                daysBetween = vm.schedule.daysBetween,
+                weeksBetween = vm.schedule.weeksBetween,
+                monthsBetween = vm.schedule.monthsBetween,
+                yearsBetween = vm.schedule.yearsBetween,
+                notify = vm.shouldNotify(),
+                requirePhotoProof = vm.requirePhotoProof,
+                typeId = typeId,
+                rxNumber = vm.rxNumber,
+                pharmacy = vm.pharmacy,
+                amountPerDose = vm.amountPerDose,
+                doseUnitId = doseUnitId,
+                remainingDoses = vm.remainingDoses,
+                takeWithFood = vm.takeWithFood,
+                moreDosesPerDay = ArrayList(vm.getExtraSchedules())
+        )
+        medication.id = this.medication.medication.id
+        if (medication.id.canBeRealId()) {
             medication.updateStartsToFuture()
-            medicationDao(this).updateMedications(medication)
-        } else {
-            medicationDao(this).insertAll(medication)
-            medication = medicationDao(this).getAllRaw().last()
         }
-        return medication
+        val rowId = medicationDao(this).updateOrCreate(medication)
+        val savedMedication = medicationDao(this).getByRowId(rowId)
+        return savedMedication
+//        if (id.canBeRealId()) {
+//            medication.id = id
+//            medication.updateStartsToFuture()
+//            medicationDao(this).updateMedications(medication)
+//        } else {
+//            medicationDao(this).insertAll(medication)
+//            medication = medicationDao(this).getAllRaw().last()
+//        }
+//        return medication
     }
 
     private fun setMedicationAlarm(medication: Medication) {

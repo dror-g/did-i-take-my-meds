@@ -122,11 +122,11 @@ class DoseDetailActivity :
         val medId = this.medId
         lifecycleScope.launch(lifecycleDispatcher) {
             deleteProofImage(medId, doseRecord.doseTime)
-            val medication = medicationDao(this@DoseDetailActivity).get(medId)
+            val medication = medicationDao(this@DoseDetailActivity).getById(medId)
             medication.removeTakenDose(doseRecord, false)
             val newRecord = DoseRecord(newTimeTakenMills, doseRecord.closestDose)
             medication.addNewTakenDose(newRecord)
-            medicationDao(this@DoseDetailActivity).updateMedications(medication)
+            medicationDao(this@DoseDetailActivity).updateOrCreate(medication)
             mainScope.launch {
                 vm.doseRecord = newRecord
             }

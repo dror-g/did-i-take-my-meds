@@ -62,7 +62,7 @@ class ActionReceiver : BroadcastReceiver() {
             NotificationsUtil.cancelNotification(context.applicationContext, medId.toInt())
             return
         }
-        val medication = medicationDao(context).get(medId)
+        val medication = medicationDao(context).getById(medId)
 
         if (!medication.active) {
             NotificationsUtil.cancelNotification(context.applicationContext, medId.toInt())
@@ -82,7 +82,7 @@ class ActionReceiver : BroadcastReceiver() {
                         medication.calculateClosestDose().timeInMillis)
             }
             medication.addNewTakenDose(takenDose)
-            medicationDao(context).updateMedications(medication)
+            medicationDao(context).updateOrCreate(medication)
         }
 
         NotificationsUtil.notify(context, medication, context.getString(R.string.taken), true)
@@ -109,7 +109,7 @@ class ActionReceiver : BroadcastReceiver() {
         if (medicationDao(context).medicationExists(medId)) {
             val calendar = Calendar.getInstance()
             calendar.add(Calendar.MINUTE, REMIND_DELAY)
-            val medication: Medication = medicationDao(context).get(medId)
+            val medication: Medication = medicationDao(context).getById(medId)
             AlarmIntentManager.scheduleMedicationAlarm(context, medication, calendar.timeInMillis)
 
         }
@@ -127,11 +127,11 @@ class ActionReceiver : BroadcastReceiver() {
                 }
             }
         }
-        medicationDao(context).updateMedications(*medications.toTypedArray())
+        medicationDao(context).update(medications)
     }
 
     private fun onNotifyAction(context: Context, intent: Intent) {
-        val medication = medicationDao(context).get(intent.getLongExtra(context.getString(R.string.med_id_key),
+        val medication = medicationDao(context).getById(intent.getLongExtra(context.getString(R.string.med_id_key),
                 -1))
 
         medication.updateStartsToFuture()

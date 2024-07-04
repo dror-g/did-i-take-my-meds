@@ -30,28 +30,34 @@ import kotlinx.coroutines.flow.filterNotNull
 
 @Dao
 interface MedicationDao {
-    @Insert
-    fun insertAll(vararg medications: Medication)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun updateOrCreate(medication: Medication): Long
 
     @Update
-    fun updateMedications(vararg medications: Medication)
+    fun update(medications: List<Medication>)
 
     @Delete
     fun delete(medication: Medication)
 
     @Query("SELECT * FROM $MED_TABLE WHERE id = :medId LIMIT 1")
-    fun get(medId: Long): Medication
+    fun getById(medId: Long): Medication
 
+    /** Get record by its database row id
+     * @param rowId: row id as returned by [updateOrCreate]
+     */
+    @Query("SELECT * from $MED_TABLE WHERE $MED_TABLE.rowid = :rowId")
+    fun getByRowId(rowId: Long): Medication
 
     @Transaction
     @Query("SELECT * FROM $MED_TABLE WHERE id = :medId LIMIT 1")
-    fun getFull(medId: Long): MedicationFull
+    fun getByIdFull(medId: Long): MedicationFull
 
     @Transaction
     @Query("SELECT * FROM $MED_TABLE WHERE id = :medId LIMIT 1")
-    fun observeFull(medId: Long): Flow<MedicationFull?>
+    fun observeByIdFull(medId: Long): Flow<MedicationFull?>
 
-    suspend fun observeFullDistinct(medId: Long) = observeFull(medId).distinctUntilChanged()
+    suspend fun observeByIdFullDistinct(medId: Long) = observeByIdFull(medId).distinctUntilChanged()
             .filterNotNull()
 
     @Query("SELECT * FROM $MED_TABLE")

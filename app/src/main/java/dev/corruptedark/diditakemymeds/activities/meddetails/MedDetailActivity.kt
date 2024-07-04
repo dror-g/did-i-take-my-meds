@@ -121,7 +121,7 @@ class MedDetailActivity :
 
         lifecycleScope.launch {
             medicationFlow = MedicationDB.getInstance(this@MedDetailActivity).medicationDao()
-                    .observeFullDistinct(medicationId)
+                    .observeByIdFullDistinct(medicationId)
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 medicationFlow?.collectLatest { medFull ->
                     medFull.medication.let {
@@ -179,7 +179,7 @@ class MedDetailActivity :
     // region medication manipulation
     private fun updateMedication(medication: Medication) {
         lifecycleScope.launch(lifecycleDispatcher) {
-            medicationDao(context).updateMedications(medication)
+            medicationDao(context).updateOrCreate(medication)
         }
     }
 
@@ -270,7 +270,7 @@ class MedDetailActivity :
 
         lifecycleScope.launch(lifecycleDispatcher) {
             val db = MedicationDB.getInstance(context)
-            db.medicationDao().updateMedications(medication)
+            db.medicationDao().updateOrCreate(medication)
             with(NotificationManagerCompat.from(context.applicationContext)) {
                 cancel(medication.id.toInt())
             }
@@ -315,7 +315,7 @@ class MedDetailActivity :
             }
 
             medication.removeTakenDose(doseRecord, realDose)
-            medicationDao(context).updateMedications(medication)
+            medicationDao(context).updateOrCreate(medication)
         }
     }
     // endregion
