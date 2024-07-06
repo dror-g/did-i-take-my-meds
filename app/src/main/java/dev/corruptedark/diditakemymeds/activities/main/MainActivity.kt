@@ -20,18 +20,23 @@
 package dev.corruptedark.diditakemymeds.activities.main
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.core.content.getSystemService
 import androidx.core.view.iterator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -40,8 +45,10 @@ import com.jakewharton.processphoenix.ProcessPhoenix
 import com.siravorona.utils.activityresult.ActivityResultManager
 import com.siravorona.utils.activityresult.createDocument
 import com.siravorona.utils.activityresult.getContent
+import com.siravorona.utils.activityresult.requestPermission
 import com.siravorona.utils.base.BaseBoundInteractableVmActivity
 import com.siravorona.utils.getThemeDrawableByAttr
+import com.siravorona.utils.permissions.isPermissionGranted
 import dev.corruptedark.diditakemymeds.BR
 import dev.corruptedark.diditakemymeds.BuildConfig
 import dev.corruptedark.diditakemymeds.R
@@ -108,6 +115,13 @@ class MainActivity :
         vm.setupMedicationsRecycler(binding.medsRecycler)
         mainScope.launch {
             launchMedicationsObserve()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mainScope.launch {
+            requestPermissions()
         }
     }
 
@@ -191,6 +205,24 @@ class MainActivity :
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+
+    private suspend fun requestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!isPermissionGranted(android.Manifest.permission.POST_NOTIFICATIONS)) {
+                ActivityResultManager.getInstance().requestPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService<AlarmManager>()
+            if (alarmManager != null) {
+                if (!alarmManager.canScheduleExactAlarms()) {
+                    ActivityResultManager.getInstance().requestResult(ActivityResultContracts.StartActivityForResult(), Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+                }
+            }
+        }
+    }
+
 
     private fun adjustMenuItemsVisibility(menu: Menu) {
         val isLightTheme = AppSettings.isLightTheme

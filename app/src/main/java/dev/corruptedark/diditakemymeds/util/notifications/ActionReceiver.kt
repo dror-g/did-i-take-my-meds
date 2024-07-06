@@ -30,7 +30,7 @@ class ActionReceiver : BroadcastReceiver() {
 
 
     override fun onReceive(context: Context, intent: Intent) {
-        NotificationsUtil.createNotificationChannel(context)
+        NotificationsUtil.createNotificationChannels(context)
 
         GlobalScope.launch(dispatcher) {
             when (intent.action) {
@@ -85,7 +85,7 @@ class ActionReceiver : BroadcastReceiver() {
             medicationDao(context).updateOrCreate(medication)
         }
 
-        NotificationsUtil.notify(context, medication, context.getString(R.string.taken), true)
+        NotificationsUtil.notifyOnMedTakenChannel(context, medication, context.getString(R.string.taken), noActions = true)
         NotificationsUtil.cancelNotificationWithDelay(context, medication.id.toInt(), CANCEL_DELAY)
     }
 
@@ -123,7 +123,7 @@ class ActionReceiver : BroadcastReceiver() {
                 //Create alarm
                 AlarmIntentManager.scheduleMedicationAlarm(context, medication)
                 if (System.currentTimeMillis() > medication.calculateClosestDose().timeInMillis && !medication.closestDoseAlreadyTaken()) {
-                    NotificationsUtil.notify(context, medication)
+                    NotificationsUtil.notifyOnMainChannel(context, medication)
                 }
             }
         }
@@ -138,7 +138,7 @@ class ActionReceiver : BroadcastReceiver() {
         AlarmIntentManager.scheduleMedicationAlarm(context, medication)
 
         if (medication.active && !medication.closestDoseAlreadyTaken()) {
-            NotificationsUtil.notify(context, medication)
+            NotificationsUtil.notifyOnMainChannel(context, medication)
         }
     }
 }

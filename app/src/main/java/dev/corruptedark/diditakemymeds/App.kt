@@ -12,6 +12,6 @@ class App : Application() {
         Kotpref.init(this)
         BindableManager.loadBR(BR::class.java)
         ActivityResultManager.init(this)
-        NotificationsUtil.createNotificationChannel(this)
+        NotificationsUtil.createNotificationChannels(this)
     }
 }

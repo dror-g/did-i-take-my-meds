@@ -54,7 +54,6 @@
     <string name="edit_cancelled">Uređivanje je prekinuto</string>
     <string name="notifications_enabled">Obavijesti su aktivirane</string>
     <string name="notifications_disabled">Obavijesti su deaktivirane</string>
-    <string name="channel_name" translatable="false">did_i_take_my_meds</string>
     <string name="channel_description">obavijesti podsjetnika</string>
     <string name="med_id_key" translatable="false">med_id</string>
     <string name="time_for_your_dose">Vrijeme je za tvoju dozu</string>
