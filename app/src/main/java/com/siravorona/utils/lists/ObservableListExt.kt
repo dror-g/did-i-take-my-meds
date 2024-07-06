@@ -6,15 +6,33 @@ import androidx.databinding.ObservableList.OnListChangedCallback
 
 
 fun <T> observableListOf(vararg elements: T): ObservableList<T> {
+    return improvedObservableListOf(*elements)
+}
+
+fun <T> observableListOf(
+        collection: Collection<T> = emptyList(),
+        callback: OnListChangedCallback<ObservableList<T>>? = null,
+): ObservableList<T> {
+    return  improvedObservableListOf(collection, callback)
+}
+
+fun <T> observableListOf(
+        collection: Collection<T> = emptyList(),
+        onChanged: (ObservableList<T>) -> Unit,
+): ObservableList<T> {
+    return  improvedObservableListOf(collection, onChanged)
+}
+
+fun <T> improvedObservableListOf(vararg elements: T): ImprovedObservableArrayList<T> {
     val list = ImprovedObservableArrayList<T>()
     list.addAll(elements)
     return list
 }
 
-fun <T> observableListOf(
-    collection: Collection<T> = emptyList(),
-    callback: OnListChangedCallback<ObservableList<T>>? = null,
-): ObservableList<T> {
+fun <T> improvedObservableListOf(
+        collection: Collection<T> = emptyList(),
+        callback: OnListChangedCallback<ObservableList<T>>? = null,
+): ImprovedObservableArrayList<T> {
     val list = ImprovedObservableArrayList<T>()
     if (callback != null) {
         list.addOnListChangedCallback(callback)
@@ -23,45 +41,45 @@ fun <T> observableListOf(
     return list
 }
 
-fun <T> observableListOf(
-    collection: Collection<T> = emptyList(),
-    onChanged: (ObservableList<T>) -> Unit,
-): ObservableList<T> {
-    return observableListOf(collection,
-        callback = object : OnListChangedCallback<ObservableList<T>>() {
-            override fun onChanged(sender: ObservableList<T>) {
-                onChanged(sender)
-            }
+fun <T> improvedObservableListOf(
+        collection: Collection<T> = emptyList(),
+        onChanged: (ObservableList<T>) -> Unit,
+): ImprovedObservableArrayList<T> {
+    return improvedObservableListOf(collection,
+            callback = object : OnListChangedCallback<ObservableList<T>>() {
+                override fun onChanged(sender: ObservableList<T>) {
+                    onChanged(sender)
+                }
 
-            override fun onItemRangeChanged(sender: ObservableList<T>, i: Int, i1: Int) {
-                onChanged(sender)
-            }
+                override fun onItemRangeChanged(sender: ObservableList<T>, i: Int, i1: Int) {
+                    onChanged(sender)
+                }
 
-            override fun onItemRangeInserted(sender: ObservableList<T>, start: Int, count: Int) {
-                onChanged(sender)
-            }
+                override fun onItemRangeInserted(sender: ObservableList<T>, start: Int, count: Int) {
+                    onChanged(sender)
+                }
 
-            override fun onItemRangeMoved(
-                sender: ObservableList<T>,
-                fromPosition: Int,
-                toPosition: Int,
-                itemCount: Int,
-            ) {
-                onChanged(sender)
-            }
+                override fun onItemRangeMoved(
+                        sender: ObservableList<T>,
+                        fromPosition: Int,
+                        toPosition: Int,
+                        itemCount: Int,
+                ) {
+                    onChanged(sender)
+                }
 
-            override fun onItemRangeRemoved(
-                sender: ObservableList<T>,
-                positionStart: Int,
-                itemCount: Int,
-            ) {
-                onChanged(sender)
-            }
-        })
+                override fun onItemRangeRemoved(
+                        sender: ObservableList<T>,
+                        positionStart: Int,
+                        itemCount: Int,
+                ) {
+                    onChanged(sender)
+                }
+            })
 }
 
 /*
-* ObservableArrayList with removeAll that notifies observers and DiffUtil support
+* ObservableArrayList with removeAll, sortWithAndNotify that notifies observers and DiffUtil support
 * */
 class ImprovedObservableArrayList<T>() : ArrayList<T>(), ObservableList<T> {
 
@@ -152,12 +170,21 @@ class ImprovedObservableArrayList<T>() : ArrayList<T>(), ObservableList<T> {
         notifyRemove(fromIndex, toIndex - fromIndex)
     }
 
+    fun sortWithAndNotify(comparator: Comparator<T>) {
+        sortWith(comparator)
+        notifyChanged()
+    }
+
     private fun notifyAdd(start: Int, count: Int) {
         listeners.notifyInserted(this, start, count)
     }
 
     private fun notifyRemove(start: Int, count: Int) {
         listeners.notifyRemoved(this, start, count)
+    }
+
+    private fun notifyChanged() {
+        listeners.notifyChanged(this)
     }
     // endregion
 

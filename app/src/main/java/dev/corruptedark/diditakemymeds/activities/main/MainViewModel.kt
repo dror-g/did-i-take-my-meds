@@ -1,8 +1,11 @@
 package dev.corruptedark.diditakemymeds.activities.main
 
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import com.siravorona.utils.base.InteractableViewModel
 import com.siravorona.utils.listadapters.BindableAdapter
+import com.siravorona.utils.lists.ImprovedObservableArrayList
+import com.siravorona.utils.lists.improvedObservableListOf
 import com.siravorona.utils.lists.observableListOf
 import dev.corruptedark.diditakemymeds.BR
 import dev.corruptedark.diditakemymeds.R
@@ -15,7 +18,7 @@ class MainViewModel : InteractableViewModel<MainViewModel.Interactor>() {
         fun openMedication(medication: Medication)
     }
 
-    private val medicationItems = observableListOf<ItemMedication>()
+    private val medicationItems = improvedObservableListOf<ItemMedication>()
 
     fun setMedications(medications: List<MedicationFull>, sortBy: SortBy) {
         medicationItems.clear()
@@ -35,13 +38,13 @@ class MainViewModel : InteractableViewModel<MainViewModel.Interactor>() {
     }
 
     fun sortMedications(sortBy: SortBy) {
-        medicationItems.sortWith(getMedicationSortComparator(sortBy))
+        medicationItems.sortWithAndNotify(getMedicationSortComparator(sortBy))
     }
 
     private fun getMedicationSortComparator(sortType: SortBy): Comparator<ItemMedication> {
         return when (sortType) {
             SortBy.TIME -> Comparator { a, b ->
-                Medication.compareByType(a.medication, b.medication)
+                Medication.compareByTime(a.medication, b.medication)
             }
 
             SortBy.NAME -> Comparator { a, b ->
@@ -49,7 +52,7 @@ class MainViewModel : InteractableViewModel<MainViewModel.Interactor>() {
             }
 
             SortBy.TYPE -> Comparator { a, b ->
-                Medication.compareByTime(a.medication, b.medication)
+                Medication.compareByType(a.medication, b.medication)
             }
         }
     }
