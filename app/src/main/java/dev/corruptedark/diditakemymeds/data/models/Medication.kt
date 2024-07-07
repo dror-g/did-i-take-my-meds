@@ -30,6 +30,8 @@ import kotlin.math.sign
 
 @Entity(tableName = MedicationDB.MED_TABLE)
 data class Medication(
+        @PrimaryKey(autoGenerate = true)
+        var id: Long = DEFAULT_ID,
         var name: String,
         var hour: Int = RepeatSchedule.BLANK.hour,
         var minute: Int = RepeatSchedule.BLANK.minute,
@@ -54,11 +56,6 @@ data class Medication(
         @ColumnInfo(name = "dose_record") var doseRecord: ArrayList<DoseRecord> = ArrayList(),
         var moreDosesPerDay: ArrayList<RepeatSchedule> = ArrayList()
 ) {
-
-
-    @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
-
     companion object {
 
         const val FALLBACK_TRANSITION_TIME = Long.MAX_VALUE

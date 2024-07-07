@@ -70,7 +70,6 @@ class MedDetailActivity :
     private var closestDose: Long = -1L
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-    private val context = this
     private val mainScope = MainScope()
 
     private var takeMed = false
@@ -120,9 +119,9 @@ class MedDetailActivity :
         vm.setupDoseRecordsList(binding.dosesRecycler)
 
         lifecycleScope.launch {
-            medicationFlow = MedicationDB.getInstance(this@MedDetailActivity).medicationDao()
-                    .observeByIdFullDistinct(medicationId)
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                medicationFlow = MedicationDB.getInstance(this@MedDetailActivity).medicationDao()
+                        .observeByIdFullDistinct(medicationId)
                 medicationFlow?.collectLatest { medFull ->
                     medFull.medication.let {
                         it.updateStartsToFuture()
@@ -131,9 +130,11 @@ class MedDetailActivity :
                     mainScope.launch {
                         onMedicationChanged(medFull)
                     }
+
                 }
             }
         }
+
     }
 
     override fun onResume() {
@@ -179,13 +180,13 @@ class MedDetailActivity :
     // region medication manipulation
     private fun updateMedication(medication: Medication) {
         lifecycleScope.launch(lifecycleDispatcher) {
-            medicationDao(context).updateOrCreate(medication)
+            medicationDao(this@MedDetailActivity).updateOrCreate(medication)
         }
     }
 
     private fun deleteMedication(medication: Medication) {
         lifecycleScope.launch(lifecycleDispatcher) {
-            val db = MedicationDB.getInstance(context)
+            val db = MedicationDB.getInstance(this@MedDetailActivity)
             cancelExistingMedicationAlarm(medication, false)
             withContext(Dispatchers.IO) {
                 val proofImages = db.proofImageDao().getProofImagesByMedId(medication.id)
@@ -234,23 +235,23 @@ class MedDetailActivity :
     private fun cancelExistingMedicationAlarm(medication: Medication, showToast: Boolean = true) {
         AlarmIntentManager.cancelAlarm(this, medication)
         if (showToast) {
-            Toast.makeText(context, getString(R.string.notifications_disabled), Toast.LENGTH_SHORT)
+            Toast.makeText(this, getString(R.string.notifications_disabled), Toast.LENGTH_SHORT)
                     .show()
         }
     }
 
     private fun scheduleNextMedicationAlarm(medication: Medication, showToast: Boolean = true) {
         cancelExistingMedicationAlarm(medication, false)
-        AlarmIntentManager.scheduleMedicationAlarm(context, medication)
+        AlarmIntentManager.scheduleMedicationAlarm(this, medication)
         if (showToast) {
-            Toast.makeText(context, getString(R.string.notifications_enabled), Toast.LENGTH_SHORT)
+            Toast.makeText(this, getString(R.string.notifications_enabled), Toast.LENGTH_SHORT)
                     .show()
         }
     }
     // endregion
 
     private fun openDoseDetail(medication: Medication, doseRecord: DoseRecord) {
-        DoseDetailActivity.open(context, medication.id, doseRecord)
+        DoseDetailActivity.open(this, medication.id, doseRecord)
     }
 
     // region dose manipulation
@@ -263,26 +264,25 @@ class MedDetailActivity :
         }
     }
 
-    private fun saveDose(newDose: DoseRecord) {
-        val medication = vm.medication
-        medication.addNewTakenDose(newDose)
-        vm.notifyMedicationPropertyChange()
-
+    private fun saveDose(newDose: DoseRecord, onSuccess: (() -> Unit)? = null) {
         lifecycleScope.launch(lifecycleDispatcher) {
-            val db = MedicationDB.getInstance(context)
-            db.medicationDao().updateOrCreate(medication)
-            with(NotificationManagerCompat.from(context.applicationContext)) {
+            val medication = vm.medication.copy()
+            medication.addNewTakenDose(newDose)
+            updateMedication(medication)
+            with(NotificationManagerCompat.from(this@MedDetailActivity.applicationContext)) {
                 cancel(medication.id.toInt())
             }
+            onSuccess?.invoke()
         }
     }
 
 
-    private fun promptDeleteDoseRecord(medication: Medication, doseRecord: DoseRecord) {
+    private fun promptDeleteDoseRecord(med: Medication, doseRecord: DoseRecord) {
+        val medication = med.copy()
         val dialogBuilder = MaterialAlertDialogBuilder(this).setTitle(
                 getString(R.string.are_you_sure)).setMessage(
                 getString(R.string.dose_record_delete_warning) + "\n\n" + medicationDoseString(
-                        context, doseRecord.doseTime))
+                        this, doseRecord.doseTime))
                 .setNegativeButton(getString(R.string.cancel)) { dialog, which ->
                     dialog.dismiss()
                 }.setPositiveButton(getString(R.string.confirm)) { _, _ ->
@@ -306,16 +306,16 @@ class MedDetailActivity :
             val medId = medication.id
             val doseTime = doseRecord.doseTime
 
-            if (proofImageDao(context).proofImageExists(medId, doseTime)) {
-                val proofImage = proofImageDao(context).get(medId, doseTime)
+            if (proofImageDao(this@MedDetailActivity).proofImageExists(medId, doseTime)) {
+                val proofImage = proofImageDao(this@MedDetailActivity).get(medId, doseTime)
                 if (proofImage != null) {
                     StorageManager.deleteImageFile(this@MedDetailActivity, proofImage)
-                    proofImageDao(context).delete(proofImage)
+                    proofImageDao(this@MedDetailActivity).delete(proofImage)
                 }
             }
 
             medication.removeTakenDose(doseRecord, realDose)
-            medicationDao(context).updateOrCreate(medication)
+            updateMedication(medication)
         }
     }
     // endregion
@@ -335,10 +335,10 @@ class MedDetailActivity :
                 return@launch // can't take photos
             }
             val photoFile = withContext(Dispatchers.IO) {
-                runCatching { StorageManager.createImageFile(context, medId, doseTime) }
+                runCatching { StorageManager.createImageFile(this@MedDetailActivity, medId, doseTime) }
             }.getOrNull() ?: return@launch // couldn't create file to hold the image
 
-            val photoURI = FileProvider.getUriForFile(context, getString(R.string.file_provider),
+            val photoURI = FileProvider.getUriForFile(this@MedDetailActivity, getString(R.string.file_provider),
                     photoFile)
             val picTaken = ActivityResultManager.getInstance().takePicture(photoURI)
             saveImageProof(picTaken, photoFile.name)
@@ -384,17 +384,16 @@ class MedDetailActivity :
         if (pictureTaken) {
             val dose = createDose(medication)
             val proofImage = ProofImage(medication.id, dose.doseTime, filePath)
-            saveDose(dose)
-            lifecycleScope.launch(lifecycleDispatcher) {
-                proofImageDao(context).insertAll(proofImage)
+            saveDose(dose) {
+                proofImageDao(this@MedDetailActivity).insertAll(proofImage)
                 mainScope.launch {
-                    Toast.makeText(context, getString(R.string.dose_and_proof_saved),
+                    Toast.makeText(this@MedDetailActivity, getString(R.string.dose_and_proof_saved),
                             Toast.LENGTH_SHORT).show()
                 }
             }
         } else {
             mainScope.launch {
-                Toast.makeText(context, getString(R.string.failed_to_get_proof), Toast.LENGTH_SHORT)
+                Toast.makeText(this@MedDetailActivity, getString(R.string.failed_to_get_proof), Toast.LENGTH_SHORT)
                         .show()
             }
         }
