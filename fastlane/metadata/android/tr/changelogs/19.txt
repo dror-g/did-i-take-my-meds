@@ -1,0 +1,12 @@
+v1.3.0
+
+Değişiklikler
+- Geliştirilmiş dolgu
+- Yeni yedeklemeler artık resimleri içermek için zip formatında (Eski yedeklemeler hala geri yüklenebilir)
+
+Eklemeler
+- İlaç alırken fotoğraf gerektirme seçeneği eklendi
+- Doz kayıt detaylarını görüntülemek için bir görünüm eklendi
+
+Düzeltmeler
+- Bazı Brezilya Portekizcesi format dizeleri düzeltildi

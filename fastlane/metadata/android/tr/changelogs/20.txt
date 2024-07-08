@@ -1,0 +1,4 @@
+v1.3.1
+
+Fix
+- Bazı cihazlarda geri yükleme hatası düzeltildi

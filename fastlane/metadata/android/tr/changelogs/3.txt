@@ -1,0 +1,4 @@
+v1.0.2
+
+Değişiklik:
+-Cihaz bekleme durumdayken bile bildirimleri aynı zamanda gönder

@@ -1,0 +1,12 @@
+v1.1.0
+
+Değişiklikler:
+- Bazı görüntüler için küçük geliştirmeler
+- Bir bildirime tıklamak artık ilacın detaylı görünümünü açıyor
+
+Eklemeler:
+- Rastgele tekrarlama süreleriyle ilaç başına çoklu doz programları
+- Gerektiğinde ilaçları takvim olmadan ekleme seçeneği
+- Mezysinc'in Brezilya Portekizcesi çevirileri GitHub'da
+- Araç çubuğuna geri düğmesi
+- En yakın doz zamanına ve ilaç adına göre sıralama seçenekleri

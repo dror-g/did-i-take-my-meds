@@ -1,0 +1,18 @@
+v1.4.0
+
+Değişiklikler
+- İlaç türleri artık ana ilaç listesinde gösteriliyor
+- Yeni seçeneklere uyum sağlamak için görünümler yeniden düzenlendi ve ayarlandı
+- Almanca çevirileri jpameli tarafından GitHub üzerinde güncellendi
+
+Eklemeler
+- Bir ilacı pasif hale getirme seçeneği eklendi
+- İlaç türlerini belirtme seçeneği eklendi
+- İlaç türlerine göre sıralama seçeneği eklendi
+- Her ilaç için Rx numarasını belirtme seçeneği eklendi
+- Her ilaç için dozaj boyutunu belirtme seçeneği eklendi
+- Her ilaç için eczane adını belirtme seçeneği eklendi
+- Her ilaç için kalan doz sayısını izleme seçeneği eklendi
+- Her ilacın yiyecekle birlikte alınması gerekip gerekmediğini belirtme seçeneği eklendi
+- Fransızca çevirileri Edanas tarafından Weblate üzerinde eklendi
+- İbranice çevirileri Yaron tarafından Weblate üzerinde eklendi

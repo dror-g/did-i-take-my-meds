@@ -1,0 +1,8 @@
+v1.5.1
+
+Değişiklikler
+- Çince Basitleştirilmiş çevirileri güncellendi
+- İbranice çevirileri güncellendi
+
+Eklemeler
+- Önceki dozlar için alınan zamanı düzenleme seçeneği eklendi

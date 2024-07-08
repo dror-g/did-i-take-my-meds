@@ -1,0 +1,8 @@
+v1.5.2
+
+Değişiklikler
+- İbranice çevirileri güncellendi
+- Basitleştirilmiş Çince çevirileri güncellendi
+
+Düzeltme
+- Basitleştirilmiş Çince tarih ve saat formatları düzeltildi

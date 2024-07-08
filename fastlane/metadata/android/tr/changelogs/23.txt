@@ -1,0 +1,4 @@
+v1.4.1
+
+Düzeltme
+- İlaç detay aktivitesinde yanlış metin görüntüleyen etiketler düzeltildi

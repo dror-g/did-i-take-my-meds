@@ -1,0 +1,8 @@
+v1.2.6
+
+Değişiklikler
+-Donmaya neden olmadan periyodik kullanıcı arayüzü yenileme yeniden etkinleştirildi
+-GitHub'da lnux-usr tarafından Brezilya Portekizcesi çevirileri güncellendi
+
+Ek
+-En son alınan dozdan bu yana geçen süreyi izleyen bir etiket ilaç detay aktivitesine eklendi

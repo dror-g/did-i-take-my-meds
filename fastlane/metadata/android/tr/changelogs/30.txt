@@ -1,0 +1,5 @@
+v1.6.1
+
+Düzeltmeler
+-Varsayılan TakvimPlanlamaİletişimKutusu her açıldığında normal bir takvime dönüştürme
+-Doğum kontrol takvimi eklendiğinde takvim tuşlarınının tepki vermemesi düzeltildi

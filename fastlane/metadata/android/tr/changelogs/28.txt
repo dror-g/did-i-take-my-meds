@@ -1,0 +1,6 @@
+v1.5.3
+
+Değişiklikler
+- İspanyolca çevirileri nzgha tarafından Weblate üzerinde güncellendi
+- Brezilya Portekizcesi çevirileri Card151915 tarafından Weblate üzerinde güncellendi
+- Almanca çevirileri jpameli tarafından GitHub üzerinde güncellendi

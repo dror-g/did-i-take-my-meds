@@ -1,0 +1,11 @@
+v1.2.4
+
+Değişiklikler
+- Bildirim simgesi ve eylem metni renkleri artık WCAG ile uyumlu, ancak cihaz temasını değiştirirseniz, aktif bir bildirim renkleri uyumlu kalmaz. Değişiklikten sonraki yeni bildirimler tekrar uyumlu olacaktır.
+- Alınmadıysa bildirimler artık cihaz yeniden başlatıldığında ve paket değiştirme durumunda yeniden görünmelidir, ancak bu özellikler sistemin izin vermesine bağlıdır.
+
+Ekleme
+- En yakın doz değiştiğinde aktiviteler artık güncellenir.
+
+Düzeltme
+- Sıfır olmayan, tam sayı haftaları içeren zaman programlarına izin vermeyen bir sorun düzeltildi

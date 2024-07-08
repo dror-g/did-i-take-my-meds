@@ -1,0 +1,10 @@
+v1.3.2
+
+Change
+- Doz detay aktivitesinin görünümü ayarlandı
+
+Addition
+- Veritabanı yedeklemesi üzerine geri bildirim mesajları eklendi
+
+Fix
+- Veritabanı geri yüklemesinden sonra meydana gelen bazı çökmeler düzeltildi

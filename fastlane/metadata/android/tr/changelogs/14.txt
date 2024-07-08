@@ -1,0 +1,13 @@
+v1.2.2
+
+Değişiklikler
+-ExecutorService çoklu iş parçacığını Kotlin ortak rutinlerine dönüştür
+-İnternet içerik erişilebilirlik yönergelerine uygun olarak renkleri güncelle
+-Yüksek istek üzerine bildirimler bir doz alındıktan sonra kapanacaktır.
+
+Eklemeler
+-Alındı butonuna yanlışıkla basıldığı taktirde bu işlemi silmek için bir seçenek eklendi
+
+Düzeltmeler
+-Veri tabanından veri almanın başarısız olması durumunda oluşan çökmeler düzeltildi
+-Geri tuşuna basıldığında oluşan garip görüntü döngüsü düzeltildi

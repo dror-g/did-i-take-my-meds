@@ -1,0 +1,4 @@
+v1.2.3
+
+Düzeltme
+-Uygulamanın önyükleme amacını veya paket güncelleme amacını almaması düzeltildi

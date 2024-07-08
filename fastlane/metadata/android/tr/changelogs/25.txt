@@ -1,0 +1,11 @@
+v1.5.0
+
+Değişiklik
+- Metin görünümlerini standart metin boyutları kullanacak şekilde ayarlama
+- GitHub'da jpameli tarafından Almanca çeviriler güncellendi
+
+Eklemeler
+- Her ilaç için basit ana ekran widget'ı ekleme seçeneği eklendi
+- Weblate üzerinde luxu tarafından Çince (Basitleştirilmiş) çeviriler eklendi
+- Weblate üzerinde sguinetti ve caos30 tarafından İspanyolca çevirileri eklendi
+- Weblate üzerinde caos30 tarafından Katalanca çevirileri eklendi
