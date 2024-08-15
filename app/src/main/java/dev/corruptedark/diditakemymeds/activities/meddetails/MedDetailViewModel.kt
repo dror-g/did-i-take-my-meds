@@ -18,7 +18,7 @@ import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.MedicationType
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ItemDoseListBinding
-import dev.corruptedark.diditakemymeds.util.views.ColorDividerItemDecoration
+import dev.corruptedark.diditakemymeds.util.addDefaultDivider
 
 class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>() {
     interface Interactor {
@@ -126,13 +126,7 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
     }
 
     fun setupDoseRecordsList(recyclerView: RecyclerView) {
-        val context = recyclerView.context
-
-        val dividerColor = context.getThemedColorByAttr(R.attr.ditmm_colorBackground)
-        val decoration = ColorDividerItemDecoration(LinearLayoutManager.VERTICAL, dividerColor,
-                context.dp2Px(5.0f))
-        recyclerView.addItemDecoration(decoration)
-
+        recyclerView.addDefaultDivider()
         BindableAdapter(doseRecordItems, BR.item).map<DoseRecordItem, ItemDoseListBinding>(
                 R.layout.item_dose_list) {
             onLongClick {

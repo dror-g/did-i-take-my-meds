@@ -1,6 +1,8 @@
 package dev.corruptedark.diditakemymeds.activities.main
 
 import android.util.Log
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.siravorona.utils.base.InteractableViewModel
 import com.siravorona.utils.listadapters.BindableAdapter
@@ -12,6 +14,7 @@ import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.MedListItem2Binding
+import dev.corruptedark.diditakemymeds.util.addDefaultDivider
 
 class MainViewModel : InteractableViewModel<MainViewModel.Interactor>() {
     interface Interactor {
@@ -28,6 +31,7 @@ class MainViewModel : InteractableViewModel<MainViewModel.Interactor>() {
     }
 
     fun setupMedicationsRecycler(recyclerView: RecyclerView) {
+        recyclerView.addDefaultDivider()
         BindableAdapter(medicationItems, BR.item).map<ItemMedication, MedListItem2Binding>(
                 R.layout.med_list_item2) {
             onClick {

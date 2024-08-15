@@ -18,6 +18,7 @@ import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ExtraDoseTemplate2Binding
 import dev.corruptedark.diditakemymeds.listadapters.DoseUnitListAdapter2
 import dev.corruptedark.diditakemymeds.listadapters.MedTypeListAdapter2
+import dev.corruptedark.diditakemymeds.util.addDefaultDivider
 import java.util.Calendar
 
 class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
@@ -158,6 +159,7 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
     }
 
     fun setupExtraDosesList(recyclerView: RecyclerView) {
+        recyclerView.addDefaultDivider()
         BindableAdapter(extraDoseItems, BR.item).map<ItemExtraDose, ExtraDoseTemplate2Binding>(
                 R.layout.extra_dose_template2) {
             onBind { holder ->

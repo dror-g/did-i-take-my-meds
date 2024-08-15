@@ -10,6 +10,7 @@ import dev.corruptedark.diditakemymeds.activities.main.ItemMedication
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.MedListItem2Binding
+import dev.corruptedark.diditakemymeds.util.addDefaultDivider
 
 class ConfigureWidgetViewModel : InteractableViewModel<ConfigureWidgetViewModel.Interactor>() {
     interface Interactor {
@@ -19,6 +20,7 @@ class ConfigureWidgetViewModel : InteractableViewModel<ConfigureWidgetViewModel.
     private val medicationItems = observableListOf<ItemMedication>()
 
     fun initRecycler(recyclerView: RecyclerView) {
+        recyclerView.addDefaultDivider()
         BindableAdapter(medicationItems, BR.item)
                 .map<ItemMedication, MedListItem2Binding>(R.layout.med_list_item2) {
                     onClick {
