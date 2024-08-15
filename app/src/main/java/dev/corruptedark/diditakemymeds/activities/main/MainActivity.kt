@@ -62,6 +62,7 @@ import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ActivityMainBinding
 import dev.corruptedark.diditakemymeds.settings.AppSettings
+import dev.corruptedark.diditakemymeds.util.applyThemeFromPreferences
 import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -274,11 +275,6 @@ class MainActivity :
         this.sortType = nextSortType
         AppSettings.sortBy = sortType
         vm.sortMedications(sortType)
-    }
-
-    private fun applyThemeFromPreferences() {
-        val appTheme = AppSettings.currentTheme
-        setTheme(appTheme)
     }
 
     private fun openAboutActivity() {

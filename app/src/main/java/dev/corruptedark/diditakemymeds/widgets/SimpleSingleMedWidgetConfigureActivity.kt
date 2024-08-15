@@ -30,6 +30,7 @@ import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.databinding.SimpleSingleMedWidgetConfigureBinding
+import dev.corruptedark.diditakemymeds.util.applyThemeFromPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -55,6 +56,7 @@ class SimpleSingleMedWidgetConfigureActivity :
 
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+        applyThemeFromPreferences()
         super.onCreate(savedInstanceState)
 
         // Set the result to CANCELED.  This will cause the widget host to cancel

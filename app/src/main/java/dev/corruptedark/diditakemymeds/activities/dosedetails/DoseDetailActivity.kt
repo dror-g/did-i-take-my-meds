@@ -37,6 +37,7 @@ import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.databinding.ActivityDoseDetailBinding
 import dev.corruptedark.diditakemymeds.util.DialogUtil
+import dev.corruptedark.diditakemymeds.util.applyThemeFromPreferences
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -74,6 +75,7 @@ class DoseDetailActivity :
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        applyThemeFromPreferences()
         super.onCreate(savedInstanceState)
 
         setSupportActionBar(binding.appbar.toolbar)

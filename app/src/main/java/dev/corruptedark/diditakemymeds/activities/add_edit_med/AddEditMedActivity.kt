@@ -44,6 +44,7 @@ import dev.corruptedark.diditakemymeds.data.models.RepeatSchedule
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ActivityAddOrEditMed2Binding
 import dev.corruptedark.diditakemymeds.dialogs.RepeatScheduleDialog2
+import dev.corruptedark.diditakemymeds.util.applyThemeFromPreferences
 import dev.corruptedark.diditakemymeds.util.canBeRealId
 import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import kotlinx.coroutines.MainScope
@@ -77,6 +78,7 @@ class AddEditMedActivity :
 
     @SuppressLint("CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
+        applyThemeFromPreferences()
         super.onCreate(savedInstanceState)
         vm.setupExtraDosesList(binding.shedulesList)
 

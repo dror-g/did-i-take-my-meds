@@ -52,6 +52,7 @@ import dev.corruptedark.diditakemymeds.data.models.ProofImage
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
 import dev.corruptedark.diditakemymeds.databinding.ActivityMedDetailBinding
 import dev.corruptedark.diditakemymeds.util.DialogUtil
+import dev.corruptedark.diditakemymeds.util.applyThemeFromPreferences
 import dev.corruptedark.diditakemymeds.util.medicationDoseString
 import dev.corruptedark.diditakemymeds.util.notifications.AlarmIntentManager
 import kotlinx.coroutines.Dispatchers
@@ -105,6 +106,7 @@ class MedDetailActivity :
 
     // region lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
+        applyThemeFromPreferences()
         super.onCreate(savedInstanceState)
         takeMed = intent.getBooleanExtra(EXTRA_TAKE_MED, false)
         medicationId = intent.getLongExtra(EXTRA_MEDICATION_ID, -1)

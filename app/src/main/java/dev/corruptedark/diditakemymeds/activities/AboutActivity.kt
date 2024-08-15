@@ -27,9 +27,11 @@ import com.siravorona.utils.base.BaseBoundActivity
 import dev.corruptedark.diditakemymeds.BuildConfig
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.databinding.ActivityAboutBinding
+import dev.corruptedark.diditakemymeds.util.applyThemeFromPreferences
 
 class AboutActivity : BaseBoundActivity<ActivityAboutBinding>(ActivityAboutBinding::class) {
     override fun onCreate(savedInstanceState: Bundle?) {
+        applyThemeFromPreferences()
         super.onCreate(savedInstanceState)
         setSupportActionBar(binding.appbar.toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
