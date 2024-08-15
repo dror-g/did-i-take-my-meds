@@ -252,22 +252,20 @@
                     android:id="@+id/delete_hint_label"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="?colorAccent"
+                    android:textColor="?android:textColorTertiary"
                     app:autoSizeTextType="uniform"
-                    android:textSize="@dimen/medium_text_size"
+                    android:textSize="@dimen/micro_text_size"
                     android:paddingHorizontal="20dp"
-                    android:paddingBottom="20dp"
                     android:text="@string/record_delete_hint" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/detail_hint_label"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="?colorAccent"
+                    android:textColor="?android:textColorTertiary"
                     app:autoSizeTextType="uniform"
-                    android:textSize="@dimen/medium_text_size"
+                    android:textSize="@dimen/micro_text_size"
                     android:paddingHorizontal="20dp"
-                    android:paddingBottom="20dp"
                     android:text="@string/record_detail_hint" />
 
                 <androidx.recyclerview.widget.RecyclerView
