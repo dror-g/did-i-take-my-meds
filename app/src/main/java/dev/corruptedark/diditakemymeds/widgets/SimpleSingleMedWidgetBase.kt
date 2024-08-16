@@ -50,9 +50,9 @@ abstract class SimpleSingleMedWidgetBase(protected val layoutId: Int) : AppWidge
     }
 
     override fun onUpdate(
-            context: Context,
-            appWidgetManager: AppWidgetManager,
-            appWidgetIds: IntArray
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
     ) {
         Companion.appWidgetIds = appWidgetIds
 
@@ -76,25 +76,25 @@ abstract class SimpleSingleMedWidgetBase(protected val layoutId: Int) : AppWidge
 
             while (medicationDao(context).getAllRaw().isNotEmpty()) {
                 val medication = medicationDao(context).getAllRaw()
-                        .sortedWith(Medication::compareByClosestDoseTransition).first()
+                    .sortedWith(Medication::compareByClosestDoseTransition).first()
 
                 val transitionDelay =
-                        medication.closestDoseTransitionTime() - System.currentTimeMillis()
+                    medication.closestDoseTransitionTime() - System.currentTimeMillis()
 
                 val delayDuration =
-                        when {
-                            transitionDelay < MINIMUM_DELAY -> {
-                                MINIMUM_DELAY
-                            }
-
-                            transitionDelay in MINIMUM_DELAY until MAXIMUM_DELAY -> {
-                                transitionDelay
-                            }
-
-                            else -> {
-                                MAXIMUM_DELAY
-                            }
+                    when {
+                        transitionDelay < MINIMUM_DELAY -> {
+                            MINIMUM_DELAY
                         }
+
+                        transitionDelay in MINIMUM_DELAY until MAXIMUM_DELAY -> {
+                            transitionDelay
+                        }
+
+                        else -> {
+                            MAXIMUM_DELAY
+                        }
+                    }
 
                 delay(delayDuration)
                 appWidgetIds?.apply {

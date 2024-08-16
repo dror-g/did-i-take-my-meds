@@ -29,10 +29,10 @@ import android.widget.Filterable
 import com.google.android.material.textview.MaterialTextView
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.DoseUnit
-import java.util.*
+import java.util.Locale
 
 class DoseUnitListAdapter2(private val context: Context, units: List<DoseUnit>) : BaseAdapter(),
-        Filterable {
+    Filterable {
     val doseUnits = units.toMutableList()
     val filteredUnits = mutableListOf<DoseUnit>().also { it.addAll(doseUnits) }
 
@@ -50,7 +50,7 @@ class DoseUnitListAdapter2(private val context: Context, units: List<DoseUnit>) 
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view = convertView ?: LayoutInflater.from(context)
-                .inflate(R.layout.dose_unit_list_item, parent, false)
+            .inflate(R.layout.dose_unit_list_item, parent, false)
 
         val unitNameLabel = view?.findViewById<MaterialTextView>(R.id.unit_name_label)
         unitNameLabel?.text = getItem(position).unit

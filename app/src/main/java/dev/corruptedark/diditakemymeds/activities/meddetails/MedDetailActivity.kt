@@ -66,8 +66,9 @@ import java.util.Calendar
 import java.util.concurrent.Executors
 
 class MedDetailActivity :
-        BaseBoundInteractableVmActivity<ActivityMedDetailBinding, MedDetailViewModel, MedDetailViewModel.Interactor>(
-                ActivityMedDetailBinding::class, BR.vm) {
+    BaseBoundInteractableVmActivity<ActivityMedDetailBinding, MedDetailViewModel, MedDetailViewModel.Interactor>(
+        ActivityMedDetailBinding::class, BR.vm
+    ) {
     private var closestDose: Long = -1L
     private val lifecycleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
@@ -123,7 +124,7 @@ class MedDetailActivity :
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 medicationFlow = MedicationDB.getInstance(this@MedDetailActivity).medicationDao()
-                        .observeByIdFullDistinct(medicationId)
+                    .observeByIdFullDistinct(medicationId)
                 medicationFlow?.collectLatest { medFull ->
                     medFull.medication.let {
                         it.updateStartsToFuture()
@@ -209,10 +210,12 @@ class MedDetailActivity :
 
     private fun promptDeleteMedication(medication: Medication) {
         lifecycleScope.launch(lifecycleDispatcher) {
-            val action = DialogUtil.showMaterialDialogSuspend(this@MedDetailActivity,
-                    this@MedDetailActivity, title = getString(R.string.are_you_sure),
-                    message = getString(R.string.medication_delete_warning),
-                    positiveButtonText = getString(R.string.confirm))
+            val action = DialogUtil.showMaterialDialogSuspend(
+                this@MedDetailActivity,
+                this@MedDetailActivity, title = getString(R.string.are_you_sure),
+                message = getString(R.string.medication_delete_warning),
+                positiveButtonText = getString(R.string.confirm)
+            )
             when (action) {
                 DialogUtil.Action.POSITIVE -> {
                     deleteMedication(medication)
@@ -238,7 +241,7 @@ class MedDetailActivity :
         AlarmIntentManager.cancelAlarm(this, medication)
         if (showToast) {
             Toast.makeText(this, getString(R.string.notifications_disabled), Toast.LENGTH_SHORT)
-                    .show()
+                .show()
         }
     }
 
@@ -247,7 +250,7 @@ class MedDetailActivity :
         AlarmIntentManager.scheduleMedicationAlarm(this, medication)
         if (showToast) {
             Toast.makeText(this, getString(R.string.notifications_enabled), Toast.LENGTH_SHORT)
-                    .show()
+                .show()
         }
     }
     // endregion
@@ -282,23 +285,27 @@ class MedDetailActivity :
     private fun promptDeleteDoseRecord(med: Medication, doseRecord: DoseRecord) {
         val medication = med.copy()
         val dialogBuilder = MaterialAlertDialogBuilder(this).setTitle(
-                getString(R.string.are_you_sure)).setMessage(
-                getString(R.string.dose_record_delete_warning) + "\n\n" + medicationDoseString(
-                        this, doseRecord.doseTime))
-                .setNegativeButton(getString(R.string.cancel)) { dialog, which ->
-                    dialog.dismiss()
-                }.setPositiveButton(getString(R.string.confirm)) { _, _ ->
-                    val realDoseRecordDialogBuilder = MaterialAlertDialogBuilder(this).setTitle(
-                            getString(R.string.was_this_dose_really_taken))
-                            .setMessage(getString(R.string.remaining_doses_correction_message))
-                            .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                                removeDose(medication, doseRecord, realDose = true)
-                            }.setNegativeButton(getString(R.string.no)) { _, _ ->
-                                removeDose(medication, doseRecord, realDose = false)
-                            }.setCancelable(false)
-                    realDoseRecordDialogBuilder.show()
+            getString(R.string.are_you_sure)
+        ).setMessage(
+            getString(R.string.dose_record_delete_warning) + "\n\n" + medicationDoseString(
+                this, doseRecord.doseTime
+            )
+        )
+            .setNegativeButton(getString(R.string.cancel)) { dialog, which ->
+                dialog.dismiss()
+            }.setPositiveButton(getString(R.string.confirm)) { _, _ ->
+                val realDoseRecordDialogBuilder = MaterialAlertDialogBuilder(this).setTitle(
+                    getString(R.string.was_this_dose_really_taken)
+                )
+                    .setMessage(getString(R.string.remaining_doses_correction_message))
+                    .setPositiveButton(getString(R.string.yes)) { _, _ ->
+                        removeDose(medication, doseRecord, realDose = true)
+                    }.setNegativeButton(getString(R.string.no)) { _, _ ->
+                        removeDose(medication, doseRecord, realDose = false)
+                    }.setCancelable(false)
+                realDoseRecordDialogBuilder.show()
 
-                }
+            }
 
         dialogBuilder.show()
     }
@@ -337,11 +344,19 @@ class MedDetailActivity :
                 return@launch // can't take photos
             }
             val photoFile = withContext(Dispatchers.IO) {
-                runCatching { StorageManager.createImageFile(this@MedDetailActivity, medId, doseTime) }
+                runCatching {
+                    StorageManager.createImageFile(
+                        this@MedDetailActivity,
+                        medId,
+                        doseTime
+                    )
+                }
             }.getOrNull() ?: return@launch // couldn't create file to hold the image
 
-            val photoURI = FileProvider.getUriForFile(this@MedDetailActivity, getString(R.string.file_provider),
-                    photoFile)
+            val photoURI = FileProvider.getUriForFile(
+                this@MedDetailActivity, getString(R.string.file_provider),
+                photoFile
+            )
             val picTaken = ActivityResultManager.getInstance().takePicture(photoURI)
             saveImageProof(picTaken, photoFile.name)
         }
@@ -367,10 +382,12 @@ class MedDetailActivity :
             medication.updateStartsToFuture()
             if (medication.closestDoseAlreadyTaken() && !medication.isAsNeeded()) {
                 Toast.makeText(this, getString(R.string.already_took_dose), Toast.LENGTH_SHORT)
-                        .show()
+                    .show()
             } else if (!medication.hasDoseRemaining()) {
-                Toast.makeText(this, getString(R.string.no_remaining_doses_message),
-                        Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this, getString(R.string.no_remaining_doses_message),
+                    Toast.LENGTH_LONG
+                ).show()
             } else {
                 if (medication.requirePhotoProof) {
                     takeImageProof(medication.id, System.currentTimeMillis())
@@ -389,14 +406,20 @@ class MedDetailActivity :
             saveDose(dose) {
                 proofImageDao(this@MedDetailActivity).insertAll(proofImage)
                 mainScope.launch {
-                    Toast.makeText(this@MedDetailActivity, getString(R.string.dose_and_proof_saved),
-                            Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MedDetailActivity, getString(R.string.dose_and_proof_saved),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         } else {
             mainScope.launch {
-                Toast.makeText(this@MedDetailActivity, getString(R.string.failed_to_get_proof), Toast.LENGTH_SHORT)
-                        .show()
+                Toast.makeText(
+                    this@MedDetailActivity,
+                    getString(R.string.failed_to_get_proof),
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
             }
         }
     }

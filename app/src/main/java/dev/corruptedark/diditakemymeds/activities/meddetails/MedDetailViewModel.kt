@@ -2,12 +2,9 @@ package dev.corruptedark.diditakemymeds.activities.meddetails
 
 import android.widget.CompoundButton
 import androidx.databinding.Bindable
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.siravorona.utils.base.InteractableViewModel
 import com.siravorona.utils.bindableproperty.bindableProperty
-import com.siravorona.utils.dp2Px
-import com.siravorona.utils.getThemedColorByAttr
 import com.siravorona.utils.listadapters.BindableAdapter
 import com.siravorona.utils.lists.observableListOf
 import dev.corruptedark.diditakemymeds.BR
@@ -34,7 +31,8 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
 
     @get:Bindable
     var medicationFull: MedicationFull by bindableProperty(
-            MedicationFull.BLANK) { oldValue, newValue ->
+        MedicationFull.BLANK
+    ) { oldValue, newValue ->
         doseRecordItems.clear()
         val records = newValue.medication.doseRecord
         doseRecordItems.addAll(records.map { DoseRecordItem(it) })
@@ -128,7 +126,8 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
     fun setupDoseRecordsList(recyclerView: RecyclerView) {
         recyclerView.addDefaultDivider()
         BindableAdapter(doseRecordItems, BR.item).map<DoseRecordItem, ItemDoseListBinding>(
-                R.layout.item_dose_list) {
+            R.layout.item_dose_list
+        ) {
             onLongClick {
                 val record = it.binding.item?.doseRecord ?: return@onLongClick false
                 interactor?.promptDeleteDoseRecord(medication, record)
@@ -140,6 +139,6 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
             }
         }
 
-                .into(recyclerView)
+            .into(recyclerView)
     }
 }

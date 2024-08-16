@@ -22,9 +22,9 @@ private const val PREF_KEY_LAYOUT = "_layout"
 
 
 internal fun updateAppWidget(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetId: Int,
+    context: Context,
+    appWidgetManager: AppWidgetManager,
+    appWidgetId: Int,
 ) {
     val medId = loadMedIdPref(context, appWidgetId)
     val layoutId = getLayoutPref(context, appWidgetId)
@@ -47,7 +47,7 @@ internal fun updateAppWidget(
                 putExtra(context.getString(R.string.med_id_key), medication.id)
             }
             val tookMedPendingIntent = context.broadcastIntentFromIntent(
-                    medication.id.toInt(), tookMedIntent
+                medication.id.toInt(), tookMedIntent
             )
             val buttonText = if (medication.closestDoseAlreadyTaken()) {
                 context.getString(R.string.took_this_already)
@@ -81,7 +81,7 @@ internal fun deleteLayoutPref(context: Context, appWidgetId: Int) {
 internal fun getLayoutPref(context: Context, appWidgetId: Int): Int {
     val prefName = getLayoutPrefKey(appWidgetId)
     return getSharedPreferences(context)
-            .getInt(prefName, R.layout.simple_single_med_widget_dark)
+        .getInt(prefName, R.layout.simple_single_med_widget_dark)
 }
 
 internal fun saveMedIdPref(context: Context, appWidgetId: Int, medId: Long) {

@@ -32,8 +32,8 @@ import dev.corruptedark.diditakemymeds.data.models.MedicationType
 import java.util.Calendar
 
 class MedListAdapter(
-        private val context: Context, private val medications: MutableList<Medication>,
-        private val medicationTypes: MutableList<MedicationType>
+    private val context: Context, private val medications: MutableList<Medication>,
+    private val medicationTypes: MutableList<MedicationType>
 ) : BaseAdapter() {
     private val isSystem24Hour = DateFormat.is24HourFormat(context)
     private val calendar = Calendar.getInstance()
@@ -80,8 +80,8 @@ class MedListAdapter(
             } else {
                 takenLabel?.visibility = View.VISIBLE
                 timeLabel?.text = if (isSystem24Hour) DateFormat.format(
-                        context.getString(R.string.time_24),
-                        calendar
+                    context.getString(R.string.time_24),
+                    calendar
                 )
                 else DateFormat.format(context.getString(R.string.time_12), calendar)
                 if (medications[position].closestDoseAlreadyTaken()) {

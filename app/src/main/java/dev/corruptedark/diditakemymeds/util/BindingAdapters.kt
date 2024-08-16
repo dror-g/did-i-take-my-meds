@@ -22,7 +22,7 @@ fun setNoContentInsetStart(view: MaterialToolbar, noContentInsetStart: Boolean) 
 
 @BindingAdapter("zeroNavigationContentInsetStart")
 fun setNoNavigationContentInsetStart(
-        view: MaterialToolbar, zeroNavigationContentInsetStart: Boolean
+    view: MaterialToolbar, zeroNavigationContentInsetStart: Boolean
 ) {
     if (zeroNavigationContentInsetStart) {
         view.contentInsetStartWithNavigation = 0
@@ -50,9 +50,11 @@ fun setRxNumber(view: TextView, medication: Medication) {
 fun setDoseInfo(view: TextView, doseUnit: DoseUnit, amountPerDose: Double) {
     val doseValueString = amountPerDose.toBigDecimal().stripTrailingZeros().toPlainString()
     val doseUnitString = doseUnit.unit
-    val text = view.context.getString(R.string.dose_amount_label_format,
-            doseValueString,
-            doseUnitString)
+    val text = view.context.getString(
+        R.string.dose_amount_label_format,
+        doseValueString,
+        doseUnitString
+    )
     view.text = text
 }
 
@@ -155,13 +157,15 @@ fun setSchedule(view: TextView, schedule: RepeatSchedule?, blankScheduleText: St
         val formattedTime = context.formatTime(calendar)
         val formattedDate = context.formatDate(calendar)
         val activeDays = schedule.daysBetween
-        context.getString(R.string.schedule_format,
-                formattedTime,
-                formattedDate,
-                activeDays,
-                0,
-                0,
-                0)
+        context.getString(
+            R.string.schedule_format,
+            formattedTime,
+            formattedDate,
+            activeDays,
+            0,
+            0,
+            0
+        )
     } else {
         blankScheduleText
     }

@@ -76,8 +76,9 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class MainActivity :
-        BaseBoundInteractableVmActivity<ActivityMainBinding, MainViewModel, MainViewModel.Interactor>(
-                ActivityMainBinding::class, BR.vm) {
+    BaseBoundInteractableVmActivity<ActivityMainBinding, MainViewModel, MainViewModel.Interactor>(
+        ActivityMainBinding::class, BR.vm
+    ) {
     private var sortType = SortBy.NAME
     private val MIME_TYPES = "application/*"
 
@@ -137,8 +138,10 @@ class MainActivity :
             }
             AppSettings.lastVersionUsed = BuildConfig.VERSION_CODE
 
-            val medId = intent.getLongExtra(getString(R.string.med_id_key),
-                    Medication.INVALID_MED_ID)
+            val medId = intent.getLongExtra(
+                getString(R.string.med_id_key),
+                Medication.INVALID_MED_ID
+            )
             val takeMed = intent.getBooleanExtra(getString(R.string.take_med_key), false)
             if (medicationDao(context).medicationExists(medId)) {
                 openMedDetailActivity(medId, takeMed)
@@ -211,14 +214,18 @@ class MainActivity :
     private suspend fun requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (!isPermissionGranted(android.Manifest.permission.POST_NOTIFICATIONS)) {
-                ActivityResultManager.getInstance().requestPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                ActivityResultManager.getInstance()
+                    .requestPermission(android.Manifest.permission.POST_NOTIFICATIONS)
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = getSystemService<AlarmManager>()
             if (alarmManager != null) {
                 if (!alarmManager.canScheduleExactAlarms()) {
-                    ActivityResultManager.getInstance().requestResult(ActivityResultContracts.StartActivityForResult(), Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+                    ActivityResultManager.getInstance().requestResult(
+                        ActivityResultContracts.StartActivityForResult(),
+                        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    )
                 }
             }
         }
@@ -291,7 +298,7 @@ class MainActivity :
     private fun restoreDatabase() {
         lifecycleScope.launch(lifecycleDispatcher) {
             val restoreUri = ActivityResultManager.getInstance().getContent(MIME_TYPES)
-                    ?: return@launch
+                ?: return@launch
             restoreJob = lifecycleScope.launch(lifecycleDispatcher) {
                 doRestore(this@MainActivity, restoreUri)
             }
@@ -304,7 +311,7 @@ class MainActivity :
         lifecycleScope.launch(lifecycleDispatcher) {
             val suggestedName = StorageManager.suggestBackupFileName()
             val backupUri = ActivityResultManager.getInstance()
-                    .createDocument(MIME_TYPES, suggestedName) ?: return@launch
+                .createDocument(MIME_TYPES, suggestedName) ?: return@launch
             doBackup(context, backupUri)
         }
     }
@@ -334,13 +341,13 @@ class MainActivity :
             exception.printStackTrace()
             mainScope.launch {
                 Toast.makeText(context, getString(R.string.back_up_failed), Toast.LENGTH_SHORT)
-                        .show()
+                    .show()
                 launchMedicationsObserve()
             }
         }.onSuccess {
             mainScope.launch {
                 Toast.makeText(context, getString(R.string.back_up_successful), Toast.LENGTH_SHORT)
-                        .show()
+                    .show()
                 launchMedicationsObserve()
             }
         }
@@ -355,16 +362,20 @@ class MainActivity :
             }.onSuccess {
                 mainScope.launch {
                     launchMedicationsObserve {
-                        Toast.makeText(context, getString(R.string.database_restored),
-                                Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context, getString(R.string.database_restored),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }.onFailure { exception ->
                 exception.printStackTrace()
                 mainScope.launch {
                     launchMedicationsObserve()
-                    Toast.makeText(context, getString(R.string.database_is_invalid),
-                            Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context, getString(R.string.database_is_invalid),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -382,15 +393,19 @@ class MainActivity :
             }.onFailure { exception ->
                 exception.printStackTrace()
                 mainScope.launch {
-                    Toast.makeText(applicationContext, getString(R.string.database_is_invalid),
-                            Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        applicationContext, getString(R.string.database_is_invalid),
+                        Toast.LENGTH_SHORT
+                    ).show()
                     launchMedicationsObserve()
                 }
             }.onSuccess {
                 mainScope.launch {
                     launchMedicationsObserve {
-                        Toast.makeText(applicationContext, getString(R.string.database_restored),
-                                Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            applicationContext, getString(R.string.database_restored),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -405,12 +420,13 @@ class MainActivity :
         }
         medicationsFlowJob = lifecycleScope.launch {
             medicationsFlow = MedicationDB.getInstance(this@MainActivity).medicationDao()
-                    .observeAllFullDistinct()
+                .observeAllFullDistinct()
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 medicationsFlow?.collectLatest { medications ->
                     mainScope.launch {
                         vm.setMedications(medications, sortType)
-                        binding.listEmptyLabel.visibility = if (medications.isEmpty()) View.VISIBLE else View.GONE
+                        binding.listEmptyLabel.visibility =
+                            if (medications.isEmpty()) View.VISIBLE else View.GONE
                     }
                 }
             }

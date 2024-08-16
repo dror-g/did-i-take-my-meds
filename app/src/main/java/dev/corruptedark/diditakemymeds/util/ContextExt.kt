@@ -31,7 +31,8 @@ fun Context.formatDate(calendar: Calendar): String {
 
 fun Context.getTimeFormat(): String {
     val systemIs24Hour = DateFormat.is24HourFormat(this)
-    val timeFormat = if (systemIs24Hour) this.getString(R.string.time_24) else this.getString(R.string.time_12)
+    val timeFormat =
+        if (systemIs24Hour) this.getString(R.string.time_24) else this.getString(R.string.time_12)
     return timeFormat
 }
 

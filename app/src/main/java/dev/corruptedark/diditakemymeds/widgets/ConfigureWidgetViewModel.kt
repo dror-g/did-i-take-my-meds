@@ -22,12 +22,12 @@ class ConfigureWidgetViewModel : InteractableViewModel<ConfigureWidgetViewModel.
     fun initRecycler(recyclerView: RecyclerView) {
         recyclerView.addDefaultDivider()
         BindableAdapter(medicationItems, BR.item)
-                .map<ItemMedication, MedListItem2Binding>(R.layout.med_list_item2) {
-                    onClick {
-                        val item = it.binding.item ?: return@onClick
-                        interactor?.onMedicationTapped(item.medication)
-                    }
-                }.into(recyclerView)
+            .map<ItemMedication, MedListItem2Binding>(R.layout.med_list_item2) {
+                onClick {
+                    val item = it.binding.item ?: return@onClick
+                    interactor?.onMedicationTapped(item.medication)
+                }
+            }.into(recyclerView)
     }
 
     fun setMedications(medications: List<MedicationFull>) {

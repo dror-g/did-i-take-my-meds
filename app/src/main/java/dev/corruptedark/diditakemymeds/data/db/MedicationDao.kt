@@ -20,7 +20,13 @@
 package dev.corruptedark.diditakemymeds.data.db
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB.Companion.MED_TABLE
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import dev.corruptedark.diditakemymeds.data.models.joins.MedicationFull
@@ -58,7 +64,7 @@ interface MedicationDao {
     fun observeByIdFull(medId: Long): Flow<MedicationFull?>
 
     suspend fun observeByIdFullDistinct(medId: Long) = observeByIdFull(medId).distinctUntilChanged()
-            .filterNotNull()
+        .filterNotNull()
 
     @Query("SELECT * FROM $MED_TABLE")
     fun getAllLiveData(): LiveData<MutableList<Medication>>

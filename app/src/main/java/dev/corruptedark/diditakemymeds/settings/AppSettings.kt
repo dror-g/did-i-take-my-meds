@@ -11,8 +11,8 @@ object AppSettings : KotprefModel() {
     var lastVersionUsed by intPref(AppSettingsLegacy.lastVersionUsed)
 
     private var currentThemeKey by stringPref(
-            ThemePrefHelper.defaultThemePrefValue,
-            key = R.string.pref_key_app_theme
+        ThemePrefHelper.defaultThemePrefValue,
+        key = R.string.pref_key_app_theme
     )
 
     var sortBy: SortBy

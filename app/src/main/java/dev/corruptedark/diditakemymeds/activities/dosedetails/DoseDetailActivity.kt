@@ -45,8 +45,9 @@ import java.util.TimeZone
 import java.util.concurrent.Executors
 
 class DoseDetailActivity :
-        BaseBoundInteractableVmActivity<ActivityDoseDetailBinding, DoseDetailViewModel, DoseDetailViewModel.Interactor>(
-                ActivityDoseDetailBinding::class, BR.vm) {
+    BaseBoundInteractableVmActivity<ActivityDoseDetailBinding, DoseDetailViewModel, DoseDetailViewModel.Interactor>(
+        ActivityDoseDetailBinding::class, BR.vm
+    ) {
 
     private var medId = Medication.INVALID_MED_ID
 
@@ -111,11 +112,11 @@ class DoseDetailActivity :
 
     private suspend fun promptConfirmTimeChanges(): Boolean {
         val action = DialogUtil.showMaterialDialogSuspend(
-                this, this,
-                getString(R.string.are_you_sure),
-                getString(R.string.dose_update_warning),
-                getString(R.string.confirm),
-                getString(R.string.cancel),
+            this, this,
+            getString(R.string.are_you_sure),
+            getString(R.string.dose_update_warning),
+            getString(R.string.confirm),
+            getString(R.string.cancel),
         )
         return action == DialogUtil.Action.POSITIVE
     }
@@ -142,15 +143,21 @@ class DoseDetailActivity :
     }
 
     private suspend fun requestTimeOfDay(initialHour: Int, initialMinute: Int): Pair<Int, Int>? {
-        val config = DialogUtil.TimePickerConfig(getString(R.string.select_a_time), initialHour,
-                initialMinute, DateFormat.is24HourFormat(this))
-        return DialogUtil.showMaterialTimePickerSuspend(this.supportFragmentManager, this, config,
-                getString(R.string.time_picker_tag))
+        val config = DialogUtil.TimePickerConfig(
+            getString(R.string.select_a_time), initialHour,
+            initialMinute, DateFormat.is24HourFormat(this)
+        )
+        return DialogUtil.showMaterialTimePickerSuspend(
+            this.supportFragmentManager, this, config,
+            getString(R.string.time_picker_tag)
+        )
     }
 
     private suspend fun requestDate(initialSelection: Long): Triple<Int, Int, Int>? {
-        val config = DialogUtil.DatePickerConfigB(getString(R.string.select_a_start_date),
-                TimeZone.getTimeZone(getString(R.string.utc)), initialSelection)
+        val config = DialogUtil.DatePickerConfigB(
+            getString(R.string.select_a_start_date),
+            TimeZone.getTimeZone(getString(R.string.utc)), initialSelection
+        )
         return DialogUtil.showMaterialDatePickerSuspend(supportFragmentManager, this, config)
     }
 

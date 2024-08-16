@@ -29,10 +29,10 @@ import android.widget.Filterable
 import com.google.android.material.textview.MaterialTextView
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.MedicationType
-import java.util.*
+import java.util.Locale
 
 class MedTypeListAdapter2(private val context: Context, types: List<MedicationType>) :
-        BaseAdapter(), Filterable {
+    BaseAdapter(), Filterable {
     private val medicationTypes = types.toMutableList()
     val filteredTypes = mutableListOf<MedicationType>().also { it.addAll(medicationTypes) }
 
@@ -50,7 +50,7 @@ class MedTypeListAdapter2(private val context: Context, types: List<MedicationTy
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view = convertView ?: LayoutInflater.from(context)
-                .inflate(R.layout.med_type_list_item, parent, false)
+            .inflate(R.layout.med_type_list_item, parent, false)
 
         val nameLabel = view?.findViewById<MaterialTextView>(R.id.type_name_label)
         nameLabel?.text = getItem(position).name

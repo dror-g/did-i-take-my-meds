@@ -89,8 +89,8 @@ class RepeatScheduleDialog2 : DialogFragment() {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRepeatScheduleDialogBinding.inflate(inflater, container, false)
 
@@ -99,7 +99,8 @@ class RepeatScheduleDialog2 : DialogFragment() {
                 binding.birthControlGroup.visibility = View.VISIBLE
                 binding.timeBetweenPickers.visibility = View.GONE
                 birthControlTypeSchedule = getBirthControl(
-                        binding.birthControlGroup.checkedRadioButtonId)
+                    binding.birthControlGroup.checkedRadioButtonId
+                )
             } else {
                 binding.birthControlGroup.visibility = View.GONE
                 binding.timeBetweenPickers.visibility = View.VISIBLE
@@ -120,11 +121,11 @@ class RepeatScheduleDialog2 : DialogFragment() {
             calendar.set(Calendar.MONTH, startMonth)
             calendar.set(Calendar.YEAR, startYear)
             val formattedTime =
-                    if (isSystem24Hour) DateFormat.format(getString(R.string.time_24), calendar)
-                    else DateFormat.format(getString(R.string.time_12), calendar)
+                if (isSystem24Hour) DateFormat.format(getString(R.string.time_24), calendar)
+                else DateFormat.format(getString(R.string.time_12), calendar)
             binding.timePickerButton.text = formattedTime
             binding.startDateButton.text =
-                    DateFormat.format(getString(R.string.date_format), calendar)
+                DateFormat.format(getString(R.string.date_format), calendar)
             binding.daysBetweenPicker.progress = daysBetween
             binding.weeksBetweenPicker.progress = weeksBetween
             binding.monthsBetweenPicker.progress = monthsBetween
@@ -160,8 +161,10 @@ class RepeatScheduleDialog2 : DialogFragment() {
             dismiss()
         }
         binding.confirmButton.setOnClickListener {
-            val schedule = RepeatSchedule(hour, minute, startDay, startMonth, startYear,
-                    daysBetween, weeksBetween, monthsBetween, yearsBetween)
+            val schedule = RepeatSchedule(
+                hour, minute, startDay, startMonth, startYear,
+                daysBetween, weeksBetween, monthsBetween, yearsBetween
+            )
             val result = Result.SchedulePicked(schedule, birthControlTypeSchedule)
             setResult(result)
             dismiss()
@@ -207,28 +210,28 @@ class RepeatScheduleDialog2 : DialogFragment() {
             val isSystem24Hour = DateFormat.is24HourFormat(view.context)
             val clockFormat = if (isSystem24Hour) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
             val timePicker = MaterialTimePicker.Builder()
-                    .setTimeFormat(clockFormat)
-                    .setHour(initialHour)
-                    .setMinute(initialMinute)
-                    .setTitleText(getString(R.string.select_a_time))
-                    .build()
+                .setTimeFormat(clockFormat)
+                .setHour(initialHour)
+                .setMinute(initialMinute)
+                .setTitleText(getString(R.string.select_a_time))
+                .build()
             timePicker.addOnPositiveButtonClickListener {
                 hour = timePicker.hour
                 minute = timePicker.minute
                 calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
                 calendar.set(Calendar.MINUTE, timePicker.minute)
                 val formattedTime =
-                        if (isSystem24Hour) DateFormat.format(getString(R.string.time_24), calendar)
-                        else DateFormat.format(getString(R.string.time_12), calendar)
+                    if (isSystem24Hour) DateFormat.format(getString(R.string.time_24), calendar)
+                    else DateFormat.format(getString(R.string.time_12), calendar)
                 (view as TextView).text = formattedTime
             }
             timePicker.addOnDismissListener {
                 pickerIsOpen = false
             }
             timePicker.show(
-                    childFragmentManager, getString(
+                childFragmentManager, getString(
                     R.string.time_picker_tag
-            )
+                )
             )
         }
     }
@@ -249,33 +252,33 @@ class RepeatScheduleDialog2 : DialogFragment() {
             }
 
             val datePicker = MaterialDatePicker.Builder.datePicker()
-                    .setSelection(initialSelection)
-                    .setTitleText(getString(R.string.select_a_start_date))
-                    .build()
+                .setSelection(initialSelection)
+                .setTitleText(getString(R.string.select_a_start_date))
+                .build()
             datePicker.addOnPositiveButtonClickListener {
                 calendar.timeInMillis = datePicker.selection!!
                 startDay = calendar.get(Calendar.DATE)
                 startMonth = calendar.get(Calendar.MONTH)
                 startYear = calendar.get(Calendar.YEAR)
                 (view as TextView).text =
-                        DateFormat.format(getString(R.string.date_format), calendar)
+                    DateFormat.format(getString(R.string.date_format), calendar)
             }
             datePicker.addOnDismissListener {
                 pickerIsOpen = false
             }
             datePicker.show(
-                    childFragmentManager, getString(
+                childFragmentManager, getString(
                     R.string.date_picker_tag
-            )
+                )
             )
         }
     }
 
     fun scheduleIsValid(): Boolean {
         val periodIsValid =
-                daysBetween > 0 || weeksBetween > 0 || monthsBetween > 0 || yearsBetween > 0
+            daysBetween > 0 || weeksBetween > 0 || monthsBetween > 0 || yearsBetween > 0
         val startTimeIsValid =
-                hour >= 0 && minute >= 0 && startDay >= 0 && startMonth >= 0 && startYear >= 0
+            hour >= 0 && minute >= 0 && startDay >= 0 && startMonth >= 0 && startYear >= 0
         return (periodIsValid || binding.birthControlSwitch.isChecked) && startTimeIsValid
     }
 
@@ -286,10 +289,10 @@ class RepeatScheduleDialog2 : DialogFragment() {
     sealed class Result : Serializable {
         object Cancelled : Result()
         class SchedulePicked(
-                val schedule: RepeatSchedule,
-                val birthControlTypeSchedule: BirthControlType
+            val schedule: RepeatSchedule,
+            val birthControlTypeSchedule: BirthControlType
         ) :
-                Result()
+            Result()
     }
 
     companion object {
@@ -298,22 +301,22 @@ class RepeatScheduleDialog2 : DialogFragment() {
         const val FRAGMENT_RESULT_KEY = "RepeatScheduleDialog2.Result"
         private var counter = 0
         suspend fun requestSchedule(
-                fragmentManager: FragmentManager,
-                lifecycleOwner: LifecycleOwner,
-                initialSchedule: RepeatSchedule,
+            fragmentManager: FragmentManager,
+            lifecycleOwner: LifecycleOwner,
+            initialSchedule: RepeatSchedule,
         ): Pair<RepeatSchedule, BirthControlType>? {
             val fragmentResult =
-                    FragmentResultManager.getInstance().showDialogFragmentForResult<Result>(
-                            fragmentManager = fragmentManager, lifecycleOwner = lifecycleOwner,
-                            requestKey = FRAGMENT_REQUEST_KEY,
-                            resultKey = FRAGMENT_RESULT_KEY,
-                            fragmentTag = "RepeatScheduleDialog2-$counter",
-                            fragment = RepeatScheduleDialog2().apply {
-                                arguments = bundleOf(
-                                        EXTRA_SCHEDULE to initialSchedule,
-                                )
-                            }
-                    )
+                FragmentResultManager.getInstance().showDialogFragmentForResult<Result>(
+                    fragmentManager = fragmentManager, lifecycleOwner = lifecycleOwner,
+                    requestKey = FRAGMENT_REQUEST_KEY,
+                    resultKey = FRAGMENT_RESULT_KEY,
+                    fragmentTag = "RepeatScheduleDialog2-$counter",
+                    fragment = RepeatScheduleDialog2().apply {
+                        arguments = bundleOf(
+                            EXTRA_SCHEDULE to initialSchedule,
+                        )
+                    }
+                )
             val result = when (fragmentResult) {
                 is Result.SchedulePicked -> fragmentResult.schedule to fragmentResult.birthControlTypeSchedule
                 else -> null

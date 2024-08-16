@@ -1,14 +1,9 @@
 package dev.corruptedark.diditakemymeds.activities.main
 
-import android.util.Log
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.siravorona.utils.base.InteractableViewModel
 import com.siravorona.utils.listadapters.BindableAdapter
-import com.siravorona.utils.lists.ImprovedObservableArrayList
 import com.siravorona.utils.lists.improvedObservableListOf
-import com.siravorona.utils.lists.observableListOf
 import dev.corruptedark.diditakemymeds.BR
 import dev.corruptedark.diditakemymeds.R
 import dev.corruptedark.diditakemymeds.data.models.Medication
@@ -26,14 +21,15 @@ class MainViewModel : InteractableViewModel<MainViewModel.Interactor>() {
     fun setMedications(medications: List<MedicationFull>, sortBy: SortBy) {
         medicationItems.clear()
         val newItems = medications.map { ItemMedication(it) }
-                .sortedWith(getMedicationSortComparator(sortBy))
+            .sortedWith(getMedicationSortComparator(sortBy))
         medicationItems.addAll(newItems)
     }
 
     fun setupMedicationsRecycler(recyclerView: RecyclerView) {
         recyclerView.addDefaultDivider()
         BindableAdapter(medicationItems, BR.item).map<ItemMedication, MedListItem2Binding>(
-                R.layout.med_list_item2) {
+            R.layout.med_list_item2
+        ) {
             onClick {
                 val item = it.binding.item ?: return@onClick
                 interactor?.openMedication(item.medication)

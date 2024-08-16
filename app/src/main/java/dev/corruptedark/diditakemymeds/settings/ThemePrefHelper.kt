@@ -6,8 +6,8 @@ object ThemePrefHelper {
     const val THEME_LIGHT = "Theme.DidITakeMyMeds.Light"
     const val THEME_DARK = "Theme.DidITakeMyMeds"
     private val themePrefToIdMap = mapOf(
-            THEME_LIGHT to R.style.Theme_DidITakeMyMeds_Light,
-            THEME_DARK to R.style.Theme_DidITakeMyMeds,
+        THEME_LIGHT to R.style.Theme_DidITakeMyMeds_Light,
+        THEME_DARK to R.style.Theme_DidITakeMyMeds,
     )
     private val themeIdToNameMap = themePrefToIdMap.map { it.value to it.key }.toMap()
     const val defaultThemePrefValue = THEME_DARK
@@ -21,9 +21,9 @@ object ThemePrefHelper {
 
     private fun getDefaultThemeResId() = themePrefToIdMap[defaultThemePrefValue]!!
     fun getThemeResIdOrDefault(themePrefValue: String) =
-            themePrefToIdMap[themePrefValue] ?: getDefaultThemeResId()
+        themePrefToIdMap[themePrefValue] ?: getDefaultThemeResId()
 
     fun getThemePrefValueOrDefault(themeResId: Int) =
-            themeIdToNameMap[themeResId] ?: defaultThemePrefValue
+        themeIdToNameMap[themeResId] ?: defaultThemePrefValue
 
 }

@@ -55,7 +55,7 @@ class ActionReceiver : BroadcastReceiver() {
     }
 
     private suspend fun onTookMedAction(
-            context: Context, intent: Intent
+        context: Context, intent: Intent
     ) {
         val medId = intent.getLongExtra(context.getString(R.string.med_id_key), -1L)
         if (!medicationDao(context).medicationExists(medId)) {
@@ -78,19 +78,26 @@ class ActionReceiver : BroadcastReceiver() {
             val takenDose = if (medication.isAsNeeded()) {
                 DoseRecord(System.currentTimeMillis())
             } else {
-                DoseRecord(System.currentTimeMillis(),
-                        medication.calculateClosestDose().timeInMillis)
+                DoseRecord(
+                    System.currentTimeMillis(),
+                    medication.calculateClosestDose().timeInMillis
+                )
             }
             medication.addNewTakenDose(takenDose)
             medicationDao(context).updateOrCreate(medication)
         }
 
-        NotificationsUtil.notifyOnMedTakenChannel(context, medication, context.getString(R.string.taken), noActions = true)
+        NotificationsUtil.notifyOnMedTakenChannel(
+            context,
+            medication,
+            context.getString(R.string.taken),
+            noActions = true
+        )
         NotificationsUtil.cancelNotificationWithDelay(context, medication.id.toInt(), CANCEL_DELAY)
     }
 
     private fun takePhotoProof(
-            context: Context, medication: Medication
+        context: Context, medication: Medication
     ) {
         val takeMedIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -131,8 +138,12 @@ class ActionReceiver : BroadcastReceiver() {
     }
 
     private fun onNotifyAction(context: Context, intent: Intent) {
-        val medication = medicationDao(context).getById(intent.getLongExtra(context.getString(R.string.med_id_key),
-                -1))
+        val medication = medicationDao(context).getById(
+            intent.getLongExtra(
+                context.getString(R.string.med_id_key),
+                -1
+            )
+        )
 
         medication.updateStartsToFuture()
         AlarmIntentManager.scheduleMedicationAlarm(context, medication)

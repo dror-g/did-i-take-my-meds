@@ -20,7 +20,11 @@
 package dev.corruptedark.diditakemymeds.data.db
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 import dev.corruptedark.diditakemymeds.data.db.MedicationDB.Companion.IMAGE_TABLE
 import dev.corruptedark.diditakemymeds.data.models.ProofImage
 
@@ -49,7 +53,8 @@ interface ProofImageDao {
     fun getProofImagesByMedId(medId: Long): MutableList<ProofImage>
 
     @Query(
-            "SELECT EXISTS(SELECT * FROM $IMAGE_TABLE WHERE medId = :medId AND doseTime = :doseTime)")
+        "SELECT EXISTS(SELECT * FROM $IMAGE_TABLE WHERE medId = :medId AND doseTime = :doseTime)"
+    )
     fun proofImageExists(medId: Long, doseTime: Long): Boolean
 
 }

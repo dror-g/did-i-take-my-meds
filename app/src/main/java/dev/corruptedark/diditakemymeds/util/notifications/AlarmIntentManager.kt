@@ -30,21 +30,25 @@ import dev.corruptedark.diditakemymeds.data.models.Medication
 object AlarmIntentManager {
 
     fun scheduleMedicationAlarm(
-            context: Context, medication: Medication,
-            customTimeMillis: Long? = null,
+        context: Context, medication: Medication,
+        customTimeMillis: Long? = null,
     ): PendingIntent {
         val alarmIntent = NotificationsUtil.buildNotificationAlarmIntent(context, medication)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(alarmIntent)
-        setExactAlarm(alarmManager,
-                alarmIntent,
-                customTimeMillis ?: medication.calculateNextDose().timeInMillis)
+        setExactAlarm(
+            alarmManager,
+            alarmIntent,
+            customTimeMillis ?: medication.calculateNextDose().timeInMillis
+        )
 
         val receiver = ComponentName(context, ActionReceiver::class.java)
 
-        context.packageManager.setComponentEnabledSetting(receiver,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP)
+        context.packageManager.setComponentEnabledSetting(
+            receiver,
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+            PackageManager.DONT_KILL_APP
+        )
         return alarmIntent
     }
 
@@ -55,14 +59,18 @@ object AlarmIntentManager {
     }
 
     private fun setExactAlarm(
-            alarmManager: AlarmManager, alarmIntent: PendingIntent, timeInMillis: Long
+        alarmManager: AlarmManager, alarmIntent: PendingIntent, timeInMillis: Long
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 if (canScheduleExactAlarms(alarmManager)) {
                     //  alarms set with setAlarmClock appear to persist after process is closed
-                    alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(timeInMillis,
-                            alarmIntent), alarmIntent)
+                    alarmManager.setAlarmClock(
+                        AlarmManager.AlarmClockInfo(
+                            timeInMillis,
+                            alarmIntent
+                        ), alarmIntent
+                    )
                 }
             } catch (e: SecurityException) {
                 //

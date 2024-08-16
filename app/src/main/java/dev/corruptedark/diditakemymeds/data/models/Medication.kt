@@ -30,31 +30,31 @@ import kotlin.math.sign
 
 @Entity(tableName = MedicationDB.MED_TABLE)
 data class Medication(
-        @PrimaryKey(autoGenerate = true)
-        var id: Long = DEFAULT_ID,
-        var name: String,
-        var hour: Int = RepeatSchedule.BLANK.hour,
-        var minute: Int = RepeatSchedule.BLANK.minute,
-        var description: String,
-        var startDay: Int = RepeatSchedule.BLANK.startDay,
-        var startMonth: Int = RepeatSchedule.BLANK.startMonth,
-        var startYear: Int = RepeatSchedule.BLANK.startYear,
-        var daysBetween: Int = RepeatSchedule.BLANK.daysBetween,
-        var weeksBetween: Int = RepeatSchedule.BLANK.weeksBetween,
-        var monthsBetween: Int = RepeatSchedule.BLANK.monthsBetween,
-        var yearsBetween: Int = RepeatSchedule.BLANK.yearsBetween,
-        var notify: Boolean = true,
-        var requirePhotoProof: Boolean = true,
-        var active: Boolean = true,
-        var typeId: Long = DEFAULT_ID,
-        var rxNumber: String = UNDEFINED,
-        var pharmacy: String = UNDEFINED,
-        var doseUnitId: Long = DEFAULT_ID,
-        var amountPerDose: Double = UNDEFINED_AMOUNT,
-        var remainingDoses: Int = UNDEFINED_REMAINING,
-        var takeWithFood: Boolean = false,
-        @ColumnInfo(name = "dose_record") var doseRecord: ArrayList<DoseRecord> = ArrayList(),
-        var moreDosesPerDay: ArrayList<RepeatSchedule> = ArrayList()
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = DEFAULT_ID,
+    var name: String,
+    var hour: Int = RepeatSchedule.BLANK.hour,
+    var minute: Int = RepeatSchedule.BLANK.minute,
+    var description: String,
+    var startDay: Int = RepeatSchedule.BLANK.startDay,
+    var startMonth: Int = RepeatSchedule.BLANK.startMonth,
+    var startYear: Int = RepeatSchedule.BLANK.startYear,
+    var daysBetween: Int = RepeatSchedule.BLANK.daysBetween,
+    var weeksBetween: Int = RepeatSchedule.BLANK.weeksBetween,
+    var monthsBetween: Int = RepeatSchedule.BLANK.monthsBetween,
+    var yearsBetween: Int = RepeatSchedule.BLANK.yearsBetween,
+    var notify: Boolean = true,
+    var requirePhotoProof: Boolean = true,
+    var active: Boolean = true,
+    var typeId: Long = DEFAULT_ID,
+    var rxNumber: String = UNDEFINED,
+    var pharmacy: String = UNDEFINED,
+    var doseUnitId: Long = DEFAULT_ID,
+    var amountPerDose: Double = UNDEFINED_AMOUNT,
+    var remainingDoses: Int = UNDEFINED_REMAINING,
+    var takeWithFood: Boolean = false,
+    @ColumnInfo(name = "dose_record") var doseRecord: ArrayList<DoseRecord> = ArrayList(),
+    var moreDosesPerDay: ArrayList<RepeatSchedule> = ArrayList()
 ) {
     companion object {
 
@@ -68,21 +68,23 @@ data class Medication(
         val BLANK = Medication(name = "", description = "")
 
         fun doseString(
-                yesterdayString: String,
-                todayString: String,
-                tomorrowString: String,
-                doseTime: Long,
-                dateFormat: String,
-                timeFormat: String,
-                locale: Locale
+            yesterdayString: String,
+            todayString: String,
+            tomorrowString: String,
+            doseTime: Long,
+            dateFormat: String,
+            timeFormat: String,
+            locale: Locale
         ): String {
-            return dev.corruptedark.diditakemymeds.util.doseString(yesterdayString,
-                    todayString,
-                    tomorrowString,
-                    doseTime,
-                    dateFormat,
-                    timeFormat,
-                    locale)
+            return dev.corruptedark.diditakemymeds.util.doseString(
+                yesterdayString,
+                todayString,
+                tomorrowString,
+                doseTime,
+                dateFormat,
+                timeFormat,
+                locale
+            )
         }
 
         fun compareByName(a: Medication, b: Medication): Int {
@@ -237,17 +239,21 @@ data class Medication(
         localCalendar.set(Calendar.DAY_OF_MONTH, startDay)
         localCalendar.set(Calendar.MONTH, startMonth)
         localCalendar.set(Calendar.YEAR, startYear)
-        scheduleTriple = ScheduleSortTriple(localCalendar.timeInMillis,
-                RepeatSchedule(hour,
-                        minute,
-                        startDay,
-                        startMonth,
-                        startYear,
-                        daysBetween,
-                        weeksBetween,
-                        monthsBetween,
-                        yearsBetween),
-                -1)
+        scheduleTriple = ScheduleSortTriple(
+            localCalendar.timeInMillis,
+            RepeatSchedule(
+                hour,
+                minute,
+                startDay,
+                startMonth,
+                startYear,
+                daysBetween,
+                weeksBetween,
+                monthsBetween,
+                yearsBetween
+            ),
+            -1
+        )
 
         nextDose = scheduleTriple
 
@@ -294,17 +300,21 @@ data class Medication(
         localCalendar.set(Calendar.DAY_OF_MONTH, startDay)
         localCalendar.set(Calendar.MONTH, startMonth)
         localCalendar.set(Calendar.YEAR, startYear)
-        scheduleTriple = ScheduleSortTriple(localCalendar.timeInMillis,
-                RepeatSchedule(hour,
-                        minute,
-                        startDay,
-                        startMonth,
-                        startYear,
-                        daysBetween,
-                        weeksBetween,
-                        monthsBetween,
-                        yearsBetween),
-                -1)
+        scheduleTriple = ScheduleSortTriple(
+            localCalendar.timeInMillis,
+            RepeatSchedule(
+                hour,
+                minute,
+                startDay,
+                startMonth,
+                startYear,
+                daysBetween,
+                weeksBetween,
+                monthsBetween,
+                yearsBetween
+            ),
+            -1
+        )
 
         closestDose = scheduleTriple
 
@@ -314,17 +324,21 @@ data class Medication(
         localCalendar.add(Calendar.WEEK_OF_YEAR, -weeksBetween)
         localCalendar.add(Calendar.MONTH, -monthsBetween)
         localCalendar.add(Calendar.YEAR, -yearsBetween)
-        scheduleTriple = ScheduleSortTriple(localCalendar.timeInMillis,
-                RepeatSchedule(hour,
-                        minute,
-                        startDay,
-                        startMonth,
-                        startYear,
-                        daysBetween,
-                        weeksBetween,
-                        monthsBetween,
-                        yearsBetween),
-                -1)
+        scheduleTriple = ScheduleSortTriple(
+            localCalendar.timeInMillis,
+            RepeatSchedule(
+                hour,
+                minute,
+                startDay,
+                startMonth,
+                startYear,
+                daysBetween,
+                weeksBetween,
+                monthsBetween,
+                yearsBetween
+            ),
+            -1
+        )
 
         scheduleTripleList.add(scheduleTriple)
 
@@ -332,17 +346,21 @@ data class Medication(
         localCalendar.add(Calendar.WEEK_OF_YEAR, 2 * weeksBetween)
         localCalendar.add(Calendar.MONTH, 2 * monthsBetween)
         localCalendar.add(Calendar.YEAR, 2 * yearsBetween)
-        scheduleTriple = ScheduleSortTriple(localCalendar.timeInMillis,
-                RepeatSchedule(hour,
-                        minute,
-                        startDay,
-                        startMonth,
-                        startYear,
-                        daysBetween,
-                        weeksBetween,
-                        monthsBetween,
-                        yearsBetween),
-                -1)
+        scheduleTriple = ScheduleSortTriple(
+            localCalendar.timeInMillis,
+            RepeatSchedule(
+                hour,
+                minute,
+                startDay,
+                startMonth,
+                startYear,
+                daysBetween,
+                weeksBetween,
+                monthsBetween,
+                yearsBetween
+            ),
+            -1
+        )
 
         scheduleTripleList.add(scheduleTriple)
 

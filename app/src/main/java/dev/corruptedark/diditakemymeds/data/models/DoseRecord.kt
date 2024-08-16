@@ -26,7 +26,7 @@ import kotlin.math.sign
 
 @Parcelize
 data class DoseRecord(val doseTime: Long, val closestDose: Long = NONE) : Comparable<DoseRecord>,
-        Parcelable {
+    Parcelable {
 
     companion object {
         const val NONE = -1L

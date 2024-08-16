@@ -110,9 +110,9 @@ object StorageManager {
         databaseFile?.inputStream()?.use { databaseStream ->
             if (MedicationDB.databaseFileIsValid(context, databaseFile.toUri())) {
                 context.getDatabasePath(MedicationDB.DATABASE_NAME).outputStream()
-                        .use { outStream ->
-                            databaseStream.copyTo(outStream)
-                        }
+                    .use { outStream ->
+                        databaseStream.copyTo(outStream)
+                    }
             }
         }
 
@@ -120,7 +120,8 @@ object StorageManager {
             if (file.exists()) file.deleteRecursively()
         }
 
-        val tempImageFolder = tempFiles?.find { file -> file.isDirectory && file.name == imageFolder.name }
+        val tempImageFolder =
+            tempFiles?.find { file -> file.isDirectory && file.name == imageFolder.name }
 
         tempImageFolder?.copyRecursively(imageFolder)
 

@@ -40,8 +40,9 @@ import kotlinx.coroutines.launch
  * The configuration screen for the [SimpleSingleMedWidgetDark] AppWidget.
  */
 class SimpleSingleMedWidgetConfigureActivity :
-        BaseBoundInteractableVmActivity<SimpleSingleMedWidgetConfigureBinding, ConfigureWidgetViewModel, ConfigureWidgetViewModel.Interactor>(
-                SimpleSingleMedWidgetConfigureBinding::class, BR.vm) {
+    BaseBoundInteractableVmActivity<SimpleSingleMedWidgetConfigureBinding, ConfigureWidgetViewModel, ConfigureWidgetViewModel.Interactor>(
+        SimpleSingleMedWidgetConfigureBinding::class, BR.vm
+    ) {
     val context = this
     val mainScope = MainScope()
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
@@ -80,7 +81,7 @@ class SimpleSingleMedWidgetConfigureActivity :
         val extras = intent.extras
         if (extras != null) {
             appWidgetId = extras.getInt(
-                    AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID
+                AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID
             )
         }
 

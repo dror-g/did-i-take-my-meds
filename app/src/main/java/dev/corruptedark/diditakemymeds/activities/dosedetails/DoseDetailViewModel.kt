@@ -53,7 +53,7 @@ class DoseDetailViewModel : InteractableViewModel<DoseDetailViewModel.Interactor
             val initialHour = workingCalendar.get(Calendar.HOUR_OF_DAY)
             val initialMinute = workingCalendar.get(Calendar.MINUTE)
             val (hour, minute) = interactor.requestTime(initialHour, initialMinute)
-                    ?: return@launchVmScope
+                ?: return@launchVmScope
             workingCalendar.set(Calendar.HOUR_OF_DAY, hour)
             workingCalendar.set(Calendar.MINUTE, minute)
             notifyPropertyChanged(BR.workingCalendar)
@@ -63,7 +63,7 @@ class DoseDetailViewModel : InteractableViewModel<DoseDetailViewModel.Interactor
     fun onDateTapped() {
         launchVmScope({
             val (year, month, day) = interactor?.requestDate(workingCalendar.timeInMillis)
-                    ?: return@launchVmScope
+                ?: return@launchVmScope
             workingCalendar.set(Calendar.YEAR, year)
             workingCalendar.set(Calendar.MONTH, month)
             workingCalendar.set(Calendar.DAY_OF_MONTH, day)

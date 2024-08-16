@@ -3,16 +3,12 @@ package dev.corruptedark.diditakemymeds.util.notifications
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
-import android.app.NotificationChannelGroup
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationChannelGroupCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.res.ResourcesCompat
@@ -37,7 +33,8 @@ object NotificationsUtil {
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Register the channel with the system
-            val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager: NotificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(buildMainChannel(context))
             notificationManager.createNotificationChannel(buildMedTakenChannel(context))
 
@@ -54,6 +51,7 @@ object NotificationsUtil {
         }
         return channel
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun buildMedTakenChannel(context: Context): NotificationChannel {
         val name = context.getString(R.string.channel_med_taken_name)
@@ -66,34 +64,34 @@ object NotificationsUtil {
     }
 
     fun notifyOnMainChannel(
-            context: Context,
-            medication: Medication,
-            contentText: String? = null,
-            noActions: Boolean = false,
+        context: Context,
+        medication: Medication,
+        contentText: String? = null,
+        noActions: Boolean = false,
     ) = notify(context, medication, CHANNEL_MAIN, contentText, noActions)
 
     fun notifyOnMedTakenChannel(
-            context: Context,
-            medication: Medication,
-            contentText: String? = null,
-            noActions: Boolean = false,
+        context: Context,
+        medication: Medication,
+        contentText: String? = null,
+        noActions: Boolean = false,
     ) = notify(context, medication, CHANNEL_TAKEN, contentText, noActions)
 
     @SuppressLint("MissingPermission")
     fun notify(
-            context: Context,
-            medication: Medication,
-            channel: String = CHANNEL_MAIN,
-            contentText: String? = null,
-            noActions: Boolean = false,
+        context: Context,
+        medication: Medication,
+        channel: String = CHANNEL_MAIN,
+        contentText: String? = null,
+        noActions: Boolean = false,
     ) {
         if (context.isPermissionGranted(Manifest.permission.POST_NOTIFICATIONS)) {
             val notification = configureMedicationNotification(
-                    context,
-                    medication,
-                    contentText = contentText,
-                    noActions = noActions,
-                    channel = channel
+                context,
+                medication,
+                contentText = contentText,
+                noActions = noActions,
+                channel = channel
             ).build()
             val nm = NotificationManagerCompat.from(context)
             nm.notify(medication.id.toInt(), notification)
@@ -112,9 +110,9 @@ object NotificationsUtil {
     }
 
     private fun medicationNotificationBuilder(
-            context: Context,
-            medication: Medication,
-            channel: String
+        context: Context,
+        medication: Medication,
+        channel: String
     ): NotificationCompat.Builder {
         val calendar = Calendar.getInstance()
         val closestDose = medication.calculateClosestDose()
@@ -125,21 +123,24 @@ object NotificationsUtil {
         val formattedTime = context.formatTime(calendar)
 
         return NotificationCompat.Builder(context, channel)
-                .setSmallIcon(R.drawable.ic_small_notification).setColor(ResourcesCompat.getColor(
-                        context.resources,
-                        R.color.notification_icon_color,
-                        context.theme)).setContentTitle(medication.name).setSubText(formattedTime)
-                .setContentText(context.getString(R.string.time_for_your_dose))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT).setAutoCancel(false)
+            .setSmallIcon(R.drawable.ic_small_notification).setColor(
+                ResourcesCompat.getColor(
+                    context.resources,
+                    R.color.notification_icon_color,
+                    context.theme
+                )
+            ).setContentTitle(medication.name).setSubText(formattedTime)
+            .setContentText(context.getString(R.string.time_for_your_dose))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT).setAutoCancel(false)
     }
 
 
     private fun configureMedicationNotification(
-            context: Context,
-            medication: Medication,
-            contentText: String? = null,
-            noActions: Boolean = false,
-            channel: String
+        context: Context,
+        medication: Medication,
+        contentText: String? = null,
+        noActions: Boolean = false,
+        channel: String
     ): NotificationCompat.Builder {
 
         val builder = medicationNotificationBuilder(context, medication, channel)
@@ -156,15 +157,19 @@ object NotificationsUtil {
         if (!noActions) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || !medication.requirePhotoProof) {
                 val tookMedPendingIntent = buildActionTookMedIntent(context, medication)
-                builder.addAction(NO_ICON,
-                        context.getString(R.string.took_it),
-                        tookMedPendingIntent)
+                builder.addAction(
+                    NO_ICON,
+                    context.getString(R.string.took_it),
+                    tookMedPendingIntent
+                )
             }
 
             val remindPendingIntent = buildActionRemindIntent(context, medication)
-            builder.addAction(NO_ICON,
-                    context.getString(R.string.remind_in_15),
-                    remindPendingIntent)
+            builder.addAction(
+                NO_ICON,
+                context.getString(R.string.remind_in_15),
+                remindPendingIntent
+            )
         }
 
         return builder
@@ -196,7 +201,7 @@ object NotificationsUtil {
     }
 
     private fun buildContentIntent(
-            context: Context, medication: Medication, actionIntent: Intent
+        context: Context, medication: Medication, actionIntent: Intent
     ): PendingIntent {
         return context.activityIntentFromIntent(medication.id.toInt(), actionIntent)
     }

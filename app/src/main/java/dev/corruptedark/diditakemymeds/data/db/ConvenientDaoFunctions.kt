@@ -22,12 +22,12 @@ package dev.corruptedark.diditakemymeds.data.db
 import android.content.Context
 
 fun medicationDao(context: Context): MedicationDao = MedicationDB.getInstance(context)
-        .medicationDao()
+    .medicationDao()
 
 fun proofImageDao(context: Context): ProofImageDao = MedicationDB.getInstance(context)
-        .proofImageDao()
+    .proofImageDao()
 
 fun medicationTypeDao(context: Context): MedicationTypeDao = MedicationDB.getInstance(context)
-        .medicationTypeDao()
+    .medicationTypeDao()
 
 fun doseUnitDao(context: Context): DoseUnitDao = MedicationDB.getInstance(context).doseUnitDao()

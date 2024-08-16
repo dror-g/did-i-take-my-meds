@@ -11,13 +11,13 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 fun doseString(
-        yesterdayString: String,
-        todayString: String,
-        tomorrowString: String,
-        doseTime: Long,
-        dateFormat: String,
-        timeFormat: String,
-        locale: Locale
+    yesterdayString: String,
+    todayString: String,
+    tomorrowString: String,
+    doseTime: Long,
+    dateFormat: String,
+    timeFormat: String,
+    locale: Locale
 ): String {
     val localizedFormatter = SimpleDateFormat(dateFormat, locale)
 
@@ -47,13 +47,15 @@ fun medicationDoseString(context: Context, timeInMillis: Long): String {
     val dateFormat = context.getString(R.string.date_format)
     val timeFormat = context.getTimeFormat()
 
-    return doseString(yesterdayString,
-            todayString,
-            tomorrowString,
-            timeInMillis,
-            dateFormat,
-            timeFormat,
-            locale)
+    return doseString(
+        yesterdayString,
+        todayString,
+        tomorrowString,
+        timeInMillis,
+        dateFormat,
+        timeFormat,
+        locale
+    )
 }
 
 fun Medication.nextDoseString(context: Context): String {

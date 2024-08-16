@@ -25,8 +25,8 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
     interface Interactor {
         suspend fun openSchedulePicker(): Pair<RepeatSchedule, BirthControlType>?
         suspend fun rescheduleDose(
-                index: Int,
-                schedule: RepeatSchedule
+            index: Int,
+            schedule: RepeatSchedule
         ): Pair<RepeatSchedule, BirthControlType>?
     }
 
@@ -50,7 +50,8 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
 
     @get:Bindable
     var amountPerDose by bindableProperty(Medication.UNDEFINED_AMOUNT) { _, newValue ->
-        amountPerDoseString = if (newValue == Medication.UNDEFINED_AMOUNT) "" else newValue.toString()
+        amountPerDoseString =
+            if (newValue == Medication.UNDEFINED_AMOUNT) "" else newValue.toString()
     }
 
     @get:Bindable
@@ -61,7 +62,8 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
 
     @get:Bindable
     var remainingDoses by bindableProperty(Medication.UNDEFINED_REMAINING) { _, newValue ->
-        remainingDosesString = if (newValue == Medication.UNDEFINED_REMAINING) "" else newValue.toString()
+        remainingDosesString =
+            if (newValue == Medication.UNDEFINED_REMAINING) "" else newValue.toString()
     }
 
     @get:Bindable
@@ -161,7 +163,8 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
     fun setupExtraDosesList(recyclerView: RecyclerView) {
         recyclerView.addDefaultDivider()
         BindableAdapter(extraDoseItems, BR.item).map<ItemExtraDose, ExtraDoseTemplate2Binding>(
-                R.layout.extra_dose_template2) {
+            R.layout.extra_dose_template2
+        ) {
             onBind { holder ->
                 holder.binding.deleteDoseButton.setOnClickListener {
                     holder.binding.item ?: return@setOnClickListener
@@ -245,9 +248,11 @@ class MedViewModel : InteractableViewModel<MedViewModel.Interactor>() {
         val activeDays = birthControlType.days
         val calendar = Calendar.getInstance().also { schedule.fillCalendar(it) }
         for (i in 1..activeDays) {
-            val newSchedule = RepeatSchedule(schedule.hour, schedule.minute,
-                    calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.YEAR), daysBetween = activeDays + 7)
+            val newSchedule = RepeatSchedule(
+                schedule.hour, schedule.minute,
+                calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.YEAR), daysBetween = activeDays + 7
+            )
             extraDoseItems.add(ItemExtraDose(newSchedule))
 
             calendar.add(Calendar.DATE, 1)
