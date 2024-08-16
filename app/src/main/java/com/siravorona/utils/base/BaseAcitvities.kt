@@ -1,14 +1,42 @@
 package com.siravorona.utils.base
 
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.ViewDataBinding
 import androidx.viewbinding.ViewBinding
 import kotlin.reflect.KClass
 
+typealias BackPressedCallback = () -> Boolean
+
+abstract class BaseActivity : AppCompatActivity() {
+    protected var backPressedCallback: BackPressedCallback? = null
+
+    fun setOnBackPressListener(block: BackPressedCallback) {
+        backPressedCallback = block
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(1000) {
+                if (block()) {
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        }
+    }
+
+    @Suppress("OVERRIDE_DEPRECATION")
+    override fun onBackPressed() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if (backPressedCallback?.invoke() == false) {
+                return
+            }
+        }
+        super.onBackPressed()
+    }
+}
 
 abstract class BaseBoundActivity<out TBinding : ViewBinding>(private val bindingClass: KClass<TBinding>) :
-    AppCompatActivity() {
+    BaseActivity() {
     private lateinit var __binding: TBinding
     protected val binding
         get() = __binding
