@@ -41,7 +41,7 @@
     <string name="yesterday">wczoraj</string>
     <string name="tomorrow">jutro</string>
     <string name="closest_dose_label">Następna dawka: %1$s</string>
-    <string name="already_took_dose">Dawka została już przyjęta.
+    <string name="already_took_dose">Dawka została już przyjęta
 \nMam nadzieję, że nie została przyjęta ponownie.</string>
     <string name="date_format">dd/MM/yyyy</string>
     <string name="time_taken">Czas przyjęcia: %1$s</string>
@@ -100,8 +100,8 @@
 \n%3$d dn., %4$d tyg.
 \n%5$d mies., %6$d rok/lata</string>
     <string name="utc" translatable="false">UTC</string>
-    <string name="fill_out_all_schedules">Uzupełnij wszystkie plany dawkowania przed zapisaniem.</string>
-    <string name="fill_out_schedule">Uzupełnij plan dawkowania przed zatwierdzeniem.</string>
+    <string name="fill_out_all_schedules">Uzupełnij wszystkie plany dawkowania przed zapisaniem</string>
+    <string name="fill_out_schedule">Uzupełnij plan dawkowania przed zatwierdzeniem</string>
     <string name="next_dose_label">Najbliższa dawka: %1$s</string>
     <string name="taken">Przyjęto</string>
     <string name="not_taken">Nie przyjęto</string>
@@ -115,7 +115,7 @@
     <string name="app_name_short">Leki\?</string>
     <string name="remind_in_15">Przypomnienie za 15 min</string>
     <string name="dose_record_delete_warning">Zapis przyjmowania leku zostanie trwale usunięty.</string>
-    <string name="record_delete_hint">(W celu usunięcia przytrzymaj pole z zapisem).</string>
+    <string name="record_delete_hint">(W celu usunięcia przytrzymaj pole z zapisem)</string>
     <string name="time_since_dose_sample">Około 0 dn., 0 godz. i 0 min od ostatniej przyjętej dawki</string>
     <string name="time_since_dose_template">Około %1$d dn., %2$d godz. i %3$d min od ostatniej przyjętej dawki</string>
     <string name="require_photo_proof">Wymagane zdjęcie potwierdzające</string>
@@ -126,7 +126,7 @@
     <string name="dose_time_key" translatable="false">dose_time</string>
     <string name="no_image_available">Zdjęcie jest niedostępne</string>
     <string name="temp_dir" translatable="false">tmp</string>
-    <string name="record_detail_hint">(Przytrzymaj, aby usunąć).</string>
+    <string name="record_detail_hint">(Dotknij wpis aby zobaczyć szczegóły)</string>
     <string name="time_taken_key" translatable="false">time_taken</string>
     <string name="take_med_key" translatable="false">take_med</string>
     <string name="back_up_successful">Pomyślnie utworzono kopię zapasową</string>
@@ -151,7 +151,8 @@
     <string name="remaining_doses">Pozostałe dawki</string>
     <string name="sample_remaining_doses_label">10 pozostałych dawek</string>
     <string name="remaining_doses_label_format">Pozostałe dawki: %1$d</string>
-    <string name="no_remaining_doses_message">Brak pozostałych dawek. Jeśli to jest błąd, zaktualizuj pozostałe dawki poprzez edytowanie leku</string>
+    <string name="no_remaining_doses_message">Brak pozostałych dawek
+\nJeśli to jest błąd, zaktualizuj pozostałe dawki poprzez edytowanie leku</string>
     <string name="take_with_food">Przyjmowany z jedzeniem</string>
     <string name="translation_credits">Brazylijsko-portugalskie tłumaczenia mezysinc na GitHub, Inux-usr na GitHub i Card151915 na Weblate
 \n
