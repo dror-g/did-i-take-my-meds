@@ -229,7 +229,7 @@ class MedDetailActivity :
 
     // region alarms
     private fun updateAlarm(medication: Medication) {
-        if (medication.notify) {
+        if (medication.shouldNotify()) {
             scheduleNextMedicationAlarm(medication, false)
         } else {
             //Cancel alarm
@@ -368,6 +368,7 @@ class MedDetailActivity :
     }
 
     private fun onMedicationChanged(medicationFull: MedicationFull) {
+        if (vm.medicationFull == medicationFull) return
         vm.medicationFull = medicationFull
         if (!medicationFull.medication.isAsNeeded()) {
             closestDose = medicationFull.medication.calculateClosestDose().timeInMillis

@@ -99,15 +99,21 @@ class MedDetailViewModel : InteractableViewModel<MedDetailViewModel.Interactor>(
 
 
     fun onActiveCheckedChanged(switch: CompoundButton, checked: Boolean) {
+        if (medication.active == checked) return
         medication.active = checked
         interactor?.saveMedication(medication)
+        if (medication.shouldNotify()) {
+            interactor?.scheduleNextMedicationAlarm(medication)
+        } else {
+            interactor?.cancelMedicationAlarm(medication)
+        }
     }
 
     fun onNotifyCheckedChanged(switch: CompoundButton, checked: Boolean) {
         if (medication.notify == checked) return
         medication.notify = checked
         interactor?.saveMedication(medication)
-        if (checked) {
+        if (medication.shouldNotify()) {
             interactor?.scheduleNextMedicationAlarm(medication)
         } else {
             interactor?.cancelMedicationAlarm(medication)

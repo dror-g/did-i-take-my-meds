@@ -167,6 +167,10 @@ data class Medication(
         }
     }
 
+    fun shouldNotify(): Boolean {
+        return active && notify
+    }
+
     /**
      * Updates the start times of schedules in this medication to future times
      *

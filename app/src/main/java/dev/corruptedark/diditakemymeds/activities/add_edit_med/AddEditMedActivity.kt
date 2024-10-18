@@ -240,7 +240,7 @@ class AddEditMedActivity :
     }
 
     private fun setMedicationAlarm(medication: Medication) {
-        if (medication.notify) {
+        if (medication.shouldNotify()) {
             AlarmIntentManager.scheduleMedicationAlarm(this, medication)
         } else {
             AlarmIntentManager.cancelAlarm(this, medication)

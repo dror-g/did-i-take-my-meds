@@ -126,7 +126,7 @@ class ActionReceiver : BroadcastReceiver() {
         val medications = medicationDao(context).getAllRaw()
         medications.forEach { medication ->
             medication.updateStartsToFuture()
-            if (medication.notify) {
+            if (medication.shouldNotify()) {
                 //Create alarm
                 AlarmIntentManager.scheduleMedicationAlarm(context, medication)
                 if (System.currentTimeMillis() > medication.calculateClosestDose().timeInMillis && !medication.closestDoseAlreadyTaken()) {

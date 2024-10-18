@@ -151,7 +151,7 @@ class MainActivity :
 
     private fun ensureAlarmsScheduled() {
         medicationDao(context).getAllRaw().forEach { medication ->
-            if (medication.notify) {
+            if (medication.shouldNotify()) {
                 scheduleMedicationAlarm(medication)
             }
         }
