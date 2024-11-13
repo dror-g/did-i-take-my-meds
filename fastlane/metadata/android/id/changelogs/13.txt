@@ -1,0 +1,4 @@
+v1.2.1
+
+Change
+- Latar antarmuka dipergelap agar kontras lebih ketara
