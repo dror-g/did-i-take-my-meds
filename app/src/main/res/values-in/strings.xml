@@ -15,65 +15,54 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see https://www.gnu.org/licenses.--><resources>
-    <string name="app_name">Apakah Saya Menggunakan Obat Saya\?</string>
-    <string name="add">Tambah</string>
-    <string name="add_medications">Tambah medikasi ke daftar Anda</string>
-    <string name="medication_name">Nama medikasi</string>
+    <string name="app_name">Aku Sudah Minum Obat Belum, Ya?</string>
+    <string name="add">Tambahkan</string>
+    <string name="add_medications">Tambahkan obat ke daftar Anda</string>
+    <string name="medication_name">Nama obat</string>
     <string name="description">Deskripsi</string>
     <string name="select_a_time">pilih waktu</string>
     <string name="time_picker_tag" translatable="false">time_picker</string>
     <string name="save">Simpan</string>
-    <string name="cancel">Batal</string>
-    <string name="pick_a_time">Pilih waktu sebelum menyimpan</string>
-    <string name="fill_fields">Isi nama terlebih dahulu sebelum menyimpan</string>
-    <string name="med_saved">Medikasi tersimpan</string>
-    <string name="cancelled">Medikasi baru dibatalkan</string>
-    <string name="time_24">H:mm</string>
-    <string name="time_12">h:mma</string>
+    <string name="cancel">Batalkan</string>
+    <string name="pick_a_time">Pilih waktu sebelum menyimpan obat</string>
+    <string name="fill_fields">Isi nama terlebih dahulu sebelum menyimpan obat</string>
+    <string name="med_saved">Obat tersimpan</string>
+    <string name="cancelled">Obat baru batal tersimpan</string>
+    <string name="time_24">J:mm</string>
+    <string name="time_12">j:mma</string>
     <string name="sample_medicine">Contoh Obat</string>
     <string name="midnight">12:00AM</string>
-    <string name="sample_description">Ini adalah contoh deskripsi dari sebuah medikasi. Ini memiliki beberapa kalimat dan meliputi beberapa baris.</string>
+    <string name="sample_description">Berikut ini adalah contoh deskripsi sebuah obat. Deskripsi ini meliputi beberapa kalimat dan baris.</string>
     <string name="previous_doses">Dosis sebelumnya:</string>
-    <string name="i_just_took_it">Saya baru menggunakannya!</string>
+    <string name="i_just_took_it">Obat baru aku minum, lho!</string>
     <string name="closest_dose_sample">Dosis terdekat: 1:00PM hari ini</string>
     <string name="med_position_key" translatable="false">medication_position</string>
     <string name="today">Hari Ini</string>
     <string name="yesterday">Kemarin</string>
     <string name="tomorrow">Besok</string>
     <string name="closest_dose_label">Dosis terdekat: %1$s</string>
-    <string name="already_took_dose">Anda sudah menggunakan dosis ini
-\nSaya harap Anda tidak menggunakannya lagi</string>
-    <string name="date_format">MMM d, yyyy</string>
-    <string name="time_taken">Waktu digunakan: %1$s</string>
+    <string name="already_took_dose">Anda sudah meminum obat ini\nJangan diminum lagi, ya:)</string>
+    <string name="date_format">BBB h, tttt</string>
+    <string name="time_taken">Waktu saat Anda minum: %1$s</string>
     <string name="delete">hapus</string>
-    <string name="are_you_sure">Apakah Anda yakin\?</string>
-    <string name="medication_delete_warning">Medikasi ini akan dihapus secara permanen</string>
-    <string name="confirm">konfirmasi</string>
-    <string name="took_this_already">Anda sudah menggunakan ini</string>
+    <string name="are_you_sure">Anda yakin?</string>
+    <string name="medication_delete_warning">Obat ini akan dihapus secara permanen</string>
+    <string name="confirm">konfirmasikan</string>
+    <string name="took_this_already">Kamu sudah meminum obat ini</string>
     <string name="edit">Sunting</string>
-    <string name="edit_cancelled">Sunting dibatalkan</string>
+    <string name="edit_cancelled">Penyuntingan dibatalkan</string>
     <string name="notifications_enabled">Notifikasi dinyalakan</string>
     <string name="notifications_disabled">Notifikasi dimatikan</string>
     <string name="channel_name" translatable="false">did_i_take_my_meds</string>
     <string name="channel_description">notifikasi pengingat</string>
     <string name="med_id_key" translatable="false">med_id</string>
-    <string name="time_for_your_dose">Waktu untuk dosis Anda</string>
-    <string name="new_medication">Medikasi Baru</string>
-    <string name="medication_details">Detail Medikasi</string>
-    <string name="edit_medication">Sunting Medikasi</string>
+    <string name="time_for_your_dose">Waktunya minum obat, nih</string>
+    <string name="new_medication">Obat Baru</string>
+    <string name="medication_details">Detail Obat</string>
+    <string name="edit_medication">Sunting Obat</string>
     <string name="about">Tentang</string>
-    <string name="app_description">v%1$s oleh Noah Stanford (alias CorruptedArk)
-\n
-\nDid I Take My Meds\? adalah aplikasi bebas dan sumber terbuka untuk melacak medikasi
-\nDid I Take My Meds\? dirancang untuk membantu mencegah pengguna dari melewati dosis dan/atau dosis berlebihan
-\nHak CIpta © 2021 Noah Stanford noahstandingford@gmail.com
-\n
-\nDid I Take My Meds\? is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-\n
-\nDid I Take My Meds\? is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-\n
-\nYou should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses.</string>
-    <string name="support_me_on_liberapay">Dukung saya di Liberapay</string>
+    <string name="app_description">v%1$s oleh Noah Stanford (alias CorruptedArk)\n\nAku Sudah Minum Obat Belum, Ya? (Did I Take My Meds?) adalah aplikasi FOSS (gratis dan bersumber terbuka) untuk melacak pengobatan Anda\nAku Sudah Minum Obat Belum, Ya? dirancang untuk membantu agar jangan sampai Anda lupa minum obat atau meminum obat dalan dosis yang berlebihan.\nHak cipta © 2021 Noah Stanford noahstandingford@gmail.com\n\nAku Sudah Minum Obat Belum, Ya? adalah sebuah perangkat lunak gratis: Anda dapat mendistribusikan ulang dan/atau memodifikasi aplikasi ini sesuai ketentuan GNU General Public License yang diterbitkan oleh Free Software Foundation, baik versi 3 atau ke atas dari lisensi ini.\n\nAku Sudah Minum Obat Belum, Ya? dibuat dan dibagikan dengan harapan aplikasi dini dapat berguna TANPA JAMINAN APA PUN; tanpa jaminan tersirat atau bahkan jaminan tersirat mengenai KETERDAGANGAN atau KESESUAIA UNTUK KEPENTINGAN TERTENTU. Silakan lihat See the GNU General Public License untuk detail lebih lanjut (lisensi dalam bahasa Inggris).\n\nAnda seharusnya mendaaptkan salinan GNU General Public License bersamaan dengan aplikasi ini. Jika tidak, silakan buka tautan berikut: https://www.gnu.org/licenses.</string>
+    <string name="support_me_on_liberapay">Yuk dukung saya di Liberapay</string>
     <string name="view_the_project_on_github">Lihat proyek di GitHub</string>
     <string name="github_link" translatable="false">https://github.com/CorruptedArk/did-i-take-my-meds</string>
     <string name="liberapay_link" translatable="false">https://liberapay.com/CorruptedArk</string>
@@ -83,9 +72,9 @@
     <string name="cannot_donate_explanation">Google tidak memperbolehkan pengembang untuk menempatkan tautan donasi di aplikasi untuk mendukung diri mereka sendiri jika mereka tidak badan amal bebas pajak. Jika Anda masih ingin mendukung saya, Anda bisa menemukan CorruptedArk di Liberapay di peramban yang berbeda. Repositori GitHub saya merupakan tempat bagus untuk memulai.</string>
     <string name="last_version_used_key" translatable="false">last_version_used</string>
     <string name="add_another_dose">Tambahkan dosis yang lain</string>
-    <string name="taken_as_needed">Digunakan sesuai yang dibutuhkan</string>
+    <string name="taken_as_needed">Obat diminum sesuai yang dibutuhkan</string>
     <string name="hello_blank_fragment">Halo pecahan kosong</string>
-    <string name="select_a_start_date">Tanggal mulai</string>
+    <string name="select_a_start_date">Tanggal dimulai</string>
     <string name="time_between_doses">Waktu antara dosis:</string>
     <string name="days">Hari</string>
     <string name="weeks">Pekan</string>
@@ -100,82 +89,63 @@
 \n%3$d hari, %4$d pekan,
 \n%5$d bulan, %6$d tahun</string>
     <string name="utc" translatable="false">UTC</string>
-    <string name="fill_out_all_schedules">Isi semua jadwal sebelum menyimpan</string>
+    <string name="fill_out_all_schedules">Isi semua jadwal sebelum simpan</string>
     <string name="fill_out_schedule">Isi jadwal sebelum mengonfirmasi</string>
     <string name="next_dose_label">Dosis selanjutnya: %1$s</string>
-    <string name="taken">Digunakan</string>
-    <string name="not_taken">Tidak digunakan</string>
-    <string name="sort">Urut</string>
+    <string name="taken">Diminum</string>
+    <string name="not_taken">Tidak diminum</string>
+    <string name="sort">Urutkan</string>
     <string name="sort_key" translatable="false">Sort</string>
-    <string name="restore_database">Pulihkan basis data</string>
-    <string name="back_up_database">Cadangkan basis data</string>
-    <string name="database_is_invalid">Basis data tidak valid</string>
-    <string name="database_restored">Basis data terpulihkan</string>
-    <string name="took_it">Telah digunakan</string>
-    <string name="app_name_short">Medikasi\?</string>
+    <string name="restore_database">Pulihkan pangkalan data</string>
+    <string name="back_up_database">Cadangkan pangkalan data</string>
+    <string name="database_is_invalid">Pangkalan data tidak valid</string>
+    <string name="database_restored">Pangkalan data dipulihkan</string>
+    <string name="took_it">Sudah diminum:)</string>
+    <string name="app_name_short">ASMOBY?</string>
     <string name="remind_in_15">Ingatkan dalam 15 menit</string>
-    <string name="dose_record_delete_warning">Rekam dosis akan dihapus secara permanen.</string>
-    <string name="record_delete_hint">(Tekan panjang sebuah rekaman untuk menghapusnya)</string>
-    <string name="time_since_dose_sample">Kira-kira 0 hari, 0 jam, dan 0 menit sejak dosis terakhir digunakan</string>
-    <string name="time_since_dose_template">Kira-kira %1$d hari, %2$d jam, dan %3$d menit sejak dosis terakhir digunakan</string>
+    <string name="dose_record_delete_warning">Catatan pengobatan akan dihapus secara permanen.</string>
+    <string name="record_delete_hint">(Tekan dan tahan lama catatan untuk hapus)</string>
+    <string name="time_since_dose_sample">Kira-kira sudah 0 hari, 0 jam, dan 0 menit sejak obat terakhir diminum</string>
+    <string name="time_since_dose_template">Kira-kira sudah %1$d hari, %2$d jam, dan %3$d menit sejak obat terakhir diminum</string>
     <string name="require_photo_proof">Butuh bukti foto</string>
     <string name="image_path" translatable="false">images</string>
-    <string name="dose_and_proof_saved">Dosis dan bukti disimpan</string>
+    <string name="dose_and_proof_saved">Obat dan bukti disimpan</string>
     <string name="failed_to_get_proof">Gagal untuk mendapatkan bukti</string>
     <string name="dose_time_key" translatable="false">dose_time</string>
     <string name="no_image_available">Tidak ada gambar yang tersedia</string>
     <string name="temp_dir" translatable="false">tmp</string>
-    <string name="record_detail_hint">(Ketuk sebuah rekaman untuk melihat detail)</string>
+    <string name="record_detail_hint">(Ketuk catatan untuk melihat detailnya)</string>
     <string name="time_taken_key" translatable="false">time_taken</string>
     <string name="take_med_key" translatable="false">take_med</string>
-    <string name="back_up_successful">Sukses mencadangkan</string>
-    <string name="back_up_failed">Gagal mencadangkan</string>
-    <string name="dose_details">Detail Dosis</string>
-    <string name="medication_active">Medikasi aktif</string>
+    <string name="back_up_successful">Pencadangan berhasil</string>
+    <string name="back_up_failed">Pencadangan gagal</string>
+    <string name="dose_details">Detail Obat</string>
+    <string name="medication_active">Pengobatan yang aktif</string>
     <string name="inactive">Tidak aktif</string>
-    <string name="medication_type">Jenis Medikasi</string>
-    <string name="undefined">Tidak terdefinisi</string>
+    <string name="medication_type">Jenis Obat</string>
+    <string name="undefined">Takterdefinisikan</string>
     <string name="type_label_format">Jenis: %1$s</string>
     <string name="sample_type_label">Jenis: Tidak terdefinisi</string>
     <string name="rx_number_hint">Rx #</string>
     <string name="rx_number_label_format">Rx #: %1$s</string>
     <string name="sample_rx_number_label">Rx #: Tidak terdefinisi</string>
-    <string name="pharmacy">Farmasi</string>
-    <string name="pharmacy_label_format">Farmasi: %1$s</string>
-    <string name="sample_pharmacy_label">Farmasi: Tidak terdefinisi</string>
-    <string name="dose_unit">Unit Dosis</string>
+    <string name="pharmacy">Apotek</string>
+    <string name="pharmacy_label_format">Apotek: %1$s</string>
+    <string name="sample_pharmacy_label">Apotek: Tidak terdefinisi</string>
+    <string name="dose_unit">Satuan dosis obat tiap kali minum</string>
     <string name="dose_amount">Jumlah Dosis</string>
-    <string name="dose_amount_label_format">%1$s%2$s per dosis</string>
-    <string name="sample_dose_amount_label">5mg per dosis</string>
-    <string name="remaining_doses">Dosis Tersisa</string>
-    <string name="sample_remaining_doses_label">10 dosis tersisa</string>
-    <string name="remaining_doses_label_format">%1$d dosis tersisa</string>
-    <string name="no_remaining_doses_message">Tidak ada dosis yang tersisa
-\nJika ini salah, perbarui dosis tersisa dengan menyunting medikasinya</string>
-    <string name="take_with_food">Gunakan dengan makanan</string>
-    <string name="translation_credits">Terjemahan Portugis Brasil oleh mezysinc di GitHub, lnux-usr di GitHub, dan Card151915 di Weblate
-\n
-\nTerjemahan bahasa Jerman oleh pamela di GitHub
-\n
-\nTerjemahan bahasa Prancis oleh Edanas di Weblate
-\n
-\nTerjemahan Ibrani oleh Yaron di Weblate
-\n
-\nTerjemahan Sederhana Cina oleh luxu di Weblate
-\n
-\nTerjemahan Spanyol oleh sguinetti di Weblate, caos30 di Weblate, dan nzgha di Weblate
-\n
-\nTerjemahan Catalan oleh caos30 di Weblate
-\n
-\nTerjemahan Bahasa Turki oleh Lion on Weblate
-\n
-\nPerbaikan Bug oleh johannes87 di GitHub
-\n
-\n</string>
-    <string name="app_widget_description">Sebuah widget yang menampilkan sebuah medikasi, waktu sejak dosis terakhir digunakan, dan tombol untuk memasukkan dosis yang digunakan</string>
-    <string name="choose_a_medication">Pilih Sebuah Medikasi</string>
-    <string name="dose_update_warning">Anda akan memperbarui waktu dosis ini digunakan dan menghapus bukti yang terhubung jika tersedia.</string>
-    <string name="birth_control_schedule">Jadwal pengendalian kelahiran</string>
+    <string name="dose_amount_label_format">%1$s%2$s tiap kali minum</string>
+    <string name="sample_dose_amount_label">5mg tiap kali minum</string>
+    <string name="remaining_doses">Jumlah obat tersisa</string>
+    <string name="sample_remaining_doses_label">10 obat tersisa untuk diminum</string>
+    <string name="remaining_doses_label_format">%1$d kali obat tersisa untuk diminum</string>
+    <string name="no_remaining_doses_message">Tidak ada obat tersisa\nJika informasi ini keliru, perbarui jumlah obat tersisa dengan menyunting pengobatannya</string>
+    <string name="take_with_food">Minum obat bersama dengan makanan</string>
+    <string name="translation_credits">Terjemahan bahasaPortugis Brasil oleh mezysinc di GitHub, lnux-usr di GitHub, dan Card151915 di Weblate\n\nTerjemahan bahasa Jerman oleh pamela di GitHub\n\nTerjemahan bahasa Prancis oleh Edanas di Weblate\n\nTerjemahan bahasa Ibrani oleh Yaron di Weblate\n\nTerjemahan bahasa Mandarin Sederhana oleh luxu di Weblate\n\nTerjemahan bahasa Spanyol oleh sguinetti di Weblate, caos30 di Weblate, dan nzgha di Weblate\n\nTerjemahan bahasa Katalan oleh caos30 di Weblate\n\nTerjemahan bahasa Turki oleh Liondi Weblate\n\nPerbaikan Kutu oleh johannes87 di GitHub\n\n</string>
+    <string name="app_widget_description">Adalah gawit yang menampilkan satu obat berikut waktu sejak kali terakhir obat diminum dan tombol untuk memasukkan info kapan obat saat ini diminum</string>
+    <string name="choose_a_medication">Pilih Satu Obat</string>
+    <string name="dose_update_warning">Waktu obat diminum akan diperbarui dan gambar bukti minum obat (jika ada) akan dihapus.</string>
+    <string name="birth_control_schedule">Jadwal minum pil KB</string>
     <string name="_21_7">21 + 7</string>
     <string name="_63_7">63 + 7</string>
 </resources>
