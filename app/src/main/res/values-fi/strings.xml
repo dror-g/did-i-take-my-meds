@@ -69,7 +69,7 @@
     <string name="liberapay_link" translatable="false">https://liberapay.com/CorruptedArk</string>
     <string name="play_release" translatable="false">playRelease</string>
     <string name="sorry"/>
-    <string name="okay"/>
+    <string name="okay">Hyvä on</string>
     <string name="cannot_donate_explanation"/>
     <string name="last_version_used_key" translatable="false">last_version_used</string>
     <string name="add_another_dose"/>
