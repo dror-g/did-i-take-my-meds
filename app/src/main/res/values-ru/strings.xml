@@ -144,13 +144,13 @@
     <string name="pharmacy"/>
     <string name="pharmacy_label_format"/>
     <string name="sample_pharmacy_label"/>
-    <string name="dose_unit"/>
-    <string name="dose_amount"/>
+    <string name="dose_unit">Доза</string>
+    <string name="dose_amount">Количество доз</string>
     <string name="dose_amount_label_format"/>
-    <string name="sample_dose_amount_label"/>
-    <string name="remaining_doses"/>
+    <string name="sample_dose_amount_label">5 мг на дозу</string>
+    <string name="remaining_doses">Оставшиеся дозы</string>
     <string name="sample_remaining_doses_label"/>
-    <string name="remaining_doses_label_format"/>
+    <string name="remaining_doses_label_format">Осталось доз: %1$d</string>
     <string name="no_remaining_doses_message">Доз не осталось
 \nЕсли это не так, обновите оставшиеся дозы, отредактировав медикамент</string>
     <string name="take_with_food">Принимать с едой</string>
@@ -159,6 +159,6 @@
     <string name="choose_a_medication">Выберите лекарство</string>
     <string name="dose_update_warning">Вы обновите время приема этой дозы и удалите связанное изображение с доказательством, если оно существует.</string>
     <string name="birth_control_schedule"/>
-    <string name="_21_7"/>
-    <string name="_63_7"/>
+    <string name="_21_7">21 + 7</string>
+    <string name="_63_7">63 + 7</string>
 </resources>
