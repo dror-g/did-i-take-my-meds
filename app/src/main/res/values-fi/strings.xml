@@ -57,53 +57,53 @@
     <string name="channel_name" translatable="false">did_i_take_my_meds</string>
     <string name="channel_description">muistutusilmoitukset</string>
     <string name="med_id_key" translatable="false">med_id</string>
-    <string name="time_for_your_dose"/>
-    <string name="new_medication"/>
-    <string name="medication_details"/>
-    <string name="edit_medication"/>
-    <string name="about"/>
+    <string name="time_for_your_dose">Aika annokselle</string>
+    <string name="new_medication">Uusi lääkitys</string>
+    <string name="medication_details">Lääkitystiedot</string>
+    <string name="edit_medication">Muokkaa lääkitystä</string>
+    <string name="about">Tietoja</string>
     <string name="app_description"/>
     <string name="support_me_on_liberapay"/>
-    <string name="view_the_project_on_github"/>
+    <string name="view_the_project_on_github">Näytä projekti GitHubissa</string>
     <string name="github_link" translatable="false">https://github.com/CorruptedArk/did-i-take-my-meds</string>
     <string name="liberapay_link" translatable="false">https://liberapay.com/CorruptedArk</string>
     <string name="play_release" translatable="false">playRelease</string>
-    <string name="sorry"/>
+    <string name="sorry">Anteeksi!</string>
     <string name="okay">Hyvä on</string>
     <string name="cannot_donate_explanation"/>
     <string name="last_version_used_key" translatable="false">last_version_used</string>
-    <string name="add_another_dose"/>
-    <string name="taken_as_needed"/>
+    <string name="add_another_dose">Lisää annos</string>
+    <string name="taken_as_needed">Otettu tarvittaessa</string>
     <string name="hello_blank_fragment"/>
-    <string name="select_a_start_date"/>
-    <string name="time_between_doses"/>
-    <string name="days"/>
-    <string name="weeks"/>
-    <string name="months"/>
-    <string name="years"/>
-    <string name="schedule_dose"/>
+    <string name="select_a_start_date">Aloituspäivämäärä</string>
+    <string name="time_between_doses">Aika annosten välillä:</string>
+    <string name="days">Päivä(ä)</string>
+    <string name="weeks">Viikko(a)</string>
+    <string name="months">Kuukausi(a)</string>
+    <string name="years">Vuosi(a)</string>
+    <string name="schedule_dose">Ajoitettu annos</string>
     <string name="schedule_picker_tag" translatable="false">schedule_picker</string>
     <string name="date_picker_tag" translatable="false">date_picker</string>
-    <string name="schedule_format"/>
+    <string name="schedule_format">%1$s\n\nAlkaa %2$s\n\nToistuu joka\n\n%3$d päivä, %4$d viikko,\n\n%5$d kuukausi, %6$d vuosi</string>
     <string name="utc" translatable="false">UTC</string>
-    <string name="fill_out_all_schedules"/>
-    <string name="fill_out_schedule"/>
-    <string name="next_dose_label"/>
-    <string name="taken"/>
-    <string name="not_taken"/>
-    <string name="sort"/>
+    <string name="fill_out_all_schedules">Täytä kaikki aikataulut ennen tallentamista</string>
+    <string name="fill_out_schedule">Täytä aikataulu ennen varmistusta</string>
+    <string name="next_dose_label">Seuraava annos: %1$s</string>
+    <string name="taken">Otettu</string>
+    <string name="not_taken">Ei otettu</string>
+    <string name="sort">Lajittele</string>
     <string name="sort_key" translatable="false">Sort</string>
-    <string name="restore_database"/>
-    <string name="back_up_database"/>
-    <string name="database_is_invalid"/>
-    <string name="database_restored"/>
-    <string name="took_it"/>
+    <string name="restore_database">Palauta tietokanta</string>
+    <string name="back_up_database">Varmuuskopioi tietokanta</string>
+    <string name="database_is_invalid">Tietokanta epäkelpo</string>
+    <string name="database_restored">Tietokanta palautettu</string>
+    <string name="took_it">Otettu</string>
     <string name="app_name_short"/>
-    <string name="remind_in_15"/>
-    <string name="dose_record_delete_warning"/>
-    <string name="record_delete_hint"/>
-    <string name="time_since_dose_sample">Suurin piirtein 0 päivä(ä), 0 tunti(a), and 0 minuutti(a) viime annoksen ottamisesta</string>
-    <string name="time_since_dose_template">Suurin piirtein %1$d päivä(ä), %2$d tunti(a), and %3$d minuutti(a) viime otetusta annoksesta</string>
+    <string name="remind_in_15">Muistuta minua 15 minuutissa</string>
+    <string name="dose_record_delete_warning">Annosmerkintä poistetaan pysyvästi.</string>
+    <string name="record_delete_hint">(Klikkaa pitkään merkintää poistaaksesi sen)</string>
+    <string name="time_since_dose_sample">Noin 0 päivä(ä), 0 tunti(a), and 0 minuutti(a) viime annoksen ottamisesta</string>
+    <string name="time_since_dose_template">Noin %1$d päivä(ä), %2$d tunti(a), and %3$d minuutti(a) viime otetusta annoksesta</string>
     <string name="require_photo_proof">Vaatii kuvatodisteen</string>
     <string name="image_path" translatable="false">images</string>
     <string name="file_provider" translatable="false">dev.corruptedark.diditakemymeds.fileprovider</string>
