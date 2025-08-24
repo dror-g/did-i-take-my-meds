@@ -29,7 +29,7 @@
     <string name="med_saved">Medicinering sparad</string>
     <string name="cancelled">Ny medicinering avbruten</string>
     <string name="time_24">H:mm</string>
-    <string name="time_12"/>
+    <string name="time_12"></string>
     <string name="sample_medicine">Exempelmedicin</string>
     <string name="midnight">12:00</string>
     <string name="sample_description">Det här är ett exempel på en beskrivning av en medicin. Det består av flera meningar och löper över flera rader.</string>
@@ -61,7 +61,7 @@
     <string name="medication_details">Medicindetaljer</string>
     <string name="edit_medication">Redigera medicin</string>
     <string name="about">Om</string>
-    <string name="app_description"/>
+    <string name="app_description"></string>
     <string name="support_me_on_liberapay">Stöd mig på Liberapay</string>
     <string name="view_the_project_on_github">Se projektet på GitHub</string>
     <string name="github_link" translatable="false">https://github.com/CorruptedArk/did-i-take-my-meds</string>
@@ -69,10 +69,10 @@
     <string name="play_release" translatable="false">playRelease</string>
     <string name="sorry">Ursäkta!</string>
     <string name="okay">Okej</string>
-    <string name="cannot_donate_explanation"/>
+    <string name="cannot_donate_explanation"></string>
     <string name="last_version_used_key" translatable="false">last_version_used</string>
     <string name="add_another_dose">Lägg till en annan dos</string>
-    <string name="taken_as_needed"/>
+    <string name="taken_as_needed">Tages efter behov</string>
     <string name="hello_blank_fragment">Hejsan blanka fragment</string>
     <string name="select_a_start_date">Startdatum</string>
     <string name="time_between_doses">Tid mellan doser:</string>
@@ -99,10 +99,10 @@
     <string name="took_it">Tog den</string>
     <string name="app_name_short">TJMM?</string>
     <string name="remind_in_15">Påminn om 15 minuter</string>
-    <string name="dose_record_delete_warning"/>
-    <string name="record_delete_hint"/>
+    <string name="dose_record_delete_warning">Dosposten kommer att raderas permanent.</string>
+    <string name="record_delete_hint">(Tryck länge på en post för att radera den)</string>
     <string name="time_since_dose_sample">Ungefär 0 dag(ar), 0 timma(r) och 0 minut(er) sedan senast tagen dos</string>
-    <string name="time_since_dose_template"/>
+    <string name="time_since_dose_template">Ungefär %1$d dag(ar), %2$d timm(e/ar) och %3$d minut(er) sedan den senast tagna dosen</string>
     <string name="require_photo_proof">Kräv fotografiskt bevis</string>
     <string name="image_path" translatable="false">images</string>
     <string name="file_provider" translatable="false">dev.corruptedark.diditakemymeds.fileprovider</string>
@@ -111,7 +111,7 @@
     <string name="dose_time_key" translatable="false">dose_time</string>
     <string name="no_image_available">Ingen bild tillgänglig</string>
     <string name="temp_dir" translatable="false">tmp</string>
-    <string name="record_detail_hint"/>
+    <string name="record_detail_hint">(Tryck på en post för att se detaljer)</string>
     <string name="time_taken_key" translatable="false">time_taken</string>
     <string name="take_med_key" translatable="false">take_med</string>
     <string name="back_up_successful">Säkerhetskopiering lyckad</string>
@@ -123,9 +123,9 @@
     <string name="undefined">Odefinierad</string>
     <string name="type_label_format">Typ: %1$s</string>
     <string name="sample_type_label">Typ: Odefinierad</string>
-    <string name="rx_number_hint"/>
-    <string name="rx_number_label_format"/>
-    <string name="sample_rx_number_label"/>
+    <string name="rx_number_hint"></string>
+    <string name="rx_number_label_format"></string>
+    <string name="sample_rx_number_label"></string>
     <string name="pharmacy">Apotek</string>
     <string name="pharmacy_label_format">Apotek: %1$s</string>
     <string name="sample_pharmacy_label">Apotek: Odefinierat</string>
@@ -141,7 +141,7 @@
     <string name="translation_credits">Brasiliansk portugisiska översättningar av mezysinc på GitHub, lnux-usr på GitHub och Card151915 på Weblate\n\nTyska översättningar av jpameli på GitHub\n\nFranska översättningar av Edanas på Weblate\n\nHebreiska översättningar av Yaron på Weblate\n\nFörenklad kinesiska översättningar av luxu på Weblate\n\nSpanska översättningar av sguinetti på Weblate, caos30 på Weblate och nzgha på Weblate\n\nKatalanska översättningar av caos30 på Weblate\n\nTurkiska översättningar av Lion på Weblate\n\nFelåtgärd av johannes87 på GitHub\n\n</string>
     <string name="app_widget_description">En widget som visar en enda medicin, tid tagen sedan den senaste tagna dosen och en knapp för att skicka in en tagen dos</string>
     <string name="choose_a_medication">Välj en medicin</string>
-    <string name="dose_update_warning"/>
+    <string name="dose_update_warning">Du kommer att uppdatera tiden då dosen togs samt radera det tillhörande bildbevis som eventuellt finns.</string>
     <string name="birth_control_schedule">Preventivmedelsschema</string>
     <string name="_21_7">21 + 7</string>
     <string name="_63_7">63 + 7</string>
