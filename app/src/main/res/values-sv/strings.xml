@@ -29,7 +29,7 @@
     <string name="med_saved">Medicinering sparad</string>
     <string name="cancelled">Ny medicinering avbruten</string>
     <string name="time_24">H:mm</string>
-    <string name="time_12"></string>
+    <string name="time_12"/>
     <string name="sample_medicine">Exempelmedicin</string>
     <string name="midnight">12:00</string>
     <string name="sample_description">Det här är ett exempel på en beskrivning av en medicin. Det består av flera meningar och löper över flera rader.</string>
@@ -61,7 +61,7 @@
     <string name="medication_details">Medicindetaljer</string>
     <string name="edit_medication">Redigera medicin</string>
     <string name="about">Om</string>
-    <string name="app_description"></string>
+    <string name="app_description"/>
     <string name="support_me_on_liberapay">Stöd mig på Liberapay</string>
     <string name="view_the_project_on_github">Se projektet på GitHub</string>
     <string name="github_link" translatable="false">https://github.com/CorruptedArk/did-i-take-my-meds</string>
@@ -69,7 +69,7 @@
     <string name="play_release" translatable="false">playRelease</string>
     <string name="sorry">Ursäkta!</string>
     <string name="okay">Okej</string>
-    <string name="cannot_donate_explanation"></string>
+    <string name="cannot_donate_explanation">Google tillåter inte att utvecklare inkluderar donationslänkar i sina appar för att försörja sig, såvida de inte är skattebefriade välgörenhetsorganisationer. Om du ändå vill stötta mig kan du leta upp CorruptedArk på Liberapay i en fristående webbläsare. Mitt kodförråd på GitHub är ett bra ställe att börja på.</string>
     <string name="last_version_used_key" translatable="false">last_version_used</string>
     <string name="add_another_dose">Lägg till en annan dos</string>
     <string name="taken_as_needed">Tages efter behov</string>
@@ -123,9 +123,9 @@
     <string name="undefined">Odefinierad</string>
     <string name="type_label_format">Typ: %1$s</string>
     <string name="sample_type_label">Typ: Odefinierad</string>
-    <string name="rx_number_hint"></string>
-    <string name="rx_number_label_format"></string>
-    <string name="sample_rx_number_label"></string>
+    <string name="rx_number_hint"/>
+    <string name="rx_number_label_format"/>
+    <string name="sample_rx_number_label"/>
     <string name="pharmacy">Apotek</string>
     <string name="pharmacy_label_format">Apotek: %1$s</string>
     <string name="sample_pharmacy_label">Apotek: Odefinierat</string>
