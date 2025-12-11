@@ -1,0 +1,11 @@
+v1.5.0
+
+Alterações
+- Ajuste das visualizações de texto para usar tamanhos de texto padronizados
+- Atualização das traduções para alemão por jpameli no GitHub
+
+Adições
+- Adição da opção de adicionar widgets simples à tela inicial para cada medicamento
+- Adição de traduções para chinês (simplificado) por luxu no Weblate
+- Adição de traduções para espanhol por sguinetti no Weblate e caos30 no Weblate
+- Adição de traduções para catalão por caos30 no Weblate
