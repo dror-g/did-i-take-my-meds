@@ -1,0 +1,12 @@
+v1.1.0
+
+Perubahan:
+- Penyesuaian kecil pada tampilan beberapa layar
+- Mengklik notifikasi kini membuka tampilan detail untuk obat terkait
+
+Penambahan:
+- Beberapa jadwal dosis per obat dengan waktu pengulangan yang bebas
+- Opsi untuk menambahkan obat yang diminum sesuai kebutuhan tanpa jadwal
+- Terjemahan bahasa Portugis Brasil oleh mezysinc di GitHub
+- Tombol kembali di toolbar
+- Opsi untuk mengurutkan berdasarkan waktu dosis terdekat dan berdasarkan nama obat

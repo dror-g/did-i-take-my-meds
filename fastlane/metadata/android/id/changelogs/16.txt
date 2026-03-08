@@ -1,0 +1,11 @@
+v1.2.4
+
+Perubahan
+- Ikon notifikasi dan warna teks aksi kini mematuhi WCAG, namun jika Anda mengganti tema perangkat, notifikasi yang sedang aktif tidak akan berubah warna agar tetap mematuhi. Notifikasi baru setelah perubahan akan kembali mematuhi.
+- Notifikasi kini seharusnya muncul kembali saat boot dan penggantian paket jika belum diminum, tetapi fitur ini bergantung pada apakah sistem mengizinkannya
+
+Penambahan
+- Aktivitas kini diperbarui saat dosis terdekat berubah
+
+Perbaikan
+- Memperbaiki masalah yang tidak memungkinkan jadwal dengan minggu bilangan bulat bukan nol

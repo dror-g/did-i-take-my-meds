@@ -1,0 +1,8 @@
+v1.2.6
+
+Perubahan
+- Mengaktifkan kembali penyegaran UI berkala tanpa menyebabkan pembekuan
+- Terjemahan bahasa Portugis Brasil diperbarui oleh lnux-usr di GitHub
+
+Penambahan
+- Menambahkan label pada aktivitas detail obat yang melacak jumlah waktu sejak dosis terakhir diminum

@@ -1,0 +1,13 @@
+v1.2.2
+
+Perubahan
+- Mengonversi multithreading ExecutorService ke coroutine Kotlin
+- Memperbarui warna agar mematuhi Pedoman Aksesibilitas Konten Web
+- Sesuai permintaan banyak pengguna, notifikasi kini akan ditutup setelah satu dosis diminum
+
+Penambahan
+- Menambahkan opsi untuk menghapus catatan dosis ketika tombol "diminum" ditekan secara tidak sengaja
+
+Perbaikan
+- Memperbaiki crash yang disebabkan oleh kegagalan saat mencoba mengambil data dari basis data
+- Memperbaiki pergantian tampilan yang aneh saat tombol kembali ditekan

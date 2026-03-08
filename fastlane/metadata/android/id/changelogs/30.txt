@@ -1,0 +1,5 @@
+v1.6.1
+
+Perbaikan
+- Mengatur RepeatScheduleDialog ke jadwal normal secara bawaan setiap kali dibuka
+- Memperbaiki tombol jadwal yang tidak melakukan apa pun saat ditambahkan dari jadwal kontrasepsi

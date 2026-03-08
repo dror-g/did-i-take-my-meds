@@ -1,3 +1,3 @@
-Aku Sudah Minum Obat Belum, Ya? (Did I Take My Meds?) membantu mengingatkan kapan Anda harus meminum obat. Aplikasi ini dirancang untuk membantu agar Anda tidak lupa minum obat dan agar Anda tidak meminum obat dalam dosis yang berlebihan.
+Apakah Saya Sudah Minum Obat? membantu melacak kapan harus minum obat. Aplikasi ini dirancang untuk membantu mencegah pengguna melewatkan dosis dan/atau overdosis.
 
- Aku Sudah Minum Obat Belum, Ya memungkinkan Anda untuk menyimpan berbagai obat dengan jadwal yang kompleks/rumit. Masing-masing jadwal obat akan mengingatkan Anda secara terpisah dari satu sama lain. Selain itu, Anda juga dapat mencatat pada waktu berapa dosis suatu obat Anda minum. Aplikasi ini dapat membantu Anda agar meminum obat secara tepat dosis dan tepat waktu.
+Apakah Saya Sudah Minum Obat? memungkinkan pengguna menyimpan beberapa obat dengan jadwal yang kompleks. Setiap obat dapat memicu notifikasi pengingat yang independen. Selain itu, aplikasi ini memungkinkan pengguna mencatat kapan mereka meminum satu dosis. Sebagai bagian dari rutinitas pengobatan, aplikasi ini dapat membantu mencegah overdosis dan dosis yang terlewat.

@@ -1,0 +1,11 @@
+v1.5.0
+
+Perubahan
+- Menyesuaikan tampilan teks agar menggunakan ukuran teks yang terstandarisasi
+- Memperbarui terjemahan bahasa Jerman oleh jpameli di GitHub
+
+Penambahan
+- Menambahkan opsi untuk menambahkan widget layar utama sederhana untuk setiap obat
+- Menambahkan terjemahan bahasa Tionghoa (Sederhana) oleh luxu di Weblate
+- Menambahkan terjemahan bahasa Spanyol oleh sguinetti di Weblate dan caos30 di Weblate
+- Menambahkan terjemahan bahasa Katalan oleh caos30 di Weblate

@@ -1,0 +1,4 @@
+v1.2.3
+
+Perbaikan
+- Memperbaiki aplikasi yang tidak menerima intent boot atau intent pembaruan paket

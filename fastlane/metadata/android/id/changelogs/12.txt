@@ -1,0 +1,16 @@
+v1.2.0
+
+Perubahan
+- Memindahkan fungsi 'tambah obat' ke tombol aksi mengambang
+- Memperbarui terjemahan bahasa Jerman oleh jpameli di GitHub
+- Menyesuaikan margin agar tata letak terlihat lebih baik
+- Memperbarui terjemahan bahasa Portugis Brasil oleh mezysinc di GitHub
+- Mengubah label peluncur bawaan menjadi singkatan "DITMM?"
+
+Penambahan
+- Menambahkan pencadangan dan pemulihan basis data
+- Menambahkan aksi notifikasi untuk minum obat
+- Menambahkan aksi notifikasi untuk mengirim ulang notifikasi dalam 15 menit
+
+Perbaikan
+- Memperbaiki crash yang disebabkan oleh klik pada notifikasi untuk obat yang telah dihapus

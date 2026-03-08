@@ -1,0 +1,12 @@
+v1.3.0
+
+Perubahan
+- Meningkatkan padding
+- Pencadangan baru kini dalam format zip untuk menyertakan gambar (Pencadangan lama masih dapat dipulihkan)
+
+Penambahan
+- Menambahkan opsi untuk mewajibkan foto saat minum obat
+- Menambahkan tampilan untuk melihat detail catatan dosis
+
+Perbaikan
+- Memperbaiki beberapa string format bahasa Portugis Brasil

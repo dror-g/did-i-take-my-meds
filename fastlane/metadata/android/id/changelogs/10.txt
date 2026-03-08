@@ -1,5 +1,5 @@
 v1.1.3
 
-Perbaikan: 
-- Memperbaiki penghitungan dosis terdekat yang salah untuk dosis tambahan dengan waktu yang berbeda dari dosis pertama dalam daftar 
-- Memperbaiki tampilanwaktu yang salah antara tampilan pada tombol pilih jadwal untuk dosis tambahan dan waktu yang berbeda dari dosis pertama dalam daftar
+Perbaikan:
+- Memperbaiki perhitungan dosis terdekat yang salah untuk dosis tambahan dengan jeda waktu yang berbeda dari dosis pertama dalam daftar
+- Memperbaiki tampilan jeda waktu yang salah pada tombol pemilihan jadwal untuk dosis tambahan dengan jeda waktu yang berbeda dari dosis pertama dalam daftar

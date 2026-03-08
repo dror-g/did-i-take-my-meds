@@ -1,0 +1,18 @@
+v1.4.0
+
+Perubahan
+- Jenis obat kini ditampilkan dalam daftar utama obat
+- Tampilan telah diatur ulang dan disesuaikan untuk mengakomodasi opsi baru
+- Terjemahan bahasa Jerman telah diperbarui oleh jpameli di GitHub
+
+Penambahan
+- Menambahkan opsi untuk membuat suatu obat tidak aktif
+- Menambahkan opsi untuk menentukan jenis obat
+- Menambahkan opsi untuk mengurutkan berdasarkan jenis obat
+- Menambahkan opsi untuk menentukan nomor resep untuk setiap obat
+- Menambahkan opsi untuk menentukan ukuran dosis untuk setiap obat
+- Menambahkan opsi untuk menentukan nama apotek untuk setiap obat
+- Menambahkan opsi untuk melacak jumlah dosis yang tersisa untuk setiap obat
+- Menambahkan opsi untuk menentukan apakah setiap obat harus diminum bersama makanan
+- Menambahkan terjemahan bahasa Prancis oleh Edanas di Weblate
+- Menambahkan terjemahan bahasa Ibrani oleh Yaron di Weblate

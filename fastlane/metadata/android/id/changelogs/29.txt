@@ -1,0 +1,7 @@
+v1.6.0
+
+Perubahan
+- Pemilih angka jadwal kini tidak memiliki batas atas
+
+Penambahan
+- Opsi baru untuk dengan mudah menambahkan jadwal kontrasepsi 21+7 dan 63+7

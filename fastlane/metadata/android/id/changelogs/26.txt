@@ -1,0 +1,8 @@
+v1.5.1
+
+Perubahan
+- Memperbarui terjemahan bahasa Tionghoa Sederhana
+- Memperbarui terjemahan bahasa Ibrani
+
+Penambahan
+- Menambahkan opsi untuk mengubah waktu diminum untuk dosis sebelumnya

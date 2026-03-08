@@ -1,0 +1,8 @@
+v1.5.2
+
+Perubahan
+- Memperbarui terjemahan bahasa Ibrani
+- Memperbarui terjemahan bahasa Tionghoa Sederhana
+
+Perbaikan
+- Memperbaiki format tanggal dan waktu bahasa Tionghoa Sederhana

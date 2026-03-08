@@ -1,0 +1,4 @@
+v1.0.5
+
+Perbaikan:
+- Memperbaiki notifikasi yang tidak diatur setelah menambahkan obat

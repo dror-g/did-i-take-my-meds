@@ -1,0 +1,4 @@
+v1.0.2
+
+Perubahan:
+- Membuat notifikasi tetap terpicu pada waktu yang tepat meskipun perangkat sedang idle

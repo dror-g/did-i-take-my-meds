@@ -1,0 +1,6 @@
+v1.5.3
+
+Perubahan
+- Memperbarui terjemahan bahasa Spanyol oleh nzgha di Weblate
+- Memperbarui terjemahan bahasa Portugis Brasil oleh Card151915 di Weblate
+- Memperbarui terjemahan bahasa Jerman oleh jpameli di GitHub
