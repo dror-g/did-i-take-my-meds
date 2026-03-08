@@ -29,7 +29,7 @@
     <string name="med_saved">Obat tersimpan</string>
     <string name="cancelled">Obat baru batal tersimpan</string>
     <string name="time_24">J:mm</string>
-    <string name="time_12">j:mma</string>
+    <string name="time_12">h:mma</string>
     <string name="sample_medicine">Contoh Obat</string>
     <string name="midnight">12:00AM</string>
     <string name="sample_description">Berikut ini adalah contoh deskripsi sebuah obat. Deskripsi ini meliputi beberapa kalimat dan baris.</string>
@@ -69,11 +69,11 @@
     <string name="play_release" translatable="false">playRelease</string>
     <string name="sorry">Maaf!</string>
     <string name="okay">Oke</string>
-    <string name="cannot_donate_explanation">Google tidak memperbolehkan pengembang untuk menempatkan tautan donasi di aplikasi untuk mendukung diri mereka sendiri jika mereka tidak badan amal bebas pajak. Jika Anda masih ingin mendukung saya, Anda bisa menemukan CorruptedArk di Liberapay di peramban yang berbeda. Repositori GitHub saya merupakan tempat bagus untuk memulai.</string>
+    <string name="cannot_donate_explanation">Google tidak mengizinkan pengembang menempatkan tautan donasi di dalam aplikasi untuk mendukung diri mereka sendiri jika mereka bukan badan amal bebas pajak. Jika Anda masih ingin mendukung saya, Anda dapat menemukan CorruptedArk di Liberapay melalui peramban terpisah. Repositori GitHub saya adalah tempat yang baik untuk memulai.</string>
     <string name="last_version_used_key" translatable="false">last_version_used</string>
     <string name="add_another_dose">Tambahkan dosis yang lain</string>
     <string name="taken_as_needed">Obat diminum sesuai yang dibutuhkan</string>
-    <string name="hello_blank_fragment">Halo pecahan kosong</string>
+    <string name="hello_blank_fragment">Halo fragmen kosong</string>
     <string name="select_a_start_date">Tanggal dimulai</string>
     <string name="time_between_doses">Waktu antara dosis:</string>
     <string name="days">Hari</string>
@@ -120,7 +120,7 @@
     <string name="back_up_successful">Pencadangan berhasil</string>
     <string name="back_up_failed">Pencadangan gagal</string>
     <string name="dose_details">Detail Obat</string>
-    <string name="medication_active">Pengobatan yang aktif</string>
+    <string name="medication_active">Obat aktif</string>
     <string name="inactive">Tidak aktif</string>
     <string name="medication_type">Jenis Obat</string>
     <string name="undefined">Takterdefinisikan</string>
