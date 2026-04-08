@@ -29,7 +29,7 @@
     <string name="med_saved">Medicinering sparad</string>
     <string name="cancelled">Ny medicinering avbruten</string>
     <string name="time_24">H:mm</string>
-    <string name="time_12"/>
+    <string name="time_12">h:mma</string>
     <string name="sample_medicine">Exempelmedicin</string>
     <string name="midnight">12:00</string>
     <string name="sample_description">Det här är ett exempel på en beskrivning av en medicin. Det består av flera meningar och löper över flera rader.</string>
@@ -123,9 +123,9 @@
     <string name="undefined">Odefinierad</string>
     <string name="type_label_format">Typ: %1$s</string>
     <string name="sample_type_label">Typ: Odefinierad</string>
-    <string name="rx_number_hint"/>
-    <string name="rx_number_label_format"/>
-    <string name="sample_rx_number_label"/>
+    <string name="rx_number_hint">Rx #</string>
+    <string name="rx_number_label_format">Rx #: %1$s</string>
+    <string name="sample_rx_number_label">Rx #: Odefinierad</string>
     <string name="pharmacy">Apotek</string>
     <string name="pharmacy_label_format">Apotek: %1$s</string>
     <string name="sample_pharmacy_label">Apotek: Odefinierat</string>
