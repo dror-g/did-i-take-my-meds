@@ -1,3 +1,22 @@
+/*
+ * Did I Take My Meds? is a FOSS app to keep track of medications
+ * Did I Take My Meds? is designed to help prevent a user from skipping doses and/or overdosing
+ *     Copyright (C) 2021  Noah Stanford <noahstandingford@gmail.com>
+ *
+ *     Did I Take My Meds? is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     Did I Take My Meds? is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package dev.corruptedark.diditakemymeds.util.notifications
 
 import android.content.BroadcastReceiver
@@ -8,15 +27,13 @@ import dev.corruptedark.diditakemymeds.activities.main.MainActivity
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.models.DoseRecord
 import dev.corruptedark.diditakemymeds.data.models.Medication
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Calendar
-import java.util.concurrent.Executors
 
 
 class ActionReceiver : BroadcastReceiver() {
-    private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     companion object {
         const val NOTIFY_ACTION = "NOTIFY"
@@ -26,30 +43,45 @@ class ActionReceiver : BroadcastReceiver() {
         const val REMIND_DELAY = 15 //minutes
         const val CANCEL_DELAY = 2000L //milliseconds
 
+        fun onStartEverything(context: Context) {
+            val medications = medicationDao(context).getAllRaw()
+            medications.forEach { medication ->
+                medication.updateStartsToFuture()
+                if (medication.shouldNotify()) {
+                    AlarmIntentManager.scheduleMedicationAlarm(context, medication)
+                    if (System.currentTimeMillis() > medication.calculateClosestDose().timeInMillis
+                        && !medication.closestDoseAlreadyTaken()
+                    ) {
+                        NotificationsUtil.notifyOnMainChannel(context, medication)
+                    }
+                }
+            }
+            medicationDao(context).update(medications)
+        }
     }
 
 
     override fun onReceive(context: Context, intent: Intent) {
         NotificationsUtil.createNotificationChannels(context)
 
-        GlobalScope.launch(dispatcher) {
-            when (intent.action) {
-                Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_LOCKED_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
-                    onStartEverythingAction(context)
-                }
+        val pendingResult = goAsync()
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                when (intent.action) {
+                    NOTIFY_ACTION -> {
+                        onNotifyAction(context, intent)
+                    }
 
-                NOTIFY_ACTION -> {
-                    //Handle alarm
-                    onNotifyAction(context, intent)
-                }
+                    TOOK_MED_ACTION -> {
+                        onTookMedAction(context, intent)
+                    }
 
-                TOOK_MED_ACTION -> {
-                    onTookMedAction(context, intent)
+                    REMIND_ACTION -> {
+                        onRemindAction(context, intent)
+                    }
                 }
-
-                REMIND_ACTION -> {
-                    onRemindAction(context, intent)
-                }
+            } finally {
+                pendingResult.finish()
             }
         }
     }
@@ -122,21 +154,6 @@ class ActionReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun onStartEverythingAction(context: Context) {
-        val medications = medicationDao(context).getAllRaw()
-        medications.forEach { medication ->
-            medication.updateStartsToFuture()
-            if (medication.shouldNotify()) {
-                //Create alarm
-                AlarmIntentManager.scheduleMedicationAlarm(context, medication)
-                if (System.currentTimeMillis() > medication.calculateClosestDose().timeInMillis && !medication.closestDoseAlreadyTaken()) {
-                    NotificationsUtil.notifyOnMainChannel(context, medication)
-                }
-            }
-        }
-        medicationDao(context).update(medications)
-    }
-
     private fun onNotifyAction(context: Context, intent: Intent) {
         val medication = medicationDao(context).getById(
             intent.getLongExtra(
@@ -153,4 +170,3 @@ class ActionReceiver : BroadcastReceiver() {
         }
     }
 }
-

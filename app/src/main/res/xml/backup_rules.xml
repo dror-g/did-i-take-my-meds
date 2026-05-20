@@ -15,11 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see https://www.gnu.org/licenses.-->
-<paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <files-path
-        name="image_path"
-        path="@string/image_path" />
-    <files-path
-        name="tmp"
-        path="@string/temp_dir" />
-</paths>
+<full-backup-content>
+    <!-- Exclude the database to protect medication data from cloud backup -->
+    <exclude domain="database" path="medications" />
+    <exclude domain="database" path="medications.db" />
+    <exclude domain="database" path="medications-wal" />
+    <exclude domain="database" path="medications-shm" />
+    <!-- Exclude proof images and temp files -->
+    <exclude domain="file" path="images/" />
+    <exclude domain="file" path="tmp/" />
+</full-backup-content>

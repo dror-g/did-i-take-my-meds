@@ -26,13 +26,11 @@ import androidx.lifecycle.Observer
 import dev.corruptedark.diditakemymeds.data.db.medicationDao
 import dev.corruptedark.diditakemymeds.data.models.Medication
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * Implementation of App Widget functionality.
@@ -72,7 +70,7 @@ abstract class SimpleSingleMedWidgetBase(protected val layoutId: Int) : AppWidge
     }
 
     private fun startRefresherLoop(context: Context): Job {
-        return GlobalScope.launch(Dispatchers.IO) {
+        return mainScope.launch(Dispatchers.IO) {
 
             while (medicationDao(context).getAllRaw().isNotEmpty()) {
                 val medication = medicationDao(context).getAllRaw()
@@ -133,7 +131,7 @@ abstract class SimpleSingleMedWidgetBase(protected val layoutId: Int) : AppWidge
             medicationDao(context).getAllLiveData().removeObserver(this)
         }
 
-        runBlocking {
+        mainScope.launch {
             stopRefresherLoop(refresher)
         }
     }

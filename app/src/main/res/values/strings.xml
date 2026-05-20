@@ -155,4 +155,5 @@
     <string name="pref_key_app_theme" translatable="false">current_theme</string>
     <string name="main_menu_light_theme" >Light theme</string>
     <string name="main_menu_dark_theme" >Dark theme</string>
+    <string name="backup_unencrypted_warning">Backups are saved as unencrypted ZIP files containing all medication data and photos. Keep backup files secure and delete them when no longer needed.</string>
 </resources>

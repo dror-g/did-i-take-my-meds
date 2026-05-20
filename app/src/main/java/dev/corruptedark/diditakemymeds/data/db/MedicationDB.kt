@@ -250,6 +250,19 @@ abstract class MedicationDB : RoomDatabase() {
                     TEST_DATABASE_NAME
                 )
                     .addMigrations(*MIGRATIONS).build()
+
+                // Verify database integrity with SQLite PRAGMA
+                val db = testDatabase.openHelper.writableDatabase
+                val cursor = db.query("PRAGMA quick_check(1)", null)
+                cursor.moveToFirst()
+                val integrityOk = cursor.getString(0) == "ok"
+                cursor.close()
+
+                if (!integrityOk) {
+                    testDatabase.close()
+                    return false
+                }
+
                 val hasEntries = testDatabase.medicationDao().getAllRaw().isNotEmpty()
                 testDatabase.close()
                 hasEntries

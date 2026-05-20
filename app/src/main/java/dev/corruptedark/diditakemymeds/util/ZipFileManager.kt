@@ -92,13 +92,22 @@ object ZipFileManager {
             }
             while (entry != null) {
                 if (entry.isDirectory) {
-                    val file = File(folder.path + File.separator + entry.name)
+                    val file = File(folder, entry.name)
+
+                    if (!file.canonicalPath.startsWith(folder.canonicalPath + File.separator)) {
+                        throw SecurityException("Zip entry outside target directory: ${entry.name}")
+                    }
 
                     if (!file.exists()) {
                         file.mkdirs()
                     }
                 } else {
-                    val file = File(folder.path + File.separator + entry.name)
+                    val file = File(folder, entry.name)
+
+                    if (!file.canonicalPath.startsWith(folder.canonicalPath + File.separator)) {
+                        throw SecurityException("Zip entry outside target directory: ${entry.name}")
+                    }
+
                     val bufferedStream = file.outputStream().buffered(BUFFER_SIZE)
 
                     var byteCount = inStream.read(buffer)

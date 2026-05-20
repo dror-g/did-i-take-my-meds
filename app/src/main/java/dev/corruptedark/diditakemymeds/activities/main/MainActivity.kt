@@ -35,6 +35,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.getSystemService
 import androidx.core.view.iterator
@@ -307,13 +308,18 @@ class MainActivity :
 
 
     private fun backUpDatabase() {
-        // Intent.normalizeMimeType(MIME_TYPES), intent.addCategory(Intent.CATEGORY_OPENABLE)
-        lifecycleScope.launch(lifecycleDispatcher) {
-            val suggestedName = StorageManager.suggestBackupFileName()
-            val backupUri = ActivityResultManager.getInstance()
-                .createDocument(MIME_TYPES, suggestedName) ?: return@launch
-            doBackup(context, backupUri)
-        }
+        AlertDialog.Builder(this)
+            .setMessage(R.string.backup_unencrypted_warning)
+            .setPositiveButton(R.string.okay) { _, _ ->
+                lifecycleScope.launch(lifecycleDispatcher) {
+                    val suggestedName = StorageManager.suggestBackupFileName()
+                    val backupUri = ActivityResultManager.getInstance()
+                        .createDocument(MIME_TYPES, suggestedName) ?: return@launch
+                    doBackup(context, backupUri)
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private suspend fun cancelJob(job: Job?) {
