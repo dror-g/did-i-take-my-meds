@@ -32,6 +32,8 @@ Did I Take My Meds? allows a user save multiple medications with complex schedul
 
 ---
 ## Credits
+[Original](https://github.com/CorruptedArk/did-i-take-my-meds) app by [CorruptedArk](https://github.com/CorruptedArk)
+
 Brazilian Portuguese translations by [mezysinc](https://github.com/mezysinc) and [lnux-usr](https://github.com/lnux-usr)
 
 German translations by [jpameli](https://github.com/jpameli)
@@ -48,6 +50,9 @@ Catalan translations by [caos30](https://hosted.weblate.org/user/caos30/)
 
 Bug fix by [johannes87](https://github.com/johannes87)
 
+Light mode, code refresh and improvements by [Kreiri](https://github.com/Kreiri)
+
+Automated release merging forks & PRs by [dror-g](https://github.com/dror-g)
 
 ***Is your name missing from this list?*** <br/>
 If so, please submit an issue or send me an email at noahstandingford@gmail.com and I will correct it
